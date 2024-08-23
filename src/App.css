@@ -1,0 +1,11 @@
+body, html {
+font-family: 'Segoe UI', sans-serif;
+}
+
+.MuiTypography, 
+.MuiFormControlLabel-label, 
+.MuiInputBase-root, 
+.MuiButton-root {
+  font-family: 'Segoe UI', sans-serif;
+}
+
