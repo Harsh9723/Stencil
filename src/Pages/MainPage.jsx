@@ -31,7 +31,7 @@ export default function MainPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const hexColor = data.colortheme.split(',')[0];
+    const hexColor = data.colortheme.split(',')[1];
 
     const hex2rgb = (hex) => {
       const r = parseInt(hex.slice(1, 3), 16);
