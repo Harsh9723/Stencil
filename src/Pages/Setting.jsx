@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import data from '../Links.json';
 import { IconButton, Tooltip, Typography, Box, Link, TextField, Button } from '@mui/material';
-// import Theme from '../Components/Theme';
+import useTheme from '../Components/Theme';
 
-const Setting = ({}) => {
+const Setting = () => {
   const navigate = useNavigate();
 
+  // Apply the theme using the custom hook
+  useTheme(data.colortheme);
 
   const handleClick = () => {
     window.open(data.logourl, '_blank');
@@ -16,6 +18,7 @@ const Setting = ({}) => {
   const handleBackClick = () => { 
     navigate('/mainpage');
   };
+
   const CustomTypography = ({ children, ...props }) => (
     <Typography variant="body2" sx={{ fontSize: '12px', fontFamily:['Segoe UI', 'sans-serif'] }} {...props}>
       {children}
@@ -24,7 +27,6 @@ const Setting = ({}) => {
 
   return (
     <div
-    
       style={{
         backgroundColor: 'var(--bg-color)',
         minHeight: '100vh',
@@ -102,7 +104,6 @@ const Setting = ({}) => {
             },
           }}
           fullWidth
-          
         />
         <TextField 
           label={<CustomTypography>Subscription Number</CustomTypography>} 
@@ -110,8 +111,7 @@ const Setting = ({}) => {
           placeholder='Enter Purchased Subscription number'
           InputLabelProps={{ style: { color: 'var(--font-color)' } }}
           InputProps={{
-            style: { color: 'var(--font-color)', borderColor: 'var(--font-color)',  // Adjust padding to reduce height
-              fontSize: '12px'   },
+            style: { color: 'var(--font-color)', borderColor: 'var(--font-color)', fontSize: '12px' },
           }}
           sx={{
             '.MuiOutlinedInput-root': {
@@ -122,7 +122,7 @@ const Setting = ({}) => {
                 borderColor: 'var(--font-color)',
               },
               '&.Mui-focused fieldset': {
-                borderColor: 'var(--font-color)', fontSize:'12px'
+                borderColor: 'var(--font-color)',
               },
             },
           }}
@@ -131,11 +131,15 @@ const Setting = ({}) => {
       </Box>
       
       <Button 
-        // color='var(--button-color)' 
         variant='contained' 
         sx={{ 
           padding: '10px 20px', 
-          alignSelf: 'flex-center' 
+          alignSelf: 'flex-center',
+          backgroundColor: 'var(--font-color)', // Ensure button color is properly set based on your needs
+          color: 'var(--bg-color)',
+          '&:hover': {
+            backgroundColor: 'var(--font-color)',
+          },
         }}
       >
         SAVE
