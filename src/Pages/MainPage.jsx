@@ -378,7 +378,7 @@ export default function MainPage() {
       if (!map[eqTypeKey]) {
         map[eqTypeKey] = {
           title: EQTYPE ,
-          icon: <img src={`assets/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
+          icon: <img src={`./assets/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
           key: eqTypeKey,
           children: []
         };
