@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, TextField, Typography, IconButton, Grid, Tooltip, CircularProgress, } from '@mui/material';
+import React, { useContext, useEffect, useState } from 'react';
+import { Box, TextField, Typography, IconButton, Grid, Tooltip, CircularProgress, Snackbar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Backdrop from '@mui/material/Backdrop';
 import data from '../Links.json';
@@ -13,8 +13,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
-import Theme from '../Components/Theme';
+import useTheme from '../Components/Theme';
 import axios from 'axios';
+import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, FormGroup, Checkbox, Button } from '@mui/material';
+
+
 
 
 export default function MainPage() {
@@ -28,29 +31,17 @@ export default function MainPage() {
   const [selectedProductline, setSelectProductLine] = useState('')
   const [productnumber, setProductNumber] = useState([])
   const [selectedproductnumber, setSelectedProductNumber] = useState('')
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [keyword, setKeyword] = useState('');
+  const [dtmanufacturers, setDtManufacturers] = useState([]);
+  const [selecteddtManufacturers, setSelectedDtManufacturers] = useState([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [treeData, setTreeData] = useState([]);
   const navigate = useNavigate();
+ 
 
-  useEffect(() => {
-    const hexColor = data.colortheme.split(',')[1];
 
-    const hex2rgb = (hex) => {
-      const r = parseInt(hex.slice(1, 3), 16);
-      const g = parseInt(hex.slice(3, 5), 16);
-      const b = parseInt(hex.slice(5, 7), 16);
-      return { r, g, b };
-    };
-
-    const rgbColor = hex2rgb(hexColor);
-    const fontColor = (rgbColor.r + rgbColor.g + rgbColor.b) > (255 * 4) / 2
-      ? 'rgb(0, 0, 0)'
-      : 'rgb(255, 255, 255)';
-
-    document.documentElement.style.setProperty('--font-color', fontColor);
-    document.documentElement.style.setProperty('--bg-color', hexColor);
-    document.documentElement.style.setProperty('--black-font', !fontColor);
-
-    console.log(`Font color set to ${fontColor} based on hex: ${hexColor} and RGB: (${rgbColor.r}, ${rgbColor.g}, ${rgbColor.b})`);
-  }, [data]);
   useEffect(() => {
     const fetchManufacturers = async () => {
       setLoading(true);
@@ -62,11 +53,13 @@ export default function MainPage() {
           Models: null,
         });
         const manufacturersData = response.data.Data;
+        console.log('main', manufacturersData)
         setManufacturers(manufacturersData);
-  
-        // Automatically select if only one manufacturer is available
+
         if (manufacturersData.length === 1) {
           setSelectedManufacturer(manufacturersData[0].MfgAcronym);
+          
+          
         }
       } catch (error) {
         console.error('Error fetching manufacturers:', error);
@@ -75,7 +68,6 @@ export default function MainPage() {
     };
     fetchManufacturers();
   }, []);
-  
 
   useEffect(() => {
     if (selectedManufacturer) {
@@ -91,7 +83,7 @@ export default function MainPage() {
           });
           const eqTypesData = response.data.Data;
           setEqTypes(eqTypesData);
-  
+
           // Automatically select if only one equipment type is available
           if (eqTypesData.length === 1) {
             setSelectedEqType(eqTypesData[0]);
@@ -104,7 +96,7 @@ export default function MainPage() {
       fetchEqTypes();
     }
   }, [selectedManufacturer]);
-  
+
 
   useEffect(() => {
     if (selectedManufacturer && selectedEqType) {
@@ -120,7 +112,7 @@ export default function MainPage() {
           });
           const productLineData = response.data.Data;
           setProductLine(productLineData);
-  
+
           // Automatically select if only one product line is available
           if (productLineData.length === 1) {
             setSelectProductLine(productLineData[0]);
@@ -133,7 +125,7 @@ export default function MainPage() {
       fetchProductLine();
     }
   }, [selectedManufacturer, selectedEqType]);
-  
+
 
   useEffect(() => {
     if (selectedManufacturer && selectedEqType && selectedProductline) {
@@ -150,7 +142,7 @@ export default function MainPage() {
           });
           const productNumberData = response.data.Data;
           setProductNumber(productNumberData);
-  
+
           // Automatically select if only one product number is available
           if (productNumberData.length === 1) {
             setSelectedProductNumber(productNumberData[0]);
@@ -163,24 +155,35 @@ export default function MainPage() {
       fetchProductNumber();
     }
   }, [selectedManufacturer, selectedEqType, selectedProductline]);
-  
+
   const handleManufacturerChange = (event) => {
     setSelectedManufacturer(event.target.value);
-    setSelectedEqType(''); // Reset selected equipment type when manufacturer changes
+  
+    setSelectedEqType('');
+    setSelectProductLine('')
+    setSelectedProductNumber('')
+    setEqTypes([]);
+    setProductLine([]);
+    setProductNumber([]);
   };
 
   const handleEqTypeChange = (event) => {
     setSelectedEqType(event.target.value);
     setSelectProductLine('')
+    setSelectedProductNumber('')
+    setProductLine([])
+    setProductNumber([])
   }
   const handleproductlinechange = (event) => {
     setSelectProductLine(event.target.value)
     setSelectedProductNumber('')
+    setProductNumber([])
+
   }
-const handleproductnumber = (event) => {
-  setSelectedProductNumber(event.target.value)
-}
-   const handleSettingClick = () => {
+  const handleproductnumber = (event) => {
+    setSelectedProductNumber(event.target.value)
+  }
+  const handleSettingClick = () => {
     navigate('/setting');
   };
 
@@ -188,438 +191,782 @@ const handleproductnumber = (event) => {
     window.open(data.logourl, '_blank');
   };
 
-  const handlesearchclick = () => {
-    if (selectedManufacturer && selectedEqType && selectedProductline && selectedproductnumber) {
-      const search = async () => {
-        try {
-          const response = await axios.post("http://localhost:8000/library/SearchLibraryNew", {
-            Email: "",
-            SubNo: "000000000000000000001234",
-            FullLib: false,
-            // ParamXML: `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer}</SelectedMfg><selectedEqType>${selectedEqType}</selectedEqType><selectedProductline>${selectedProductline}</selectedProductline><SelectedMfgProdNo>${selectedproductnumber}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`
-            ParamXML:`<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer}</SelectedMfg><SelectedEqType>${selectedEqType}</SelectedEqType><SelectedMfgProdLine>${selectedProductline}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`,
-            Settings: {
-              RememberLastSearchCount: 16,
-              IncludeRelatedManufacturers: true,
-              NotifyResultsExceedCount: 500,
-              NotifyResultsExceedCountCheck: true,
-              RememberLastSearchCountCheck: true,
-              IsGroupOrderAsc1: true,
-              IsGroupOrderAsc2: true,
-              IsGroupOrderAsc3: true,
-              IsGroupOrderAsc4: true,
-              TreeGroupBy1: "Manufacturer",
-              TreeGroupBy2: "Equipment Type",
-              TreeGroupBy3: "Product Line",
-              TreeGroupBy4: 'Product/Model Number'
-            }
-          });
-          const searchresponse = response.data;
-          console.log('123', searchresponse);
-        } catch (error) {
-          console.error(error);
-        }
-      };
+  // const searchSolution = () => {
+  //   const search = async () => {
+  //     try {
+  //       const response = await axios.post("http://localhost:8000/library/SearchLibraryNew", {
+  //         Email: "",
+  //         SubNo: "000000000000000000001234",
+  //         FullLib: false,
+  //         ParamXML: `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductline || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`,
+  //         Settings: {
+  //           RememberLastSearchCount: 16,
+  //           IncludeRelatedManufacturers: true,
+  //           NotifyResultsExceedCount: 500,
+  //           NotifyResultsExceedCountCheck: true,
+  //           RememberLastSearchCountCheck: true,
+  //           IsGroupOrderAsc1: true,
+  //           IsGroupOrderAsc2: true,
+  //           IsGroupOrderAsc3: true,
+  //           IsGroupOrderAsc4: true,
+  //           TreeGroupBy1: "Manufacturer",
+  //           TreeGroupBy2: "Equipment Type",
+  //           TreeGroupBy3: "Product Line",
+  //           TreeGroupBy4: "Product/Model Number"
+  //         }
+  //       });
+  //       const searchresponse =  response.data.Data.SearchData.dtSearchResults;
+  //       console.log('123', searchresponse);
+  //       const solutiontree = transformToTreeData(searchresponse)
+  //       setTreeData(solutiontree)
+
+  //       if(searchresponse){
+  //         navigate('/tree', {state : {treeData : solutiontree}})
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   };
+
+  //   search();
+  // };
+
+
+  useEffect(() => {
+    if (keyword) {
+      const matchedManufacturers = manufacturers.filter((manufacturer) =>
+        manufacturer.MfgAcronym.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (matchedManufacturers.length > 0) {
+        console.log('Matched Manufacturers:', matchedManufacturers);
+      } else {
+        console.log('No matching manufacturers found');
+      }
+    }
+  }, [keyword, manufacturers]);
+
+
+  //   const map = {};
+  //   const tree = [];
+
+  //   result.forEach(item => {
+  //     const {
+  //       MfgAcronym, // Manufacturer key
+  //       Manufacturer, // Manufacturer title
+  //       EQTYPE, // Equipment Type key
+  //       EquipmentType, // Equipment Type title
+  //       MFGPRODLINE, // Product Line key
+  //       ProductLine, // Product Line title
+  //       MFGPRODNO, // Product Number title
+  //       EQID // Product Number key
+  //     } = item;
+
+  //     // Add Manufacturer to tree if not already present
+  //     if (!map[MfgAcronym]) {
+  //       map[MfgAcronym] = { title: Manufacturer, key: MfgAcronym, children: [] };
+  //       tree.push(map[MfgAcronym]);
+  //     }
+
+  //     // Add Equipment Type to Manufacturer if not already present
+  //     if (!map[EQTYPE]) {
+  //       map[EQTYPE] = { title: EQTYPE, key: EQTYPE,  children: [] };
+  //       map[MfgAcronym].children.push(map[EQTYPE]);
+  //     }
+
+  //     // Add Product Line to Equipment Type if not already present
+  //     if (!map[MFGPRODLINE]) {
+  //       map[MFGPRODLINE] = { title: MFGPRODLINE, key: MFGPRODLINE, children: [] };
+  //       map[EQTYPE].children.push(map[MFGPRODLINE]);
+  //     }
+
+  //     // Add Product Number to Product Line
+  //     if (!map[MFGPRODNO]) {
+  //       map[EQID] = { title: MFGPRODNO, key: EQID, children: [] };
+  //       map[MFGPRODLINE].children.push(map[EQID]);
+  //     }
+  //   });
+
+  //   console.log('Transformed Tree Data:', tree);
+  //   return tree;
+  // };
+
+  // const transformToTreeData = (result) => {
+  //   const map = {};
+  //   const tree = [];
+
+  //   result.forEach(item => {
+  //     const {
+  //       MfgAcronym, // Manufacturer key
+  //       Manufacturer, // Manufacturer title
+  //       EQTYPE, // Equipment Type key
+  //       EquipmentType, // Equipment Type title
+  //       MFGPRODLINE, // Product Line key
+  //       ProductLine, // Product Line title
+  //       MFGPRODNO, // Product Number title
+  //       EQID // Product Number key
+  //     } = item;
+
+  //     // Add Manufacturer to tree if not already present
+  //     if (!map[MfgAcronym]) {
+  //       map[MfgAcronym] = { title: Manufacturer, key: MfgAcronym, children: [] };
+  //       tree.push(map[MfgAcronym]);
+  //     }
+
+  //     // Add Equipment Type to Manufacturer if not already present
+  //     if (!map[EQTYPE]) {
+  //       map[EQTYPE] = { title: EQTYPE, key: EQTYPE,  children: [] };
+  //       map[MfgAcronym].children.push(map[EQTYPE]);
+  //     }
+
+  //     // Add Product Line to Equipment Type if not already present
+  //     if (!map[MFGPRODLINE]) {
+  //       map[MFGPRODLINE] = { title: MFGPRODLINE, key: MFGPRODLINE, children: [] };
+  //       map[EQTYPE].children.push(map[MFGPRODLINE]);
+  //     }
+
+  //     // Add Product Number to Product Line
+  //     if (!map[MFGPRODNO]) {
+  //       map[EQID] = { title: MFGPRODNO, key: EQID, children: [] };
+  //       map[MFGPRODLINE].children.push(map[EQID]);
+  //     }
+  //   });
+
+  //   console.log('Transformed Tree Data:', tree);
+  //   return tree;
+  // };
+
+  const transformToTreeData = (result) => {
+    // Ensure the input is an array
+    const map = {};
+    const tree = [];
   
-      search();
-    } else {
-      console.log("Please select all the required fields.");
+    // Create a static parent node with the result length
+    const searchResultsNode = {
+      title: `Search Results [${result.length}]`,
+      key: 'search-results',
+      icon: <img src="assets12/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
+      children: [],
+      expanded: true // Root node is always expanded
+    };
+    tree.push(searchResultsNode);
+  
+    for (const item of result) {
+      const {
+        MfgAcronym = '',
+        Manufacturer = '',
+        EQTYPE = '',
+        MFGPRODLINE = '',
+        MFGPRODNO = '',
+        EQID = ''
+      } = item;
+  
+      // Create Manufacturer node
+      const manufacturerKey = MfgAcronym;
+      if (!map[manufacturerKey]) {
+        map[manufacturerKey] = {
+          title: Manufacturer,
+          key: manufacturerKey,
+          icon: <img src="assets12/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
+          children: []
+        };
+        searchResultsNode.children.push(map[manufacturerKey]);
+      }
+  
+      // Create Equipment Type node
+      const eqTypeKey = `${MfgAcronym}-${EQTYPE}`;
+      if (!map[eqTypeKey]) {
+        map[eqTypeKey] = {
+          title: EQTYPE ,
+          icon: <img src={`assets12/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
+          key: eqTypeKey,
+          children: []
+        };
+        map[manufacturerKey].children.push(map[eqTypeKey]);
+      }
+  
+      // Create Product Line node
+      const prodLineKey = `${MfgAcronym}-${EQTYPE}-${MFGPRODLINE}`;
+      if (!map[prodLineKey]) {
+        map[prodLineKey] = {
+          title: MFGPRODLINE ,
+          key: prodLineKey,
+          icon: <img src="assets12/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
+          children: []
+        };
+        map[eqTypeKey].children.push(map[prodLineKey]);
+      }
+  
+      // Create Product Number node
+      const productNumberKey = EQID;
+      if (!map[productNumberKey]) {
+        map[productNumberKey] = {
+          title: MFGPRODNO || 'Unknown Product Number',
+          key: productNumberKey,
+          icon: <img src="assets12/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
+          children: [],
+          isLeaf: true,
+        };
+        map[prodLineKey].children.push(map[productNumberKey]);
+      }
+    }
+  
+
+    const setExpandable = (node) => {
+      if (node.children.length === 1) {
+        node.expanded = true; 
+      } else {
+        node.expanded = false;
+      }
+
+      node.children.forEach(setExpandable);
+    };
+  
+
+    searchResultsNode.children.forEach(setExpandable);
+  
+    console.log('Transformed Tree Data:', JSON.stringify(tree, null, 2));
+    return tree;
+  };
+  
+  
+  
+
+
+  const search = async () => {
+    let searchType = 'Solution';
+    let paramXml = '';
+
+    if (keyword) {
+      searchType = 'Kwd';
+      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selecteddtManufacturers.length > 0 ? selecteddtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
+
+    } else if (selectedManufacturer || selectedEqType || selectedProductline || selectedproductnumber) {
+      paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductline || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
+
+    }
+
+    try {
+      const response = await axios.post('http://localhost:8000/library/SearchLibraryNew', {
+        Email: "",
+        SubNo: "000000000000000000001234",
+        FullLib: false,
+        ParamXML: paramXml,
+        Settings: {
+          RememberLastSearchCount: 16,
+          IncludeRelatedManufacturers: true,
+          NotifyResultsExceedCount: 10,
+          NotifyResultsExceedCountCheck: true,
+          RememberLastSearchCountCheck: true,
+          IsGroupOrderAsc1: true,
+          IsGroupOrderAsc2: true,
+          IsGroupOrderAsc3: true,
+          IsGroupOrderAsc4: true,
+          TreeGroupBy1: "Manufacturer",
+          TreeGroupBy2: "Equipment Type",
+          TreeGroupBy3: "Product Line",
+          TreeGroupBy4: "Product/Model Number"
+        }
+      });
+
+      const responsedtsearchresult = response.data.Data.SearchData.dtSearchResults
+
+      if(responsedtsearchresult){
+        const treeHierarchy = transformToTreeData(responsedtsearchresult );
+        console.log('treehierarchy', treeHierarchy)
+        setTreeData(treeHierarchy);
+
+        if (treeHierarchy) {
+          console.log('Navigating with treeData:', treeHierarchy);
+          navigate('/tree', { state: { treeData: treeHierarchy } });
+        } else { 
+          console.error('treeHierarchy is undefined or null');
+        } 
+      } else{
+        console.log('hierarchy is not created')
+      }
+    
+
+      const responsedtmanufacturer = response.data.Data.SearchData.dtManufacturers
+      console.log('Search Response dtmanufacturer:', responsedtmanufacturer);
+      console.log('Search Response dtsearchresult:', responsedtsearchresult);
+
+      if (!responsedtmanufacturer && ! responsedtsearchresult) {
+        setSnackbarMessage(`No Results were found for "${keyword}" in Manufacturer "${selectedManufacturer}"`);
+        setSnackbarOpen(true);
+
+      } else if (responsedtmanufacturer) {
+        setDtManufacturers(responsedtmanufacturer)
+        setIsDialogOpen(true)
+      }
+      else {
+        console.log('search result', keyword)
+      }
+    } catch (error) {
+      console.error('Search Error:', error);
     }
   };
+
+  useEffect(() =>{
+    if(selectedProductline && selectedEqType && selectedProductline && selectedproductnumber){
+      search()
+    }
+  })  
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+  const handleManufacturerSelection = (manufacturer) => {
+    setSelectedDtManufacturers((prevSelected) =>
+      prevSelected.includes(manufacturer)
+        ? prevSelected.filter((item) => item !== manufacturer)
+        : [...prevSelected, manufacturer]
+    );
+  };
+
+  const handleDialogSubmit = () => {
+    console.log('Selected Manufacturers:', selecteddtManufacturers);
+    setIsDialogOpen(false);
+    search()
+  };
+  const handlebuttonclick = () => {
+    setSnackbarOpen(false)
+  }
+
   const CustomTypography = ({ children, ...props }) => (
-    <Typography variant="body2" sx={{ fontSize: '12px', fontFamily:['Segoe UI', 'sans-serif'] }} {...props}>
+    <Typography variant="body2" sx={{ fontSize: '12px', fontFamily: ['Segoe UI', 'sans-serif'] }} {...props}>
       {children}
     </Typography>
   );
+  useTheme(data.colortheme)
   return (
-    
+
     <div
       style={{
         backgroundColor: 'var(--bg-color)',
         height: '100vh',
-        // width: '100%',
         display: 'flex',
-        overflow:'hidden',
+        overflow: 'hidden',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        fontFamily:['Segoe UI', 'sans-serif'],
+        fontFamily: ['Segoe UI', 'sans-serif'],
         alignItems: 'center',
         color: 'var(--font-color)',
-        boxSizing:'border-box',
+        boxSizing: 'border-box',  
         padding: '9px',
         width: { xs: '100%', sm: '90%', md: '100%', lg: '100%' },
 
       }}
     >
-       <Backdrop
+      <Backdrop
         sx={{
           color: '#fff',
           zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)', // Overlay color
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
         }}
         open={loading}
       >
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      {/* {loading ? (
-        <CircularProgress sx={{color: 'var(--font-color)'}} />
-      ) : ( */}
-<>
-      
-<Box
-  sx={{
-    position: 'relative',
-    top: '0px',
-    display: 'flex',
-    alignItems: 'center',
-    overflow: 'hidden',
-    width: '100%',
-  }}
->
-  <Box sx={{ display: 'flex', alignItems: 'center', }}>
-    <Tooltip title="setting" placement="bottom-end">
-      <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleSettingClick}>
-        <SettingsIcon />
-      </IconButton>
-    </Tooltip>
-    <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize:'12px' }}>Visit</Typography>
-    <Tooltip title="visit visiostencil website" placement="bottom-end">
-      <Typography
-        sx={{
-          marginLeft: '8px',
-          cursor: 'pointer',
-          textDecoration: 'underline',
-          whiteSpace: 'nowrap',
-          fontSize:'12px'
-        }}
-        onClick={handleClick}
-      >
-        VisioStencils.com
-      </Typography>
-    </Tooltip>
-  </Box>
-</Box>
-<Box
-  component="form"
-  sx={{
-    width: '101%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0px',
-    overflow: 'hidden',
-    padding:'12px'    
-  }}
-  noValidate
-  autoComplete="off"
->
-  <Grid container alignItems="center" direction='row'>
-    <Grid item xs={11} sx={{px:'1px', fontSize:'12px'}} >
-      <TextField
-        id="outlined-basic"
-        label={<CustomTypography>Search</CustomTypography>}
-        variant="outlined"
-        placeholder='By keyword'
-        InputLabelProps={{ style: { color: 'var(--font-color)',  } }}
-        InputProps={{
-          style: { color: 'var(--font-color)', borderColor: 'var(--font-color)', // Adjust padding to reduce height
-            fontSize: '12px' },
-        }}
-        fullWidth
-        sx={{
-          '.MuiOutlinedInput-root': {
-            '& fieldset': {
-              borderColor: 'var(--font-color)',
-            },
-            '&:hover fieldset': {
-              borderColor: 'var(--font-color)',
-            },
-            '&.Mui-focused fieldset': {
-              borderColor: 'var(--font-color)',
-            },
-          }, fontSize:'12px', color:'var(--font-color)'
-        }}
+      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} sx={{ fontSize: '12px' }}  >
+        <DialogTitle sx={{ fontSize: '12px' }}>Select Manufacturers</DialogTitle>
+        <DialogContent sx={{ fontSize: '12px' }} >
+          <FormControl component="fieldset" sx={{ fontSize: '12px' }} >
+            <FormGroup sx={{ fontSize: '12px' }} >
+              {dtmanufacturers.map((manufacturer, index) => (
+                <FormControlLabel
+                  key={index}
+                  control={
+                    <Checkbox
+                      checked={selecteddtManufacturers.includes(manufacturer.MfgAcronym)}
+                      onChange={() => handleManufacturerSelection(manufacturer.MfgAcronym)}
+                      sx={{ fontSize: '12px' }}
 
-      />
-    </Grid>
-    <Grid xs={1} >
-      <IconButton sx={{ color: 'var(--font-color)', padding:'10px',position:'relative' }} size='large' onClick={handlesearchclick}>
-        <SearchIcon />
-      </IconButton>
-    </Grid>
-  </Grid>
+                    />
+                  }
+                  label={manufacturer.Manufacturer}
+                  sx={{ fontSize: '12px' }}
+                />
+              ))}
+            </FormGroup>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '12px' }}>Cancel</Button>
+          <Button onClick={() => handleDialogSubmit()} sx={{ fontSize: '12px' }}>OK</Button>
+        </DialogActions>
+      </Dialog>
 
-  <FormControl component="fieldset" sx={{ width: '100%',}}>
-    <RadioGroup
-      row
-      sx={{
-        justifyContent: 'flex-start', 
-        color: 'var(--font-color)',
-        fontSize:'12px'
-      }}
-    >
-      <FormControlLabel
-      sx={{fontSize:'12px'}}
-        value="anyWord"
-        control={<Radio sx={{ color: 'var(--font-color)',fontSize:'12px' }} color='default' />}
-        label={<CustomTypography>Any Word</CustomTypography>}
-      />
-      <FormControlLabel
-        value="allWords"
-        control={<Radio sx={{ color: 'var(--font-color)' }} color='default' />}
-        label={<CustomTypography>All Words</CustomTypography>}
-      />
-    </RadioGroup>
-  </FormControl>
+      <>
 
-  <FormControl fullWidth variant="outlined" sx={{ mt: 3, }}>
-    <InputLabel sx={{ color: 'var(--font-color)', fontSize:'12px' }} shrink>
-      Manufacturers [{manufacturers.length}]
-    </InputLabel>
-    <Select
-      displayEmpty
-      value={selectedManufacturer}
-      onChange={handleManufacturerChange}
-      input={
-        <OutlinedInput
-          notched
-          label={`Manufacturers [${manufacturers.length}]`}
+        <Box
           sx={{
-            color: 'var(--font-color)',
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'var(--font-color)', 
-            },
+            position: 'relative',
+            top: '0px',
+            display: 'flex',
+            alignItems: 'center',
+            overflow: 'hidden',
+            width: '100%',
           }}
-        />
-      }
-      renderValue={(selected) => {
-        if (!selected) {
-          return <h1>All</h1>;
-        }
-        const selectedManufacturer = manufacturers.find(manufacturer => manufacturer.MfgAcronym === selected);
-        return selectedManufacturer ? selectedManufacturer.Manufacturer : '';
-      }}
-      sx={{
-        '.MuiOutlinedInput-root': {
-          '& fieldset': {
-            borderColor: 'var(--font-color)',
-          },
-          '&:hover fieldset': {
-            borderColor: 'var(--font-color)',
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: 'var(--font-color)',
-          },
-        },
-        '.MuiSelect-select': {
-          color: 'var(--font-color) !important',
-        },
-        '.MuiSvgIcon-root': {
-          color: 'var(--font-color) !important',
-        }, fontSize:'12px',
-      }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', }}>
+            <Tooltip title="setting" placement="bottom-end">
+              <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleSettingClick}>
+                <SettingsIcon />
+              </IconButton>
+            </Tooltip>
+            <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+            <Tooltip title="visit visiostencil website" placement="bottom-end">
+              <Typography
+                sx={{
+                  marginLeft: '8px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  whiteSpace: 'nowrap',
+                  fontSize: '12px'
+                }}
+                onClick={handleClick}
+              >
+                VisioStencils.com
+              </Typography>
+            </Tooltip>
+          </Box>
+        </Box>
+        <Box
+          component="form"
+          sx={{
+            width: '101%',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0px',
+            overflow: 'hidden',
+            padding: '12px'
+          }}
+          noValidate
+          autoComplete="off"
+        >
+          <Grid container alignItems="center" direction='row'>
+            <Grid item xs={11} sx={{ px: '1px', fontSize: '12px' }} >
+              <TextField
+                id="outlined-basic"
+                label={<CustomTypography>Search</CustomTypography>}
+                variant="outlined"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder='By keyword'
+                InputLabelProps={{ style: { color: 'var(--font-color)', } }}
+                InputProps={{
+                  style: {
+                    color: 'var(--font-color)', borderColor: 'var(--font-color)', // Adjust padding to reduce height
+                    fontSize: '12px'
+                  },
+                }}
+                fullWidth
+                sx={{
+                  '.MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: 'var(--font-color)',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: 'var(--font-color)',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'var(--font-color)',
+                    },
+                  }, fontSize: '12px', color: 'var(--font-color)'
+                }}
 
-    >
-    {manufacturers.length > 1 && (
+              />
+              <Snackbar
+                open={snackbarOpen}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              >
+                <Alert onClose={handleSnackbarClose} severity="info" sx={{ width: '100%' }}
+                  action={
+                    <Button color='inherit' size='small' onClick={handlebuttonclick}>OK</Button>
+                  }
+                >
+                  {snackbarMessage}
+                </Alert>
+              </Snackbar>
+            </Grid>
+            <Grid xs={1} >
+              <IconButton sx={{ color: 'var(--font-color)', padding: '10px', position: 'relative' }} size='large' onClick={search}>
+                <SearchIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
 
-      <MenuItem value="all" sx={{fontSize: '12px'}}>
-        <h1>All</h1>
-      </MenuItem>
-    )}
-      {manufacturers.length > 0 ? (
-        manufacturers.map((manufacturer) => (
-          <MenuItem
+          <FormControl component="fieldset" sx={{ width: '100%', }}>
+            <RadioGroup
+              row
+              sx={{
+                justifyContent: 'flex-start',
+                color: 'var(--font-color)',
+                fontSize: '12px'
+              }}
+            >
+              <FormControlLabel
+                sx={{ fontSize: '12px' }}
+                value="anyWord"
+                control={<Radio sx={{ color: 'var(--font-color)', fontSize: '12px' }} color='default' />}
+                label={<CustomTypography>Any Word</CustomTypography>}
+              />
+              <FormControlLabel
+                value="allWords"
+                control={<Radio sx={{ color: 'var(--font-color)' }} color='default' />}
+                label={<CustomTypography>All Words</CustomTypography>}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <FormControl fullWidth variant="outlined" sx={{ mt: 3, }}>
+            <InputLabel sx={{ color: 'var(--font-color)', fontSize: '12px' }} shrink>
+              Manufacturers [{manufacturers.length}]
+            </InputLabel>
+            <Select
+              displayEmpty
+              value={selectedManufacturer}
+              onChange={handleManufacturerChange}
+              className='nz-searchcombo'
+              input={
+                <OutlinedInput
+                notched
+                label={`Manufacturers [${manufacturers.length}]`}
+                sx={{
+                  color: 'var(--font-color)',
+                  fontSize: '12px', 
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'var(--font-color)',
+                  },
+                  '& .MuiInputBase-input': {
+                    fontSize: '12px', // Ensures input text is also 12px
+                  },
+                }}
+              />
+              
+              }
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <h1>All</h1>;
+                }
+                const selectedManufacturer = manufacturers.find(manufacturer => manufacturer.MfgAcronym === selected);
+                return selectedManufacturer ? selectedManufacturer.Manufacturer : '';
+              }}
+
+            >
+              {manufacturers.length > 0 && (
+
+                <MenuItem value="all"  >
+                  <h1>All</h1>
+                </MenuItem>
+              )}
+              {manufacturers.length > 0 ? (
+                manufacturers.map((manufacturer) => (
+                  <MenuItem
                     key={manufacturer.MfgAcronym}
                     value={manufacturer.MfgAcronym}
                     sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}
-                >
+                  >
                     {manufacturer.Manufacturer}
-                </MenuItem>
-        ))
-      ) : (
-        <MenuItem disabled>No Manufacturers Available</MenuItem>
-      )}
-    </Select>
-  </FormControl>
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No Manufacturers Available</MenuItem>
+              )}
+            </Select>
+          </FormControl>
 
-        <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-          <InputLabel sx={{ color: 'var(--font-color)',fontSize:'12px' }} shrink>
-            Equipment Types [{eqtypes.length}]
-          </InputLabel>
-          <Select
-            displayEmpty
-            value={selectedEqType}
-            onChange={handleEqTypeChange}
-            input={<OutlinedInput notched label={`Equipment Types [${eqtypes.length}]`}
-            sx={{
-              color: 'var(--font-color)',
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: 'var(--font-color)',
-              },
-            }}
-            />}
-
-            
-            renderValue={(selected) => {
-              if (!selected) {
-                return <h1>All</h1>;
-              }
-              console.log('abc', selected)
-              return selected;
-            }}
-            sx={{
-              '.MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: 'var(--font-color)',
-                },
-                '&:hover fieldset': {
-                  borderColor: 'var(--font-color)',
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: 'var(--font-color)',
-                },
-              },
-              '.MuiSelect-select': {
-                color: 'var(--font-color) !important',
-              },
-              '.MuiSvgIcon-root': {
-                color: 'var(--font-color) !important',
-              },fontSize:'12px'
-            }} 
-          >
-            {eqtypes.length > 1 && (
-              <MenuItem value="all">
-              <h1>All</h1>
-            </MenuItem>
-            )}
-            {eqtypes.length > 0 ? (
-              eqtypes.map((eqtype) => (
-                <MenuItem key={eqtype} value={eqtype}  sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                  {eqtype}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled>No Equipment Types Available</MenuItem>
-            )}
-          </Select>
-        </FormControl>
+          <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
+            <InputLabel sx={{ color: 'var(--font-color)', fontSize: '12px' }} shrink>
+              Equipment Types [{eqtypes.length}]
+            </InputLabel>
+            <Select
+              displayEmpty
+              value={selectedEqType}
+              className='nz-searchcombo'
+              onChange={handleEqTypeChange}
+              input={<OutlinedInput notched label={`Equipment Types [${eqtypes.length}]`}
+                sx={{
+                  color: 'var(--font-color)',
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'var(--font-color)',
+                    fontSize:'12px'
+                  },
+                }}
+              />}
 
 
-
-        <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-          <InputLabel
-            sx={{ color: 'var(--font-color)',fontSize:'12px' }}
-            shrink
-            >
-            Product Lines [{productline.length}]
-          </InputLabel>
-          <Select
-            displayEmpty
-            value={selectedProductline}
-            onChange={handleproductlinechange}
-            input={<OutlinedInput notched label=" Product Lines [0]" 
-            sx={{
-              color: 'var(--font-color)',
-              '.MuiOutlinedInput-root': {
-                '& fieldset': { borderColor: 'var(--font-color)' },
-                '&:hover fieldset': { borderColor: 'var(--font-color)' },
-                '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
-              },
-              '.MuiSelect-select': { color: 'var(--font-color) !important' },
-              '.MuiSvgIcon-root': { color: 'var(--font-color) !important' },fontSize:'12px'
-            }}
-            
-            />}
-            
-            renderValue={(selected) => {
-              if(!selected) {
-                return <h1>All</h1>
-              }
-              console.log('productline', selected)
-              return selected
-            }}
-            >
-            {productline.length > 1 && (
-
-              <MenuItem value="" sx={{fontSize:'12px'}}>
-              <h1>All</h1>
-            </MenuItem>
-            )}
-           {productline.length > 0 ? (
-             productline.map((productLine) => (
-               <MenuItem key={productLine} value={productLine}  sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                {productLine}
-              </MenuItem>
-            ))
-           ): (
-            <MenuItem disabled>No product line available</MenuItem>
-           )}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-          <InputLabel
-            sx={{ color: 'var(--font-color)', fontSize:'12px' }}
-            shrink
-            >
-            Product Numbers [{productnumber.length}]
-          </InputLabel>
-          <Select
-            displayEmpty
-            value={selectedproductnumber}
-            onChange={handleproductnumber}
-            input={<OutlinedInput notched label="Product Numbers [0]" 
-              sx={{color: 'var(--font-color)',
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <h1>All</h1>;
+                }
+                console.log('abc', selected)
+              
+                return selected;
+              }}
+              sx={{
                 '.MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: 'var(--font-color)' },
-                  '&:hover fieldset': { borderColor: 'var(--font-color)' },
-                  '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
+                  '& fieldset': {
+                    borderColor: 'var(--font-color)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'var(--font-color)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: 'var(--font-color)',
+                  },
                 },
-              '.MuiSelect-select': { color: 'var(--font-color) !important' },
-              '.MuiSvgIcon-root': { color: 'var(--font-color) !important' },fontSize:'12px'}}
+                '.MuiSelect-select': {
+                  color: 'var(--font-color) !important',
+                },
+                '.MuiSvgIcon-root': {
+                  color: 'var(--font-color) !important',
+                }, fontSize: '12px'
+              }}
+            >
+              {eqtypes.length > 0 && (
+                <MenuItem value="all">
+                  <h1>All</h1>
+                </MenuItem>
+              )}
+              {eqtypes.length > 0 ? (
+                eqtypes.map((eqtype) => (
+                  <MenuItem key={eqtype} value={eqtype} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                    {eqtype}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No Equipment Types Available</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+
+
+
+          <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
+            <InputLabel
+              sx={{ color: 'var(--font-color)', fontSize: '12px' }}
+              shrink
+            >
+              Product Lines [{productline.length}]
+            </InputLabel>
+            <Select
+              displayEmpty
+              value={selectedProductline}
+              className='nz-searchcombo'
+              onChange={handleproductlinechange}
+              input={<OutlinedInput notched label=" Product Lines [0]"
+                sx={{
+                  color: 'var(--font-color)',
+                  '.MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'var(--font-color)' },
+                    '&:hover fieldset': { borderColor: 'var(--font-color)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
+                  },
+                  '.MuiSelect-select': { color: 'var(--font-color) !important' },
+                  '.MuiSvgIcon-root': { color: 'var(--font-color) !important' }, fontSize: '12px'
+                }}
+
+              />}
+
+              renderValue={(selected) => {
+                if (!selected) {
+                  return <h1>All</h1>
+                }
+                console.log('productline', selected)
+                return selected
+              }}
+            >
+              {productline.length > 0 && (
+
+                <MenuItem value="" sx={{ fontSize: '12px' }}>
+                  <h1>All</h1>
+                </MenuItem>
+              )}
+              {productline.length > 0 ? (
+                productline.map((productLine) => (
+                  <MenuItem key={productLine} value={productLine} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                    {productLine}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>No product line available</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
+            <InputLabel
+              sx={{ color: 'var(--font-color)', fontSize: '12px' }}
+              shrink
+            >
+              Product Numbers [{productnumber.length}]
+            </InputLabel>
+            <Select
+              displayEmpty
+              value={selectedproductnumber}
+              onChange={handleproductnumber}
+              className='nz-searchcombo'
+              input={<OutlinedInput notched label="Product Numbers [0]"
+                sx={{
+                  color: 'var(--font-color)',
+                  '.MuiOutlinedInput-root': {
+                    '& fieldset': { borderColor: 'var(--font-color)' },
+                    '&:hover fieldset': { borderColor: 'var(--font-color)' },
+                    '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
+                  },
+                  '.MuiSelect-select': { color: 'var(--font-color) !important' },
+                  '.MuiSvgIcon-root': { color: 'var(--font-color) !important' }, fontSize: '12px'
+                }}
               />}
               renderValue={(Pnumberselected) => {
-                if(!Pnumberselected){
+                if (!Pnumberselected) {
                   return <h1>All</h1>
                 }
                 console.log('pnumberselected', Pnumberselected)
                 return Pnumberselected
               }}
-              >
-            {productnumber.length > 1 &&(
+            >
+              {productnumber.length > 0 && (
 
-              <MenuItem value="" sx={{fontSize:'12px'}}>
-              <h1>All</h1>
-            </MenuItem>
-            )}
-           {productnumber.length > 0 ? (
-             productnumber.map((pnumber) => (
-              <MenuItem key={pnumber} value={pnumber} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                {pnumber}
-              </MenuItem>
-            ))
-           ):(
-             <MenuItem disabled sx={{fontSize:'12px'}}>No Product number Available</MenuItem>
-            )}
-          </Select>
-        </FormControl> 
-      </Box>
-      
+                <MenuItem value="" sx={{ fontSize: '12px' }}>
+                  <h1>All</h1>
+                </MenuItem>
+              )}
+              {productnumber.length > 0 ? (
+                productnumber.map((pnumber) => (
+                  <MenuItem key={pnumber} value={pnumber} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                    {pnumber}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled sx={{ fontSize: '12px' }}>No Product number Available</MenuItem>
+              )}
+            </Select>
+          </FormControl>
+        </Box>
 
-      <Typography
-        sx={{
-          marginTop: '20px',
-          fontSize: { xs: '12px', sm: '14px' },
-          textAlign: 'center',
-          padding: '0 12px',
-        }}
+        <Typography
+          sx={{
+            marginTop: '20px',
+            fontSize: { xs: '12px', sm: '14px' },
+            textAlign: 'center',
+            padding: '0 12px',
+          }}
         >
-        Now you can create professional quality Visio Diagrams and PowerPoint Presentations using High Quality Shapes and Stencils.
-      </Typography>
+          Now you can create professional quality Visio Diagrams and PowerPoint Presentations using High Quality Shapes and Stencils.
+        </Typography>
       </>
-      {/* )} */}
+
+     
     </div>
-   
-   
+
+
   );
 }
