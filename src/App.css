@@ -9,3 +9,25 @@ font-family: 'Segoe UI', sans-serif;
   font-family: 'Segoe UI', sans-serif;
 }
 
+.nz-searchcombo .MuiOutlinedInput-notchedOutline{
+  border-color: var(--font-color) !important;
+}
+
+/* .nz-searchcombo .MuiOutlinedInput-notchedOutline:focus-visible{
+  border: 0;
+} */
+ .nz-searchcombo svg{
+  color: white !important;
+ }
+
+ .Mui-focused{
+  color: white !important;
+  line-height: 2.4375em;
+  font-size: 12px;
+ }
+ .MuiInputBase-input .MuiOutlinedInput-input h1 {
+  font-size: 12px;
+}
+.MuiSelect-select .MuiSelect-outlined .MuiInputBase-input .MuiOutlinedInput-input{
+  font-size: 12px;
+}

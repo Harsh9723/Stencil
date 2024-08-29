@@ -4,6 +4,9 @@ import PreloadPage from './Components/PreloadPage';
 import MainPage from './Pages/MainPage';
 import Setting from './Pages/Setting';
 import './App.css'
+import DataConverter from './Components/DataConverter';
+import Tree from './Pages/Tree';
+import Treedata from './Pages/Tree';
 // import setThemeColors from './Components/Theme';
 function App() {
   const [showMainPage, setShowMainPage] = useState(false);
@@ -46,10 +49,12 @@ function App() {
         <Route path="/" element={showMainPage ? <MainPage /> : <PreloadPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
+        <Route path='/tree' element={<Treedata />} />
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      {/* <setThemeColors /> */}
+      {/* <DataConverter /> */}
+      {/* <Tree /> */}
     </div>
   );
 }

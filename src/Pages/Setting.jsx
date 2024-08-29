@@ -8,7 +8,6 @@ import useTheme from '../Components/Theme';
 const Setting = () => {
   const navigate = useNavigate();
 
-  // Apply the theme using the custom hook
   useTheme(data.colortheme);
 
   const handleClick = () => {
@@ -132,10 +131,11 @@ const Setting = () => {
       
       <Button 
         variant='contained' 
+        size='small'
         sx={{ 
           padding: '10px 20px', 
           alignSelf: 'flex-center',
-          backgroundColor: 'var(--font-color)', // Ensure button color is properly set based on your needs
+          backgroundColor: 'var(--font-color)',
           color: 'var(--bg-color)',
           '&:hover': {
             backgroundColor: 'var(--font-color)',
