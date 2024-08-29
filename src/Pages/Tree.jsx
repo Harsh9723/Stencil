@@ -9,10 +9,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router';
 
 
-
-
-
-
 const Treedata = () => {
     
     const navigate = useNavigate()

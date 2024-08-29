@@ -55,7 +55,6 @@ export default function MainPage() {
         const manufacturersData = response.data.Data;
         console.log('main', manufacturersData)
         setManufacturers(manufacturersData);
-
         if (manufacturersData.length === 1) {
           setSelectedManufacturer(manufacturersData[0].MfgAcronym);
           
@@ -244,6 +243,10 @@ export default function MainPage() {
         console.log('No matching manufacturers found');
       }
     }
+    //  else{
+    //    setSnackbarMessage(`No Results were found for "${keyword}" in Manufacturer "${selectedManufacturer}"`);
+    //     setSnackbarOpen(true);
+    // }
   }, [keyword, manufacturers]);
 
 
@@ -345,7 +348,7 @@ export default function MainPage() {
     const searchResultsNode = {
       title: `Search Results [${result.length}]`,
       key: 'search-results',
-      icon: <img src="assets12/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
+      icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
       children: [],
       expanded: true // Root node is always expanded
     };
@@ -367,7 +370,7 @@ export default function MainPage() {
         map[manufacturerKey] = {
           title: Manufacturer,
           key: manufacturerKey,
-          icon: <img src="assets12/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
+          icon: <img src="./assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
           children: []
         };
         searchResultsNode.children.push(map[manufacturerKey]);
@@ -378,7 +381,7 @@ export default function MainPage() {
       if (!map[eqTypeKey]) {
         map[eqTypeKey] = {
           title: EQTYPE ,
-          icon: <img src={`assets12/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
+          icon: <img src={`./assets/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
           key: eqTypeKey,
           children: []
         };
@@ -391,7 +394,7 @@ export default function MainPage() {
         map[prodLineKey] = {
           title: MFGPRODLINE ,
           key: prodLineKey,
-          icon: <img src="assets12/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
+          icon: <img src="./assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
           children: []
         };
         map[eqTypeKey].children.push(map[prodLineKey]);
@@ -403,7 +406,7 @@ export default function MainPage() {
         map[productNumberKey] = {
           title: MFGPRODNO || 'Unknown Product Number',
           key: productNumberKey,
-          icon: <img src="assets12/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
+          icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
           children: [],
           isLeaf: true,
         };
