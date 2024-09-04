@@ -18,9 +18,7 @@ import axios from 'axios';
 import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, FormGroup, Checkbox, Button } from '@mui/material';
 
 
-
-
-export default function MainPage() {
+ const  MainPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [manufacturers, setManufacturers] = useState([]);
@@ -40,6 +38,7 @@ export default function MainPage() {
   const [treeData, setTreeData] = useState([]);
   const navigate = useNavigate();
  
+  
 
 
   useEffect(() => {
@@ -141,6 +140,7 @@ export default function MainPage() {
             FullLibrary: false,
           });
           const productNumberData = response.data.Data;
+          console.log('pronumber', productNumberData)
           setProductNumber(productNumberData);
 
           // Automatically select if only one product number is available
@@ -155,6 +155,105 @@ export default function MainPage() {
       fetchProductNumber();
     }
   }, [selectedManufacturer, selectedEqType, selectedProductline]);
+
+  useEffect(() => {
+    if (keyword) {
+      const matchedManufacturers = manufacturers.filter((manufacturer) =>
+        manufacturer.MfgAcronym.toLowerCase().includes(keyword.toLowerCase())
+      );
+
+      if (matchedManufacturers.length > 0) {
+        console.log('Matched Manufacturers:', matchedManufacturers);
+      } else {
+        console.log('No matching manufacturers found');
+      }
+    }
+   
+  }, [keyword, manufacturers]);
+
+  const search = async () => {
+    let searchType = 'Solution';
+    let paramXml = '';
+
+    if (keyword) {
+      searchType = 'Kwd';
+      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selecteddtManufacturers.length > 0 ? selecteddtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
+
+    }
+    else if (selectedManufacturer || selectedEqType || selectedProductline || selectedproductnumber) {
+      paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductline || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
+
+    }else  if(!keyword) {
+      setSnackbarOpen(true)
+      setSnackbarMessage('please enter keyword or Manufacturer to search')
+    } 
+
+    try {
+      const response = await axios.post('http://localhost:8000/library/SearchLibraryNew', {
+        Email: "",
+        SubNo: "000000000000000000001234",
+        FullLib: false,
+        ParamXML: paramXml,
+        Settings: {
+          RememberLastSearchCount: 16,
+          IncludeRelatedManufacturers: true,
+          NotifyResultsExceedCount: 10,
+          NotifyResultsExceedCountCheck: true,
+          RememberLastSearchCountCheck: true,
+          IsGroupOrderAsc1: true,
+          IsGroupOrderAsc2: true,
+          IsGroupOrderAsc3: true,
+          IsGroupOrderAsc4: true,
+          TreeGroupBy1: "Manufacturer",
+          TreeGroupBy2: "Equipment Type",
+          TreeGroupBy3: "Product Line",
+          TreeGroupBy4: "Product/Model Number"
+        }
+      });
+
+      const responsedtsearchresult = response.data.Data.SearchData.dtSearchResults
+
+      if(responsedtsearchresult){
+        
+        const treeHierarchy = transformToTreeData(responsedtsearchresult );
+        console.log('treehierarchy', treeHierarchy)
+        setTreeData(treeHierarchy);
+
+        if (treeHierarchy) {
+          setLoading(true)
+          console.log('Navigating with treeData:', treeHierarchy);
+          navigate('/tree', { state: { treeData: treeHierarchy, searchResult: responsedtsearchresult } });
+        } else { 
+          console.error('treeHierarchy is undefined or null');
+        } 
+      } else{
+        console.log('hierarchy is not created')
+      }
+      const responsedtmanufacturer = response.data.Data.SearchData.dtManufacturers
+      console.log('Search Response dtmanufacturer:', responsedtmanufacturer);
+      console.log('Search Response dtsearchresult:', responsedtsearchresult);
+
+      if (!responsedtmanufacturer && ! responsedtsearchresult) {
+        setSnackbarMessage(`No Results were found for "${keyword}" in Manufacturer "${selectedManufacturer}"`);
+        setSnackbarOpen(true);
+
+      } else if (responsedtmanufacturer) {
+        setDtManufacturers(responsedtmanufacturer)
+        setIsDialogOpen(true)
+      }
+      else {
+        console.log('search result', keyword)
+      }
+    } catch (error) {
+      console.error('Search Error:', error);
+    }
+  };
+
+  useEffect(() =>{
+    if(selectedProductline && selectedEqType && selectedProductline && selectedproductnumber){
+      search()
+    }
+  }) 
 
   const handleManufacturerChange = (event) => {
     setSelectedManufacturer(event.target.value);
@@ -191,327 +290,111 @@ export default function MainPage() {
     window.open(data.logourl, '_blank');
   };
 
-  // const searchSolution = () => {
-  //   const search = async () => {
-  //     try {
-  //       const response = await axios.post("http://localhost:8000/library/SearchLibraryNew", {
-  //         Email: "",
-  //         SubNo: "000000000000000000001234",
-  //         FullLib: false,
-  //         ParamXML: `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductline || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`,
-  //         Settings: {
-  //           RememberLastSearchCount: 16,
-  //           IncludeRelatedManufacturers: true,
-  //           NotifyResultsExceedCount: 500,
-  //           NotifyResultsExceedCountCheck: true,
-  //           RememberLastSearchCountCheck: true,
-  //           IsGroupOrderAsc1: true,
-  //           IsGroupOrderAsc2: true,
-  //           IsGroupOrderAsc3: true,
-  //           IsGroupOrderAsc4: true,
-  //           TreeGroupBy1: "Manufacturer",
-  //           TreeGroupBy2: "Equipment Type",
-  //           TreeGroupBy3: "Product Line",
-  //           TreeGroupBy4: "Product/Model Number"
-  //         }
-  //       });
-  //       const searchresponse =  response.data.Data.SearchData.dtSearchResults;
-  //       console.log('123', searchresponse);
-  //       const solutiontree = transformToTreeData(searchresponse)
-  //       setTreeData(solutiontree)
-
-  //       if(searchresponse){
-  //         navigate('/tree', {state : {treeData : solutiontree}})
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   };
-
-  //   search();
-  // };
-
-
-  useEffect(() => {
-    if (keyword) {
-      const matchedManufacturers = manufacturers.filter((manufacturer) =>
-        manufacturer.MfgAcronym.toLowerCase().includes(keyword.toLowerCase())
-      );
-
-      if (matchedManufacturers.length > 0) {
-        console.log('Matched Manufacturers:', matchedManufacturers);
-      } else {
-        console.log('No matching manufacturers found');
-      }
-    }
-  }, [keyword, manufacturers]);
-
-
-  //   const map = {};
-  //   const tree = [];
-
-  //   result.forEach(item => {
-  //     const {
-  //       MfgAcronym, // Manufacturer key
-  //       Manufacturer, // Manufacturer title
-  //       EQTYPE, // Equipment Type key
-  //       EquipmentType, // Equipment Type title
-  //       MFGPRODLINE, // Product Line key
-  //       ProductLine, // Product Line title
-  //       MFGPRODNO, // Product Number title
-  //       EQID // Product Number key
-  //     } = item;
-
-  //     // Add Manufacturer to tree if not already present
-  //     if (!map[MfgAcronym]) {
-  //       map[MfgAcronym] = { title: Manufacturer, key: MfgAcronym, children: [] };
-  //       tree.push(map[MfgAcronym]);
-  //     }
-
-  //     // Add Equipment Type to Manufacturer if not already present
-  //     if (!map[EQTYPE]) {
-  //       map[EQTYPE] = { title: EQTYPE, key: EQTYPE,  children: [] };
-  //       map[MfgAcronym].children.push(map[EQTYPE]);
-  //     }
-
-  //     // Add Product Line to Equipment Type if not already present
-  //     if (!map[MFGPRODLINE]) {
-  //       map[MFGPRODLINE] = { title: MFGPRODLINE, key: MFGPRODLINE, children: [] };
-  //       map[EQTYPE].children.push(map[MFGPRODLINE]);
-  //     }
-
-  //     // Add Product Number to Product Line
-  //     if (!map[MFGPRODNO]) {
-  //       map[EQID] = { title: MFGPRODNO, key: EQID, children: [] };
-  //       map[MFGPRODLINE].children.push(map[EQID]);
-  //     }
-  //   });
-
-  //   console.log('Transformed Tree Data:', tree);
-  //   return tree;
-  // };
-
-  // const transformToTreeData = (result) => {
-  //   const map = {};
-  //   const tree = [];
-
-  //   result.forEach(item => {
-  //     const {
-  //       MfgAcronym, // Manufacturer key
-  //       Manufacturer, // Manufacturer title
-  //       EQTYPE, // Equipment Type key
-  //       EquipmentType, // Equipment Type title
-  //       MFGPRODLINE, // Product Line key
-  //       ProductLine, // Product Line title
-  //       MFGPRODNO, // Product Number title
-  //       EQID // Product Number key
-  //     } = item;
-
-  //     // Add Manufacturer to tree if not already present
-  //     if (!map[MfgAcronym]) {
-  //       map[MfgAcronym] = { title: Manufacturer, key: MfgAcronym, children: [] };
-  //       tree.push(map[MfgAcronym]);
-  //     }
-
-  //     // Add Equipment Type to Manufacturer if not already present
-  //     if (!map[EQTYPE]) {
-  //       map[EQTYPE] = { title: EQTYPE, key: EQTYPE,  children: [] };
-  //       map[MfgAcronym].children.push(map[EQTYPE]);
-  //     }
-
-  //     // Add Product Line to Equipment Type if not already present
-  //     if (!map[MFGPRODLINE]) {
-  //       map[MFGPRODLINE] = { title: MFGPRODLINE, key: MFGPRODLINE, children: [] };
-  //       map[EQTYPE].children.push(map[MFGPRODLINE]);
-  //     }
-
-  //     // Add Product Number to Product Line
-  //     if (!map[MFGPRODNO]) {
-  //       map[EQID] = { title: MFGPRODNO, key: EQID, children: [] };
-  //       map[MFGPRODLINE].children.push(map[EQID]);
-  //     }
-  //   });
-
-  //   console.log('Transformed Tree Data:', tree);
-  //   return tree;
-  // };
-
-  const transformToTreeData = (result) => {
-    // Ensure the input is an array
-    const map = {};
-    const tree = [];
+  const transformToTreeData = (result, addLeafNode) => {
+    const tree = [
+      {
+        title: `Search Results [${result.length}]`,
+        key: 'search-results',
+        icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
+        children: [],
+      },
+    ];
   
-    // Create a static parent node with the result length
-    const searchResultsNode = {
-      title: `Search Results [${result.length}]`,
-      key: 'search-results',
-      icon: <img src="assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
-      children: [],
-      expanded: true // Root node is always expanded
-    };
-    tree.push(searchResultsNode);
+    const searchResultsNode = tree[0];
   
-    for (const item of result) {
+    result.forEach((item) => {
       const {
         MfgAcronym = '',
         Manufacturer = '',
         EQTYPE = '',
         MFGPRODLINE = '',
         MFGPRODNO = '',
-        EQID = ''
+        EQID = '',
       } = item;
   
-      // Create Manufacturer node
-      const manufacturerKey = MfgAcronym;
-      if (!map[manufacturerKey]) {
-        map[manufacturerKey] = {
+      let manufacturerNode = searchResultsNode.children.find(
+        (child) => child.key === MfgAcronym
+      );
+  
+      if (!manufacturerNode) {
+        manufacturerNode = {
           title: Manufacturer,
-          key: manufacturerKey,
-          icon: <img src="assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
-          children: []
-        };
-        searchResultsNode.children.push(map[manufacturerKey]);
-      }
-  
-      // Create Equipment Type node
-      const eqTypeKey = `${MfgAcronym}-${EQTYPE}`;
-      if (!map[eqTypeKey]) {
-        map[eqTypeKey] = {
-          title: EQTYPE ,
-          icon: <img src={`assets/EqType/${EQTYPE}.png`} alt="manufacturer" style={{ width: 16, height: 16 }} />,
-          key: eqTypeKey,
-          children: []
-        };
-        map[manufacturerKey].children.push(map[eqTypeKey]);
-      }
-  
-      // Create Product Line node
-      const prodLineKey = `${MfgAcronym}-${EQTYPE}-${MFGPRODLINE}`;
-      if (!map[prodLineKey]) {
-        map[prodLineKey] = {
-          title: MFGPRODLINE ,
-          key: prodLineKey,
-          icon: <img src="assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
-          children: []
-        };
-        map[eqTypeKey].children.push(map[prodLineKey]);
-      }
-  
-      // Create Product Number node
-      const productNumberKey = EQID;
-      if (!map[productNumberKey]) {
-        map[productNumberKey] = {
-          title: MFGPRODNO || 'Unknown Product Number',
-          key: productNumberKey,
-          icon: <img src="assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
+          key: MfgAcronym,
+          icon: <img src="./assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
           children: [],
-          isLeaf: true,
         };
-        map[prodLineKey].children.push(map[productNumberKey]);
+        searchResultsNode.children.push(manufacturerNode);
       }
-    }
   
-
-    const setExpandable = (node) => {
-      if (node.children.length === 1) {
-        node.expanded = true; 
-      } else {
-        node.expanded = false;
+      const eqTypeKey = `${MfgAcronym}-${EQTYPE}`;
+      let eqTypeNode = manufacturerNode.children.find(
+        (child) => child.key === eqTypeKey
+      );
+  
+      if (!eqTypeNode) {
+        eqTypeNode = {
+          title: EQTYPE,
+          key: eqTypeKey,
+          icon: <img src={`./assets/EqType/${EQTYPE}.png`} alt="EQTYPE" style={{ width: 16, height: 16 }} />,
+          children: [],
+        };
+        manufacturerNode.children.push(eqTypeNode);
       }
-
-      node.children.forEach(setExpandable);
-    };
   
-
-    searchResultsNode.children.forEach(setExpandable);
+      const prodLineKey = `${MfgAcronym}-${EQTYPE}-${MFGPRODLINE}`;
+      let prodLineNode = eqTypeNode.children.find(
+        (child) => child.key === prodLineKey
+      );
   
-    console.log('Transformed Tree Data:', JSON.stringify(tree, null, 2));
+      if (!prodLineNode) {
+        prodLineNode = {
+          title: MFGPRODLINE,
+          key: prodLineKey,
+          icon: <img src="./assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
+          children: [],
+        };
+        eqTypeNode.children.push(prodLineNode);
+      }
+  
+      const productNumberKey = EQID;
+      let productnoNode = prodLineNode.children.find(
+        (child) => child.key === productNumberKey
+      );
+  
+      if (!productnoNode) {
+        productnoNode = {
+          title: MFGPRODNO,
+          key: productNumberKey,
+          icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
+          children: [],
+          isLeaf:false
+        };
+        prodLineNode.children.push(productnoNode);
+  
+      //   // Add two simple leaf nodes
+      //   // const leafNodes = [
+      //   //   {
+      //   //     key: `${productNumberKey}-leaf1`,
+      //   //     title: 'Rear', 
+      //   //     isLeaf: true,
+      //   //   },
+      //   //   {
+      //   //     key: `${productNumberKey}-leaf2`,
+      //   //     title: 'visio',
+      //   //     isLeaf: true,
+      //   //   },
+      //   // ];
+  
+      //   // productnoNode.children.push(...leafNodes);
+  
+      //   // Ensure addLeafNode is correctly defined and use it to add the new leaf nodes with title and icon
+       
+      }
+    });
+  
     return tree;
   };
-  
-  
-  
 
-
-  const search = async () => {
-    let searchType = 'Solution';
-    let paramXml = '';
-
-    if (keyword) {
-      searchType = 'Kwd';
-      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selecteddtManufacturers.length > 0 ? selecteddtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-    } else if (selectedManufacturer || selectedEqType || selectedProductline || selectedproductnumber) {
-      paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductline || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedproductnumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-    }
-
-    try {
-      const response = await axios.post('http://localhost:8000/library/SearchLibraryNew', {
-        Email: "",
-        SubNo: "000000000000000000001234",
-        FullLib: false,
-        ParamXML: paramXml,
-        Settings: {
-          RememberLastSearchCount: 16,
-          IncludeRelatedManufacturers: true,
-          NotifyResultsExceedCount: 10,
-          NotifyResultsExceedCountCheck: true,
-          RememberLastSearchCountCheck: true,
-          IsGroupOrderAsc1: true,
-          IsGroupOrderAsc2: true,
-          IsGroupOrderAsc3: true,
-          IsGroupOrderAsc4: true,
-          TreeGroupBy1: "Manufacturer",
-          TreeGroupBy2: "Equipment Type",
-          TreeGroupBy3: "Product Line",
-          TreeGroupBy4: "Product/Model Number"
-        }
-      });
-
-      const responsedtsearchresult = response.data.Data.SearchData.dtSearchResults
-
-      if(responsedtsearchresult){
-        const treeHierarchy = transformToTreeData(responsedtsearchresult );
-        console.log('treehierarchy', treeHierarchy)
-        setTreeData(treeHierarchy);
-
-        if (treeHierarchy) {
-          console.log('Navigating with treeData:', treeHierarchy);
-          navigate('/tree', { state: { treeData: treeHierarchy } });
-        } else { 
-          console.error('treeHierarchy is undefined or null');
-        } 
-      } else{
-        console.log('hierarchy is not created')
-      }
-    
-
-      const responsedtmanufacturer = response.data.Data.SearchData.dtManufacturers
-      console.log('Search Response dtmanufacturer:', responsedtmanufacturer);
-      console.log('Search Response dtsearchresult:', responsedtsearchresult);
-
-      if (!responsedtmanufacturer && ! responsedtsearchresult) {
-        setSnackbarMessage(`No Results were found for "${keyword}" in Manufacturer "${selectedManufacturer}"`);
-        setSnackbarOpen(true);
-
-      } else if (responsedtmanufacturer) {
-        setDtManufacturers(responsedtmanufacturer)
-        setIsDialogOpen(true)
-      }
-      else {
-        console.log('search result', keyword)
-      }
-    } catch (error) {
-      console.error('Search Error:', error);
-    }
-  };
-
-  useEffect(() =>{
-    if(selectedProductline && selectedEqType && selectedProductline && selectedproductnumber){
-      search()
-    }
-  })  
 
   const handleSnackbarClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -542,6 +425,10 @@ export default function MainPage() {
     </Typography>
   );
   useTheme(data.colortheme)
+
+
+
+
   return (
 
     <div
@@ -681,7 +568,8 @@ export default function MainPage() {
                 }}
 
               />
-              <Snackbar
+              {keyword ? (
+                <Snackbar
                 open={snackbarOpen}
                 onClose={handleSnackbarClose}
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -694,8 +582,22 @@ export default function MainPage() {
                   {snackbarMessage}
                 </Alert>
               </Snackbar>
+              
+              ): (
+                <Snackbar
+                open={snackbarOpen}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{vertical:'top', horizontal:'center'}}>
+                  <Alert
+                  onClose={handleSnackbarClose} severity='error' sx={{width:'100%'}}
+                  >
+                    {snackbarMessage}
+                  </Alert>
+                </Snackbar>
+              )}
+              
             </Grid>
-            <Grid xs={1} >
+            <Grid  >
               <IconButton sx={{ color: 'var(--font-color)', padding: '10px', position: 'relative' }} size='large' onClick={search}>
                 <SearchIcon />
               </IconButton>
@@ -745,7 +647,7 @@ export default function MainPage() {
                     borderColor: 'var(--font-color)',
                   },
                   '& .MuiInputBase-input': {
-                    fontSize: '12px', // Ensures input text is also 12px
+                    fontSize: '12px', 
                   },
                 }}
               />
@@ -962,11 +864,10 @@ export default function MainPage() {
         >
           Now you can create professional quality Visio Diagrams and PowerPoint Presentations using High Quality Shapes and Stencils.
         </Typography>
-      </>
-
-     
+      </> 
     </div>
-
-
   );
 }
+export default MainPage
+
+

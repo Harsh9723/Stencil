@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 const useTheme = (colortheme) => {
   useEffect(() => {
-    const hexColor = colortheme.split(',')[0];
+    const hexColor = colortheme.split(',')[1];
 
     const hex2rgb = (hex) => {
       const r = parseInt(hex.slice(1, 3), 16);

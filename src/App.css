@@ -31,3 +31,68 @@ font-family: 'Segoe UI', sans-serif;
 .MuiSelect-select .MuiSelect-outlined .MuiInputBase-input .MuiOutlinedInput-input{
   font-size: 12px;
 }
+
+
+
+.rc-tree .rc-tree-switcher-noop,
+.rc-tree .rc-tree-switcher_open,
+.rc-tree .rc-tree-switcher_close
+ {
+  background: none !important; 
+  width: 0; 
+  height:0 ; 
+}
+
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected{
+  color: white !important;
+}
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root{
+  color: white !important;
+}
+.css-ptiqhd-MuiSvgIcon-root{
+  color: white !important;
+}
+
+.css-1yjog0e-MuiTableCell-root{
+  color: white !important;
+}
+
+.custom-rc-tree .rc-tree-switcher-leaf {
+  display: none; 
+}
+
+/* App.css or your stylesheet */
+.custom-rc-tree .rc-tree-switcher {
+  display: none; /* Hide the switcher icon by default */
+}
+
+.custom-rc-tree .rc-tree-node {
+  position: relative; /* Ensure the node has positioning */
+}
+
+.custom-rc-tree .rc-tree-node .rc-tree-switcher {
+  display: inline-block; /* Show switcher icon only for nodes with children */
+}
+
+.custom-rc-tree .rc-tree-node.rc-tree-node-leaf .rc-tree-switcher {
+  display: none; /* Hide switcher icon for leaf nodes */
+}
+
+
+/* Custom styles for selected node */
+.custom-rc-tree .rc-tree-node-selected {
+  background-color: #efefef !important; /* Background color for selected node */
+  color: black !important;
+  width: 100%; /* Font color for selected node */
+}
+
+/* Ensure expand/collapse icons also inherit the font color */
+.custom-rc-tree .rc-tree-node-selected .rc-tree-switcher {
+  color: black !important;
+}
+
+/* Full width for the rc-tree */
+.custom-rc-tree {
+  width: 100%; /* Set tree width to full */
+}

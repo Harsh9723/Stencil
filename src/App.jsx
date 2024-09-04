@@ -4,9 +4,7 @@ import PreloadPage from './Components/PreloadPage';
 import MainPage from './Pages/MainPage';
 import Setting from './Pages/Setting';
 import './App.css'
-import DataConverter from './Components/DataConverter';
-import Tree from './Pages/Tree';
-import Treedata from './Pages/Tree';
+import Treedata from './Pages/TreeData';
 // import setThemeColors from './Components/Theme';
 function App() {
   const [showMainPage, setShowMainPage] = useState(false);
@@ -53,8 +51,7 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      {/* <DataConverter /> */}
-      {/* <Tree /> */}
+     
     </div>
   );
 }
