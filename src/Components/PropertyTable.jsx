@@ -2,6 +2,7 @@ import React from 'react';
 import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import * as Office from '@microsoft/office-js';
 
 const StyledCard = styled(Card)({
   backgroundColor: '#778899',
@@ -75,14 +76,20 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
   };
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData('text/plain', svgContent);
+    e.dataTransfer.setData('image/svg+xml', svgContent);
     e.dataTransfer.dropEffect = 'copy';
   };
 
   const handleDropOnWord = async () => {
     try {
-      await Office.context.document.setSelectedDataAsync(svgContent, { coercionType: Office.CoercionType.Html });
-      console.log('SVG content inserted into Word document');
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1];
+        await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
+        console.log('SVG image inserted into Word document');
+      };
+      reader.readAsDataURL(svgBlob);
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
