@@ -438,8 +438,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const handleDrop = async (info) => {
     const droppedNode = info.node;
     const shapeId = droppedNode.key;
-
-    // Check if the node is a leaf node and if its key matches the ShapeID
+  
     if (droppedNode.isLeaf && shapeId) {
       try {
         const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
@@ -447,11 +446,15 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
           SubNo: '000000000000000000001234',
           ShapeID: shapeId,
         });
-
+  
         const previewData = response.data;
-        console.log('preview', previewData);
-        // await insertSvgIntoWord(previewData);
-
+        console.log('Preview data:', previewData);
+  
+        if (previewData && previewData.svgContent) {
+          await insertSvgIntoWord(previewData.svgContent);
+        } else {
+          console.warn('No SVG content found in API response.');
+        }
       } catch (error) {
         console.error('API Error:', error);
       }
@@ -461,21 +464,21 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   };
 
 
-
   const insertSvgIntoWord = async (svgContent) => {
     try {
       await Word.run(async (context) => {
-        const base64Image = `data:image/svg+xml;base64,${btoa(svgContent)}`; // Convert SVG content to Base64
-
-        const range = context.document.getSelection(); // Get the current selection in the Word document
-        range.insertInlinePictureFromBase64(base64Image, Word.InsertLocation.end); // Insert the image
-
+        const base64Image = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+  
+        const range = context.document.getSelection();
+        range.insertInlinePictureFromBase64(base64Image, Word.InsertLocation.end);
+  
         await context.sync();
       });
     } catch (error) {
       console.error('Word Error:', error);
     }
   };
+  
 
 
 

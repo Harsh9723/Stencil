@@ -8,6 +8,8 @@ const StyledCard = styled(Card)(({ theme }) => ({
   marginTop: '20px',
   borderRadius: '8px',
   color: 'white',
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
   [theme.breakpoints.down('sm')]: {
     marginTop: '10px',
     padding: '10px',
@@ -19,6 +21,8 @@ const StyledTableContainer = styled(TableContainer)({
   backgroundColor: '#4e88c9',
   borderRadius: '8px',
   overflow: 'hidden',
+  fontFamily: 'Segoe UI, sans-serif',
+  fontSize: '12px',
 });
 
 const StyledTableCellHeader = styled(TableCell)({
@@ -28,6 +32,8 @@ const StyledTableCellHeader = styled(TableCell)({
   color: '#333',
   border: '1px solid #778899',
   textAlign: 'left',
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
 });
 
 const StyledTableCellBody = styled(TableCell)({
@@ -37,6 +43,8 @@ const StyledTableCellBody = styled(TableCell)({
   color: '#ffffff',
   position: 'relative',
   textAlign: 'left',
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
 });
 
 const CopyIconWrapper = styled('div')({
@@ -55,6 +63,8 @@ const StyledTableRow = styled(TableRow)({
   '&:hover .copy-icon': {
     opacity: 1,
   },
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
 });
 
 const SvgWrapper = styled('div')(({ theme }) => ({
@@ -73,6 +83,8 @@ const SvgWrapper = styled('div')(({ theme }) => ({
       maxHeight: '200px',
     },
   },
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
 }));
 
 const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
