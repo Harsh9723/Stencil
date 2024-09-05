@@ -462,20 +462,20 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
 
 
-  // const insertSvgIntoWord = async (svgContent) => {
-  //   try {
-  //     await Word.run(async (context) => {
-  //       const base64Image = `data:image/svg+xml;base64,${btoa(svgContent)}`; // Convert SVG content to Base64
+  const insertSvgIntoWord = async (svgContent) => {
+    try {
+      await Word.run(async (context) => {
+        const base64Image = `data:image/svg+xml;base64,${btoa(svgContent)}`; // Convert SVG content to Base64
 
-  //       const range = context.document.getSelection(); // Get the current selection in the Word document
-  //       range.insertInlinePictureFromBase64(base64Image, Word.InsertLocation.end); // Insert the image
+        const range = context.document.getSelection(); // Get the current selection in the Word document
+        range.insertInlinePictureFromBase64(base64Image, Word.InsertLocation.end); // Insert the image
 
-  //       await context.sync();
-  //     });
-  //   } catch (error) {
-  //     console.error('Word Error:', error);
-  //   }
-  // };
+        await context.sync();
+      });
+    } catch (error) {
+      console.error('Word Error:', error);
+    }
+  };
 
 
 
@@ -538,6 +538,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
               fontFamily: '"Segoe UI", sans-serif',
               textTransform: 'none',
               color: '#ffffff',
+              padding:'0px'
             }}
           />
           {relatedDevicesVisible && (
@@ -552,6 +553,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
                 '& .MuiTab-wrapper': {
                   color: 'white',
                   display: 'flex',
+                  
                 },
               }}
             />

@@ -750,8 +750,9 @@ const SearchComponent = () => {
           sx={{
             display: showTreeComponent ? 'block' : 'none', // Control display based on showTreeComponent state
             width: '100%',
-            height: 'auto',
-            marginTop: '5px',
+            height: '100vh',
+            marginTop: '0px',
+            padding:'0px'
           }}
         >
           {showTreeComponent && treeData.length > 0 ? (

@@ -3,13 +3,16 @@ import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-
-const StyledCard = styled(Card)({
+const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
   marginTop: '20px',
   borderRadius: '8px',
   color: 'white',
-});
+  [theme.breakpoints.down('sm')]: {
+    marginTop: '10px',
+    padding: '10px',
+  },
+}));
 
 const StyledTableContainer = styled(TableContainer)({
   width: '100%',
@@ -54,15 +57,23 @@ const StyledTableRow = styled(TableRow)({
   },
 });
 
-const SvgWrapper = styled('div')({
+const SvgWrapper = styled('div')(({ theme }) => ({
   margin: '0 auto',
+  width: '100%',
   maxHeight: '325px',
   maxWidth: '80%',
   '& svg': {
     width: '100%',
-    height: '325px',
+    height: 'auto',
+    maxHeight: '325px',
+    [theme.breakpoints.down('md')]: {
+      maxHeight: '250px',
+    },
+    [theme.breakpoints.down('sm')]: {
+      maxHeight: '200px',
+    },
   },
-});
+}));
 
 const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
   const copyToClipboard = (value) => {
@@ -112,7 +123,7 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
             dangerouslySetInnerHTML={{ __html: svgContent }}
           />
         ) : (
-          <StyledTableContainer component={Paper} style={{ width: '100%' }}>
+          <StyledTableContainer component={Paper}>
             <Table>
               <TableBody>
                 {propertyData
