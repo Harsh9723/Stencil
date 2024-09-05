@@ -12,10 +12,11 @@ const root = createRoot(document.getElementById('root'));
 root.render(
   <StrictMode>
     <TreeDataProvider>
-
     <MemoryRouter>
       <App />
     </MemoryRouter>
     </TreeDataProvider>
   </StrictMode>
 );
+
+  

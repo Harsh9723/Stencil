@@ -44,55 +44,107 @@ font-family: 'Segoe UI', sans-serif;
 }
 
 
-.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected{
-  color: white !important;
-}
-.css-1h9z7r5-MuiButtonBase-root-MuiTab-root{
-  color: white !important;
-}
-.css-ptiqhd-MuiSvgIcon-root{
-  color: white !important;
-}
 
-.css-1yjog0e-MuiTableCell-root{
-  color: white !important;
-}
 
-.custom-rc-tree .rc-tree-switcher-leaf {
-  display: none; 
-}
 
-/* App.css or your stylesheet */
 .custom-rc-tree .rc-tree-switcher {
-  display: none; /* Hide the switcher icon by default */
+  display: none;
 }
 
-.custom-rc-tree .rc-tree-node {
-  position: relative; /* Ensure the node has positioning */
-}
 
 .custom-rc-tree .rc-tree-node .rc-tree-switcher {
-  display: inline-block; /* Show switcher icon only for nodes with children */
+  display: inline-block;
+  background-color: #efefef;
 }
+
 
 .custom-rc-tree .rc-tree-node.rc-tree-node-leaf .rc-tree-switcher {
-  display: none; /* Hide switcher icon for leaf nodes */
+  display: none;
 }
 
-
-/* Custom styles for selected node */
+/* Style for selected node */
 .custom-rc-tree .rc-tree-node-selected {
-  background-color: #efefef !important; /* Background color for selected node */
-  color: black !important;
-  width: 100%; /* Font color for selected node */
+  background-color: #efefef !important; /* Set background color */
+  color: black !important; /* Set text color */
+  width: 100%; /* Ensure full width selection */
 }
 
-/* Ensure expand/collapse icons also inherit the font color */
+/* Ensure expand/collapse icons also match the selected node styles */
 .custom-rc-tree .rc-tree-node-selected .rc-tree-switcher {
-  color: black !important;
+  color: black !important; /* Set icon color */
+  background-color: #efefef !important;  /* Set background color */
 }
 
-/* Full width for the rc-tree */
+/* Set rc-tree width to full */
 .custom-rc-tree {
-  width: 100%; /* Set tree width to full */
+  width: 100%; /* Make the tree take full width */
+}
+
+/* Additional styling for rc-tree node content */
+.custom-rc-tree .rc-tree-node-content-wrapper {
+  font-size: 12px; /* Adjust font size */
+  font-family: "Segoe UI", sans-serif; /* Use Segoe UI font */
+}
+
+/* Custom global styles */
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root.Mui-selected {
+  color: white !important;
+}
+
+.css-1h9z7r5-MuiButtonBase-root-MuiTab-root {
+  color: white !important;
+}
+
+.css-ptiqhd-MuiSvgIcon-root {
+  color: white !important;
+}
+
+.css-1yjog0e-MuiTableCell-root {
+  color: white !important;
+}
+
+
+.custom-rc-tree .rc-tree-switcher_open{
+  background-color: #efefef;
+}
+
+.MuiTabs-root .MuiTabs-indicator{
+  width: 0px;
+}
+.css-1oy0tqq-MuiButtonBase-root-MuiTab-root.Mui-selected{
+  color: #ffffff;
+}
+
+/* Style for selected node */
+.custom-rc-tree .rc-tree-node-selected {
+  background-color: #efefef !important; /* Set background color */
+  color: black !important; /* Set text color */
+  width: 100%; /* Ensure full width selection */
+}
+
+/* Ensure expand/collapse icons also match the selected node styles */
+.custom-rc-tree .rc-tree-node-selected .rc-tree-switcher {
+  color: black !important; /* Set icon color */
+  background-color: #efefef !important;  /* Set background color */
+}
+
+/* Ensure icons inside selected nodes match the background */
+.custom-rc-tree .rc-tree-node-selected .rc-tree-iconEle {
+  background-color: #efefef !important; /* Match background color */
+}
+
+/* Set icon styles for selected nodes */
+.custom-rc-tree .rc-tree-node-selected .css-i4bv87-MuiSvgIcon-root {
+  color: black !important; /* Set icon color */
+  background-color: #efefef !important;  /* Set background color */
+}
+
+/* Set font color to white when the tab is selected */
+.MuiButtonBase-root.MuiTab-root.MuiTab-textColorPrimary.Mui-selected {
+  color: white !important; /* Set text color to white */
+}
+
+
+.MuiTabs-indicator.css-1aquho2-MuiTabs-indicator {
+  background-color: white !important; /* Set indicator background color to white */
 }

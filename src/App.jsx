@@ -48,7 +48,6 @@ function App() {
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path='/tree' element={<Treedata />} />
-
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
      
@@ -57,3 +56,8 @@ function App() {
 }
 
 export default App;
+
+
+
+
+// handleSearch remains unchanged

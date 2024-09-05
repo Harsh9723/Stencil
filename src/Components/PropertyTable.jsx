@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import * as Office from '@microsoft/office-js';
+
 
 const StyledCard = styled(Card)({
   backgroundColor: '#778899',
@@ -57,7 +57,7 @@ const StyledTableRow = styled(TableRow)({
 const SvgWrapper = styled('div')({
   margin: '0 auto',
   maxHeight: '325px',
-  maxWidth: '100%',
+  maxWidth: '80%',
   '& svg': {
     width: '100%',
     height: '325px',
@@ -141,11 +141,11 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
                     Stencil
                   </StyledTableCellHeader>
                   <StyledTableCellBody>
-                    {stencilResponse.data.Data[0].StencilName}
+                    {stencilResponse?.data?.Data[0]?.StencilName}
                     <CopyIconWrapper className="copy-icon">
                       <IconButton
                         size="small"
-                        onClick={() => copyToClipboard(stencilResponse.data.Data[0].StencilName)}
+                        onClick={() => copyToClipboard(stencilResponse?.data?.Data[0]?.StencilName)}
                         sx={{ color: '#ffffff' }}
                       >
                         <ContentCopyIcon fontSize="small" />
