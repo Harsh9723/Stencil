@@ -16,7 +16,7 @@ import InputLabel from '@mui/material/InputLabel';
 import useTheme from '../Components/Theme';
 import axios from 'axios';
 import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, FormGroup, Checkbox, Button } from '@mui/material';
-import { handleSearch, transformToTreeData } from '../Components/utils';
+import { handleSearch, transformToTreeData } from '../Components/utils.jsx';
 import Treedata from './TreeData';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 

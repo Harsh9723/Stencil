@@ -3,13 +3,31 @@ import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-const StyledCard = styled(Card)(({ theme }) => ({
+// Styled components (no changes)
+const StyledPropertyCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
   marginTop: '20px',
   borderRadius: '8px',
   color: 'white',
   fontSize: '12px',
   fontFamily: 'Segoe UI, sans-serif',
+  [theme.breakpoints.down('sm')]: {
+    marginTop: '10px',
+    padding: '10px',
+  },
+}));
+
+const StyledSvgCard = styled(Card)(({ theme }) => ({
+  backgroundColor: '#778899',
+  marginTop: '20px',
+  borderRadius: '8px',
+  color: 'white',
+  fontSize: '12px',
+  fontFamily: 'Segoe UI, sans-serif',
+  padding: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
   [theme.breakpoints.down('sm')]: {
     marginTop: '10px',
     padding: '10px',
@@ -98,90 +116,87 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
       });
   };
 
+  // Drag start event handler
   const handleDragStart = (e) => {
     e.dataTransfer.setData('image/svg+xml', svgContent);
     e.dataTransfer.dropEffect = 'copy';
   };
 
-  const handleDropOnWord = async () => {
+  // Function to insert SVG image into Word on drop
+  const handleDropOnWord = async (e) => {
+    e.preventDefault();  // Prevent the default drop behavior
     try {
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1];
+        const base64data = reader.result.split(',')[1];  // Get the base64 string
         await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
         console.log('SVG image inserted into Word document');
       };
-      reader.readAsDataURL(svgBlob);
+      reader.readAsDataURL(svgBlob);  // Read the SVG Blob as a data URL
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
   };
 
-  return (
-    <StyledCard>
-      <CardContent
-        style={{
-          display: 'flex',
-          justifyContent: svgContent ? 'center' : 'flex-start',
-          alignItems: svgContent ? 'center' : 'flex-start',
-        }}
-      >
-        {svgContent ? (
-          <SvgWrapper
-            draggable
-            onDragStart={handleDragStart}
-            onDrop={handleDropOnWord}
-            dangerouslySetInnerHTML={{ __html: svgContent }}
-          />
-        ) : (
-          <StyledTableContainer component={Paper}>
-            <Table>
-              <TableBody>
-                {propertyData
-                  .filter((item) => item.GroupName === 'Basic')
-                  .map((item, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCellHeader component="th" scope="row">
-                        {item.pLabel}
-                      </StyledTableCellHeader>
-                      <StyledTableCellBody>
-                        {item.pValue}
-                        <CopyIconWrapper className="copy-icon">
-                          <IconButton
-                            size="small"
-                            onClick={() => copyToClipboard(item.pValue)}
-                            sx={{ color: '#ffffff' }}
-                          >
-                            <ContentCopyIcon fontSize="small" />
-                          </IconButton>
-                        </CopyIconWrapper>
-                      </StyledTableCellBody>
-                    </StyledTableRow>
-                  ))}
-                <StyledTableRow>
-                  <StyledTableCellHeader component="th" scope="row">
-                    Stencil
-                  </StyledTableCellHeader>
-                  <StyledTableCellBody>
-                    {stencilResponse?.data?.Data[0]?.StencilName}
-                    <CopyIconWrapper className="copy-icon">
-                      <IconButton
-                        size="small"
-                        onClick={() => copyToClipboard(stencilResponse?.data?.Data[0]?.StencilName)}
-                        sx={{ color: '#ffffff' }}
-                      >
-                        <ContentCopyIcon fontSize="small" />
-                      </IconButton>
-                    </CopyIconWrapper>
-                  </StyledTableCellBody>
-                </StyledTableRow>
-              </TableBody>
-            </Table>
-          </StyledTableContainer>
-        )}
+  return svgContent ? (
+    <StyledSvgCard>
+      <SvgWrapper
+        draggable
+        onDragStart={handleDragStart}
+        onDrop={handleDropOnWord}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+      />
+    </StyledSvgCard>
+  ) : (
+    <StyledPropertyCard>
+      <CardContent>
+        <StyledTableContainer component={Paper}>
+          <Table>
+            <TableBody>
+              {propertyData
+                .filter((item) => item.GroupName === 'Basic')
+                .map((item, index) => (
+                  <StyledTableRow key={index}>
+                    <StyledTableCellHeader component="th" scope="row">
+                      {item.pLabel}
+                    </StyledTableCellHeader>
+                    <StyledTableCellBody>
+                      {item.pValue}
+                      <CopyIconWrapper className="copy-icon">
+                        <IconButton
+                          size="small"
+                          onClick={() => copyToClipboard(item.pValue)}
+                          sx={{ color: '#ffffff' }}
+                        >
+                          <ContentCopyIcon fontSize="small" />
+                        </IconButton>
+                      </CopyIconWrapper>
+                    </StyledTableCellBody>
+                  </StyledTableRow>
+                ))}
+              <StyledTableRow>
+                <StyledTableCellHeader component="th" scope="row">
+                  Stencil
+                </StyledTableCellHeader>
+                <StyledTableCellBody>
+                  {stencilResponse}
+                  <CopyIconWrapper className="copy-icon">
+                    <IconButton
+                      size="small"
+                      onClick={() => copyToClipboard(stencilResponse)}
+                      sx={{ color: '#ffffff' }}
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </CopyIconWrapper>
+                </StyledTableCellBody>
+              </StyledTableRow>
+            </TableBody>
+          </Table>
+        </StyledTableContainer>
       </CardContent>
-    </StyledCard>
+    </StyledPropertyCard>
   );
 };
 

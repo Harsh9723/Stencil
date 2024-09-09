@@ -10,13 +10,12 @@ import { TreeDataProvider } from './Context/TreedataContext.jsx';
 const root = createRoot(document.getElementById('root'));
 
 root.render(
-  <StrictMode>
+  <React.StrictMode>
     <TreeDataProvider>
     <MemoryRouter>
       <App />
     </MemoryRouter>
     </TreeDataProvider>
-  </StrictMode>
+  </React.StrictMode>
 );
 
-  

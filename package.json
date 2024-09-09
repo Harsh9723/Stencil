@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,6 +15,7 @@
     "@mui/icons-material": "^5.16.7",
     "@mui/material": "^5.16.7",
     "@reduxjs/toolkit": "^2.2.7",
+    "@types/office-js": "^1.0.418",
     "axios": "^1.7.4",
     "fast-xml-parser": "^4.4.1",
     "rc-tree": "^5.8.8",
