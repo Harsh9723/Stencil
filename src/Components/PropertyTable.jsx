@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
@@ -106,6 +106,13 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 }));
 
 const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '' }) => {
+  useEffect(() => {
+    // Initialize Office when the component mounts
+    Office.initialize = () => {
+      console.log('Office is ready.');
+    };
+  }, []);
+
   const copyToClipboard = (value) => {
     navigator.clipboard.writeText(value)
       .then(() => {
@@ -117,21 +124,21 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
   };
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData('text/plain', svgContent);
+    e.dataTransfer.setData('image/svg+xml', svgContent); // Set SVG content as drag data
     e.dataTransfer.dropEffect = 'copy';
   };
 
   const handleDropOnWord = async (e) => {
-    e.preventDefault();  // Prevent default behavior
+    e.preventDefault(); // Prevent default behavior
     try {
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1];  // Get the base64 string
+        const base64data = reader.result.split(',')[1]; // Get the base64 string
         await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
         console.log('SVG image inserted into Word document');
       };
-      reader.readAsDataURL(svgBlob);  // Read the SVG Blob as a data URL
+      reader.readAsDataURL(svgBlob); // Read the SVG Blob as a data URL
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
