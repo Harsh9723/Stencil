@@ -17,6 +17,7 @@ import { handleSearch, transformToTreeData } from '../Components/utils.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const navigate = useNavigate();
+  
   const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree } = useTreeData();
 
   const [expandedKeys, setExpandedKeys] = useState([]);
@@ -784,7 +785,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         onSelect={handleSelect}
         onExpand={handleExpand}
         selectedKeys={selectedKeys}
-        // draggable
+        draggable
         onDragStart={handleDragStart}
         onDrop={handleDrop}
       />

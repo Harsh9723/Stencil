@@ -399,7 +399,7 @@ const navigate = useNavigate()
         </Box>
       </Box>
 
-      {treeData.length === 0 ? (
+      {!showTreeComponent ? (
 
         <>
 

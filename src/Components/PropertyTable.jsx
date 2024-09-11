@@ -108,9 +108,11 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '' }) => {
   useEffect(() => {
     // Initialize Office when the component mounts
-    Office.initialize = () => {
-      console.log('Office is ready.');
-    };
+    if (Office.initialize) {
+      Office.initialize = () => {
+        console.log('Office is ready.');
+      };
+    }
   }, []);
 
   const copyToClipboard = (value) => {
