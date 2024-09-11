@@ -3,7 +3,7 @@ import { styled } from '@mui/system';
 import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-// Styled components (no changes)
+// Styled components
 const StyledPropertyCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
   marginTop: '20px',
@@ -105,7 +105,7 @@ const SvgWrapper = styled('div')(({ theme }) => ({
   fontFamily: 'Segoe UI, sans-serif',
 }));
 
-const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
+const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '' }) => {
   const copyToClipboard = (value) => {
     navigator.clipboard.writeText(value)
       .then(() => {
@@ -116,15 +116,13 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
       });
   };
 
-  // Drag start event handler
   const handleDragStart = (e) => {
-    e.dataTransfer.setData('image/svg+xml', svgContent);
+    e.dataTransfer.setData('text/plain', svgContent);
     e.dataTransfer.dropEffect = 'copy';
   };
 
-  // Function to insert SVG image into Word on drop
   const handleDropOnWord = async (e) => {
-    e.preventDefault();  // Prevent the default drop behavior
+    e.preventDefault();  // Prevent default behavior
     try {
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
@@ -145,6 +143,7 @@ const PropertyTable = ({ propertyData, svgContent, stencilResponse }) => {
         draggable
         onDragStart={handleDragStart}
         onDrop={handleDropOnWord}
+        onDragOver={(e) => e.preventDefault()} // Allow drop
         dangerouslySetInnerHTML={{ __html: svgContent }}
       />
     </StyledSvgCard>

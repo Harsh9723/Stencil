@@ -3,8 +3,9 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import PreloadPage from './Components/PreloadPage';
 import MainPage from './Pages/MainPage';
 import Setting from './Pages/Setting';
-import './App.css'
+import './App.css';
 import Treedata from './Pages/TreeData';
+
 
 function App() {
   const [showMainPage, setShowMainPage] = useState(false);
@@ -16,7 +17,7 @@ function App() {
       const timer = setTimeout(() => {
         setShowMainPage(true);
         localStorage.setItem('hasVisited', 'true');
-      }, 1000); 
+      }, 1000);
 
       return () => clearTimeout(timer); // Clean up the timer on unmount
     } else {
@@ -24,39 +25,15 @@ function App() {
     }
   }, []);
 
- useEffect(() => {
 
-  
-     Office.onReady(info => {
-       if (info.host === Office.HostType.Word) {
-         console.log("Office.js is running in Word");
-         // Your Office.js code here
-        } else {
-          console.warn("Office.js is not running in an Office application");
-        }
+    Office.initialize = function () {
+      console.log("Office is ready.");
+      $(document).ready(function () {
+        console.log("Document is ready.");
+        // You can add more initialization logic here if needed.
       });
- 
-      
-  })
-    
+    };
 
-
-  // useEffect(() => {
-  //   Office.onReady(info => {
-  //     if (info.host === Office.HostType.Word) {
-  //       // Add event handler for button click
-  //       document.getElementById("insertText").onclick = insertText;
-  //     }
-  //   });
-  // }, []);
-
-  // const insertText = () => {
-  //   Word.run(async context => {
-  //     const docBody = context.document.body;
-  //     docBody.insertText("Hello, World!", Word.InsertLocation.end);
-  //     await context.sync();
-  //   });
-  // };
 
   return (
     <div className="App">
@@ -64,10 +41,9 @@ function App() {
         <Route path="/" element={showMainPage ? <MainPage /> : <PreloadPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
-        <Route path='/tree' element={<Treedata />} />
+        <Route path="/tree" element={<Treedata />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-     
     </div>
   );
 }
@@ -75,6 +51,4 @@ function App() {
 export default App;
 
 
-
-
-// handleSearch remains unchanged
+// export function run<T>(batch:(Context: Word.RequestContext) =>)

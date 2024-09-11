@@ -32,38 +32,49 @@ export const handleSearch = async (searchParams, onSuccess, onError) => {
         }else if (related || '') {
           paramXml=` <Search><NotificationCount>500</NotificationCount><SearchType>Related</SearchType><EQID>${Eqid}</EQID><MfgFilterList></MfgFilterList><IncludeRelatedMfg>true</IncludeRelatedMfg><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`
         }
-  try {
-    const response = await axios.post(`${API_URL}SearchLibraryNew`, {
-      Email: "",
-      SubNo: "000000000000000000001234",
-      FullLib: false,
-      ParamXML: paramXml,
-      Settings: {
-        RememberLastSearchCount: 16,
-        IncludeRelatedManufacturers: true,
-        NotifyResultsExceedCount: 10,
-        NotifyResultsExceedCountCheck: true,
-        RememberLastSearchCountCheck: true,
-        IsGroupOrderAsc1: true,
-        TreeGroupBy1: "Manufacturer",
-        TreeGroupBy2: "Equipment Type",
-        TreeGroupBy3: "Product Line",
-        TreeGroupBy4: "Product/Model Number",
-      },
-    });
-
-    const resultData = response.data.Data.SearchData.dtSearchResults;
-    console.log('resultdata', resultData)
-    const dtResultdata = response.data.Data.SearchData.dtManufacturers;
-    if (resultData) {
-      onSuccess(resultData);
-
-    } else if(dtResultdata){
-      onSuccess(dtResultdata)
-    } 
-  } catch (error) {
-    console.error('related not shown');
-  }
+        try {
+          const response = await axios.post(`${API_URL}SearchLibraryNew`, {
+            Email: "",
+            SubNo: "000000000000000000001234",
+            FullLib: false,
+            ParamXML: paramXml,
+            Settings: {
+              RememberLastSearchCount: 16,
+              IncludeRelatedManufacturers: true,
+              NotifyResultsExceedCount: 10,
+              NotifyResultsExceedCountCheck: true,
+              RememberLastSearchCountCheck: true,
+              IsGroupOrderAsc1: true,
+              TreeGroupBy1: "Manufacturer",
+              TreeGroupBy2: "Equipment Type",
+              TreeGroupBy3: "Product Line",
+              TreeGroupBy4: "Product/Model Number",
+            },
+          });
+        
+          const searchData = response.data.Data.SearchData;
+          const resultData = searchData?.dtSearchResults || []; // Safely handle if data is missing
+          const dtResultdata = searchData?.dtManufacturers || []; // Safely handle if data is missing
+        
+          console.log('Result Data:', resultData);
+          console.log('dtResult Data:', dtResultdata);
+        
+          if (resultData.length > 0) {
+            // If there are search results, call onSuccess with resultData
+            onSuccess(resultData);
+          } else if (dtResultdata.length > 0) {
+            // If there are no search results, but manufacturers are available
+            onSuccess(dtResultdata);
+          } else {
+            console.log('No relevant data found');
+            // Handle cases where no data is available
+            onFailure('No results found');
+          }
+        } catch (error) {
+          console.error('Related not shown:', error.message);
+          onFailure('An error occurred while fetching data');
+        }
+        
 };
 
 /**

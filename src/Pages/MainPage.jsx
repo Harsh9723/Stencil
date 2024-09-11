@@ -22,7 +22,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const SearchComponent = () => {
   const [loading, setLoading] = useState(false);
-  const [manufacturers, setManufacturers, resetManufacturers] = useState('')
+  const [manufacturers, setManufacturers] = useState('')
   const [selectedManufacturer, setSelectedManufacturer] = useState('');
   const [eqTypes, setEqTypes,] = useState([]);
   const [selectedEqType, setSelectedEqType] = useState('');
@@ -38,9 +38,17 @@ const SearchComponent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [treeData, setTreeData] = useState([]);
   const [resultData, setResultData] = useState([])
+  const [dtresultdata, SetDtresultData] = useState([])
   const [showTreeComponent, setShowTreeComponent] = useState(false)
-  const navigate = useNavigate();
+const navigate = useNavigate()
 
+
+  Office.initialize = function () {
+    console.log("Office is ready.");
+    $(document).ready(function () {
+      console.log("Document is ready.");
+    });
+  };
 
   const searchParams = {
     keyword,
@@ -55,29 +63,31 @@ const SearchComponent = () => {
 
   const onSuccess = (resultData, dtResultdata) => {
     const treeHierarchy = transformToTreeData(resultData);
-    setResultData(resultData)
+    setResultData(resultData);
+    SetDtresultData(dtResultdata)
+
+   
+    if (dtresultdata && dtresultdata.length > 0) {
+      setDtManufacturers(dtresultdata);
+      setIsDialogOpen(true);
+    }
 
     console.log('treeHierarchy', treeHierarchy);
     setTreeData(treeHierarchy);
 
-    if (treeHierarchy && treeHierarchy.length > 0) {
-
-      // setLoading(true);
-      setShowTreeComponent(true); // Set a state that controls rendering of the tree component
+    if (!resultData && !dtresultdata) {
+      setSnackbarMessage(`No results were found for ${keyword}`);
+      setSnackbarOpen(true);
+    } else if (treeHierarchy && treeHierarchy.length > 0) {
+      // Set loading and show tree component if there are results
+      setShowTreeComponent(true);
     } else {
       console.error('treeHierarchy is undefined or empty');
-      setLoading(false)
-      setShowTreeComponent(false); // Ensure tree component does not render when treeHierarchy is empty
-    }
-
-    if (!resultData && !dtResultdata) {
-      setSnackbarMessage(`No Result were found for ${keyword}`);
-      setSnackbarOpen(true);
-    } else if (dtResultdata) {
-      setDtManufacturers(dtResultdata);
-      setIsDialogOpen(true);
+      setLoading(false);
+      setShowTreeComponent(false);
     }
   };
+
 
   const onError = (message) => {
     setSnackbarMessage(message);
@@ -214,16 +224,13 @@ const SearchComponent = () => {
   }, [keyword, manufacturers]);
 
 
-  const handleFieldChange = () => {
+
+
+  useEffect(() => {
     if (selectedManufacturer && selectedEqType && selectedProductLine && selectedProductNumber) {
-      handleSearch();
+      handlesearch(searchParams, onSuccess, onError)
     }
-  };
-  // useEffect(() => {
-  //   if( selectedManufacturer || selectedEqType || selectedProductLine || selectedProductNumber){
-  //   handlesearch()
-  //   }
-  // })
+  }, [selectedManufacturer && selectedEqType && selectedProductLine && selectedProductNumber])
 
 
   const handleManufacturerChange = (event) => {
@@ -235,7 +242,7 @@ const SearchComponent = () => {
     setEqTypes([]);
     setProductLine([]);
     setProductNumber([]);
-    handleFieldChange();
+
   };
 
   const handleEqTypeChange = (event) => {
@@ -244,17 +251,17 @@ const SearchComponent = () => {
     setSelectedProductNumber('')
     setProductLine([])
     setProductNumber([])
-    handleFieldChange();
+
   }
   const handleproductlinechange = (event) => {
     setSelectedProductLine(event.target.value)
     setSelectedProductNumber('')
     setProductNumber([])
-    handleFieldChange();
+
   }
   const handleproductnumber = (event) => {
     setSelectedProductNumber(event.target.value)
-    handleFieldChange();
+
   }
   const handleSettingClick = () => {
     navigate('/setting');
@@ -273,7 +280,7 @@ const SearchComponent = () => {
   const handleDialogSubmit = () => {
     console.log('Selected Manufacturers:', selectedDtManufacturers);
     setIsDialogOpen(false);
-    search()
+    handlesearch()
   };
   const handlebuttonclick = () => {
     setSnackbarOpen(false)
@@ -293,8 +300,15 @@ const SearchComponent = () => {
   const handlesearch = () => {
     handleSearch(searchParams, onSuccess, onError)
   }
+
+  const handleBackClick = () => {
+    // When the back arrow is clicked, hide the tree and show the main page
+    setShowTreeComponent(false);
+    
+  };
   return (
 
+      
     <div
       style={{
         backgroundColor: 'var(--bg-color)',
@@ -351,6 +365,8 @@ const SearchComponent = () => {
           <Button onClick={() => handleDialogSubmit()} sx={{ fontSize: '12px' }}>OK</Button>
         </DialogActions>
       </Dialog>
+
+      
       <Box
         sx={{
           position: 'relative',
@@ -362,13 +378,6 @@ const SearchComponent = () => {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          {treeData.length > 0 ? (
-            <Tooltip title="back" placement="bottom-end">
-              <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} >
-                <ArrowBackIcon />
-              </IconButton>
-            </Tooltip>
-          ) : (
             <>
               <Tooltip title="setting" placement="bottom-end">
                 <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleSettingClick}>
@@ -391,7 +400,7 @@ const SearchComponent = () => {
                 </Typography>
               </Tooltip>
             </>
-          )}
+        
         </Box>
       </Box>
 
@@ -406,7 +415,7 @@ const SearchComponent = () => {
               display: 'flex',
               flexDirection: 'column',
               gap: '0px',
-              overflow: 'hidden',
+              overflowY: 'auto',
               padding: '12px'
             }}
             noValidate
@@ -752,12 +761,38 @@ const SearchComponent = () => {
             width: '100%',
             height: '100vh',
             marginTop: '0px',
-            padding:'0px'
+            padding: '0px'
           }}
         >
           {showTreeComponent && treeData.length > 0 ? (
-            <Treedata treeData={treeData} searchResult={resultData} />
+             <>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
 
+            
+             <Tooltip title="setting" placement="bottom-end">
+               <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleBackClick}>
+                 <ArrowBackIcon />
+               </IconButton>
+             </Tooltip>
+             <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+             <Tooltip title="visit visiostencil website" placement="bottom-end">
+               <Typography
+                 sx={{
+                   marginLeft: '8px',
+                   cursor: 'pointer',
+                   textDecoration: 'underline',
+                   whiteSpace: 'nowrap',
+                   fontSize: '12px'
+                  }}
+                  onClick={handleClick}
+                  >
+                 VisioStencils.com
+               </Typography>
+             </Tooltip>
+          
+                 </Box>
+            <Treedata treeData={treeData} searchResult={resultData} />
+</>
           ) : (
             <div>No data available for the tree.</div>
           )}
@@ -767,5 +802,3 @@ const SearchComponent = () => {
   );
 }
 export default SearchComponent
-
-
