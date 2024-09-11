@@ -576,7 +576,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     // setTabValue(0)
   }
 
-  const handleDragStart = (info) => {
+  const handleDragStart = async (info) => {
     const { node } = info;
 
     // Check if the node is a leaf
@@ -584,41 +584,73 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       console.log("Cannot drag this node. It is not a leaf node or does not have a ShapeID.");
       info.event.dataTransfer.effectAllowed = 'none';
       info.event.preventDefault();
-    } else {
-      console.log("Drag start allowed for node:", node);
+      return;
+    }
+
+    console.log("Drag start allowed for node:", node);
+
+    // Call the API to get the SVG content
+    try {
+      const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+        Email: '',
+        SubNo: '000000000000000000001234',
+        ShapeID: node.key,
+      });
+
+      const svgContent = response.data; // Assuming response.data contains the SVG content
+      console.log('API SVG response:', svgContent);
+
+      if (svgContent) {
+        // Convert SVG content to a base64 string
+        const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          const base64data = reader.result.split(',')[1];
+
+          // Set the drag data to be the SVG image as a base64-encoded image
+          info.event.dataTransfer.setData('image/svg+xml', base64data);
+          info.event.dataTransfer.effectAllowed = 'copy';
+        };
+
+        reader.readAsDataURL(svgBlob);
+      } else {
+        console.warn('No SVG content found in API response.');
+        info.event.dataTransfer.effectAllowed = 'none';
+        info.event.preventDefault();
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+      info.event.dataTransfer.effectAllowed = 'none';
+      info.event.preventDefault();
     }
   };
 
   const handleDrop = async (info) => {
-    const droppedNode = info.node;
-    const shapeId = droppedNode.key;
-  
-    if (droppedNode.isLeaf && shapeId) {
-      try {
-        // Call the API to get the SVG content
-        const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
-          Email: '',
-          SubNo: '000000000000000000001234',
-          ShapeID: shapeId,
-        });
-  
-        const svgContent = response.data; // Assuming response.data contains the SVG content
-        console.log('API SVG response:', svgContent);
-  
-        if (svgContent) {
-          // Insert SVG into Word
-          await insertSvgIntoWord(svgContent);
-        } else {
-          console.warn('No SVG content found in API response.');
-        }
-      } catch (error) {
-        console.error('API Error:', error);
+    try {
+      // Get the base64-encoded SVG data from the drag event
+      const svgBase64 = info.event.dataTransfer.getData('image/svg+xml');
+
+      if (svgBase64) {
+        // Insert the SVG image into Word
+        await Office.context.document.setSelectedDataAsync(
+          svgBase64,
+          { coercionType: Office.CoercionType.Image },
+          (asyncResult) => {
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+              console.log('SVG image inserted into Word document.');
+            } else {
+              console.error('Failed to insert SVG:', asyncResult.error.message);
+            }
+          }
+        );
+      } else {
+        console.warn('No SVG data available for drop.');
       }
-    } else {
-      console.log('Node is not a leaf or does not have a valid ShapeID.');
+    } catch (error) {
+      console.error('Error during drop:', error);
     }
   };
-  
 
 
 
