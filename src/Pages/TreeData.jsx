@@ -784,7 +784,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         onSelect={handleSelect}
         onExpand={handleExpand}
         selectedKeys={selectedKeys}
-        draggable
+        // draggable
         onDragStart={handleDragStart}
         onDrop={handleDrop}
       />
