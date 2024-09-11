@@ -585,15 +585,15 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   
     console.log("Drag start allowed for node:", node);
   
-    // Call the API to get the SVG content
     try {
+      // Call the API to get the SVG content
       const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
         Email: '',
         SubNo: '000000000000000000001234',
         ShapeID: node.key,
       });
   
-      const svgContent = response.data; // Assuming response.data contains the SVG content
+      const svgContent = response.data.Data.SVGFile; // Assuming response.data contains the SVG content
       console.log('API SVG response:', svgContent);
   
       if (svgContent) {
@@ -630,32 +630,34 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   };
   
 
-  const handleDrop = async (info) => {
-    try {
-      // Get the base64-encoded PNG data from the drag event
-      const pngDataUrl = info.event.dataTransfer.getData('image/png');
-      console.log('PNG data URL:', pngDataUrl);
-      
-      if (pngDataUrl) {
-        // Insert the PNG image into Word
-        await Office.context.document.setSelectedDataAsync(
-          pngDataUrl,
-          { coercionType: Office.CoercionType.Image },
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('Image inserted into Word document.');
-            } else {
-              console.error('Failed to insert image:', asyncResult.error.message);
-            }
+// Handle the drop event
+const handleDrop = async (info) => {
+  try {
+    // Get the base64-encoded PNG data from the drag event
+    const pngDataUrl = info.event.dataTransfer.getData('image/png');
+    console.log('PNG data URL:', pngDataUrl);
+
+    if (pngDataUrl) {
+      // Insert the PNG image into Word
+      await Office.context.document.setSelectedDataAsync(
+        pngDataUrl,
+        { coercionType: Office.CoercionType.Image },
+        (asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('Image inserted into Word document.');
+          } else {
+            console.error('Failed to insert image:', asyncResult.error.message);
           }
-        );
-      } else {
-        console.warn('No PNG data available for drop.');
-      }
-    } catch (error) {
-      console.error('Error during drop:', error);
+        }
+      );
+    } else {
+      console.warn('No PNG data available for drop.');
     }
-  };
+  } catch (error) {
+    console.error('Error during drop:', error);
+  }
+};
+
 
 
 
@@ -820,6 +822,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
                 defaultExpandAll={false}
                 showIcon={true}
                 className="custom-rc-tree"
+                allowDrop
                 expandedKeys={expandedKeys}
                 onExpand={handleExpand}
                 onSelect={handleSelect}

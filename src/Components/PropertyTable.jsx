@@ -1,6 +1,16 @@
 import React, { useEffect } from 'react';
 import { styled } from '@mui/system';
-import { Table, TableBody, TableCell, TableContainer, TableRow, Paper, IconButton, Card, CardContent } from '@mui/material';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Paper,
+  IconButton,
+  Card,
+  CardContent,
+} from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
 // Styled components
@@ -108,11 +118,9 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '' }) => {
   useEffect(() => {
     // Initialize Office when the component mounts
-    if (Office.initialize) {
-      Office.initialize = () => {
-        console.log('Office is ready.');
-      };
-    }
+    Office.initialize = () => {
+      console.log('Office is ready.');
+    };
   }, []);
 
   const copyToClipboard = (value) => {
@@ -143,6 +151,7 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64data = reader.result.split(',')[1]; // Extract base64 string from Data URL
+       console.log('base64', base64data)
         await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image }, (result) => {
           if (result.status === Office.AsyncResultStatus.Succeeded) {
             console.log('SVG image inserted into Word document.');
