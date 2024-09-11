@@ -156,6 +156,27 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       console.error('Failed to insert SVG into Word:', error);
     }
   };
+  useEffect(() => {
+    Office.onReady((info) => {
+      if (info.host === Office.HostType.Word) {
+        console.log('Office is ready.');
+      }
+    });
+  }, []);
+  const handleInsertText = () => {
+    const textToInsert = "Hello, this text was inserted from a React app!";
+    
+    // Insert the text into the Word document
+    Office.context.document.setSelectedDataAsync(textToInsert, {
+      coercionType: Office.CoercionType.Text
+    }, (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        console.log('Text inserted into Word document.');
+      } else {
+        console.error('Error inserting text into Word document:', result.error);
+      }
+    });
+  };
 
   return svgContent ? (
     <StyledSvgCard>
@@ -215,6 +236,9 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
           </Table>
         </StyledTableContainer>
       </CardContent>
+      <button onClick={handleInsertText}>
+      Insert Text into Word
+    </button>
     </StyledPropertyCard>
   );
 };
