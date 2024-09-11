@@ -14,7 +14,6 @@ import PropertyTable from '../Components/PropertyTable';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
 import { handleSearch, transformToTreeData } from '../Components/utils.jsx';
-// import  {Office from '@microsoft/office-js'
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const navigate = useNavigate();
@@ -41,8 +40,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     if (initialTreeData) {
       setTreeData(initialTreeData);
       console.log('initial treeData', initialTreeData);
-
-
     }
   }, []);
 
@@ -50,7 +47,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     if (searchdata) {
       console.log('searchResult', searchdata);
       SetSearchData(searchdata);
-
     }
   }, []);
 
@@ -64,13 +60,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     });
   };
 
-  const handleClick = () => {
-    window.open(data.logourl, '_blank');
-  };
+    // const handleClick = () => {
+    //   window.open(data.logourl, '_blank');
+    // };
 
-  const handleBackClick = () => {
-    navigate('');
-  };
+    // const handleBackClick = () => {
+    //   navigate('');
+    // };
 
   const switcherIcon = ({ expanded, isLeaf }) => {
     if (isLeaf) {
@@ -79,7 +75,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
     return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
   };
-
+ 
   const autoExpandNode = (node, expandedKeys = []) => {
     if (node.children && node.children.length === 1) {
       const singleChild = node.children[0];
@@ -410,21 +406,21 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   
     // Perform API calls based on matching data
     if (matchingShapeData) {
-      console.log('Shape data matches for ShapeID:', eqid);
+      // console.log('Shape data matches for ShapeID:', eqid);
       await callApiForGetDevicePreview(eqid); // API call for shape preview
     }
   
     if (matchingTreeData || matchingRelatedTree ) {
-      console.log('Node selected with EQID in treeData or relatedTree:', eqid);
+      // console.log('Node selected with EQID in treeData or relatedTree:', eqid);
       setSvgContent(null); // Reset SVG content
   
       // If the node is being collapsed, call the appropriate API
       if (isNodeExpanded) {
-        console.log('Collapsing node and calling API:', eqid);
+        // console.log('Collapsing node and calling API:', eqid);
         await RelatedandLibraryProperty(eqid); // API call when collapsing
       } else {
         // If the node is being expanded, call APIs for expansion
-        console.log('Expanding node and calling APIs:', eqid);
+        // console.log('Expanding node and calling APIs:', eqid);
   
         // Only call APIs if the node has no children
         if (!selectedNode.children || selectedNode.children.length === 0) {
@@ -437,12 +433,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
             setExpandedKeys(expandedChildKeys); // Update expanded keys
           }
         } else {
-          console.log('Node already has children, skipping API call:', eqid);
+          // console.log('Node already has children, skipping API call:', eqid);
         }
       }
     } else {
       // Case 3: No matching EQID found
-      console.log('No matching EQID found in treeData or relatedTree:', eqid);
+      // console.log('No matching EQID found in treeData or relatedTree:', eqid);
     }
   };
   

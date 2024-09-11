@@ -116,38 +116,26 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       });
   };
 
- 
-const handleDragStart = (e) => {
-  const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-  const reader = new FileReader();
-  
-  reader.onloadend = () => {
-    const base64data = reader.result; // Full data URL for dragging
-    e.dataTransfer.setData('text/plain', base64data); // Dragging the base64 encoded SVG
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', svgContent);
     e.dataTransfer.dropEffect = 'copy';
   };
-  
-  reader.readAsDataURL(svgBlob); // Read the SVG Blob as a data URL
-};
 
-const handleDropOnWord = async (e) => {
-  e.preventDefault();  // Prevent default behavior
-  
-  try {
-    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-    const reader = new FileReader();
-    
-    reader.onloadend = async () => {
-      const base64data = reader.result.split(',')[1];  // Get the base64 string
-      await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
-      console.log('SVG image inserted into Word document');
-    };
-    
-    reader.readAsDataURL(svgBlob);  // Read the SVG Blob as a data URL
-  } catch (error) {
-    console.error('Failed to insert SVG into Word:', error);
-  }
-};
+  const handleDropOnWord = async (e) => {
+    e.preventDefault();  // Prevent default behavior
+    try {
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1];  // Get the base64 string
+        await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
+        console.log('SVG image inserted into Word document');
+      };
+      reader.readAsDataURL(svgBlob);  // Read the SVG Blob as a data URL
+    } catch (error) {
+      console.error('Failed to insert SVG into Word:', error);
+    }
+  };
 
   return svgContent ? (
     <StyledSvgCard>
