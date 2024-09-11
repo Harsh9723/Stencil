@@ -94,6 +94,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
     return expandedKeys;
   };
+
   // useEffect(() => {
   //   if (treeData.length > 0) {
   //     const root = treeData[0]; // Assuming the root node is the first element in treeData
@@ -588,11 +589,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     }
   };
 
-
   const handleDrop = async (info) => {
     const droppedNode = info.node;
     const shapeId = droppedNode.key;
-
+  
     if (droppedNode.isLeaf && shapeId) {
       try {
         // Call the API to get the SVG content
@@ -601,13 +601,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
           SubNo: '000000000000000000001234',
           ShapeID: shapeId,
         });
-
-        const previewData = response.data;
-        console.log('Preview data:', previewData);
-
-        if (previewData && previewData.svgContent) {
+  
+        const svgContent = response.data; // Assuming response.data contains the SVG content
+        console.log('API SVG response:', svgContent);
+  
+        if (svgContent) {
           // Insert SVG into Word
-          await insertSvgIntoWord(previewData.svgContent);
+          await insertSvgIntoWord(svgContent);
         } else {
           console.warn('No SVG content found in API response.');
         }
@@ -618,16 +618,19 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       console.log('Node is not a leaf or does not have a valid ShapeID.');
     }
   };
+  
+
+
 
   const insertSvgIntoWord = async (svgContent) => {
     try {
       // Convert SVG content to a base64 string
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
-
+  
       reader.onloadend = async () => {
         const base64data = reader.result.split(',')[1];
-
+  
         // Insert the SVG image as a base64-encoded image into Word
         await Office.context.document.setSelectedDataAsync(
           base64data,
@@ -641,12 +644,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
           }
         );
       };
-
+  
       reader.readAsDataURL(svgBlob);
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
   };
+  
 
 
 

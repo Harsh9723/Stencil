@@ -31,7 +31,7 @@ useEffect(() => {
     console.log("Office is ready.");
     $(document).ready(function () {
       console.log("Document is ready.");
-      // You can add more initialization logic here if needed.
+     
     });
   };
 })
