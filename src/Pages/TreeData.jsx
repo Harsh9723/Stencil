@@ -52,13 +52,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   
 
-  Office.initialize = function () {
-    console.log("Office is ready.");
-    $(document).ready(function () {
-      console.log("Document is ready.");
-      // You can add more initialization logic here if needed.
-    });
-  };
+ 
 
     // const handleClick = () => {
     //   window.open(data.logourl, '_blank');

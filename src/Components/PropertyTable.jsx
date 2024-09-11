@@ -124,8 +124,14 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
   };
 
   const handleDragStart = (e) => {
-    e.dataTransfer.setData('image/svg+xml', svgContent); // Set SVG content as drag data
+    // Set the SVG data for drag
+    e.dataTransfer.setData('image/svg+xml', svgContent);
     e.dataTransfer.dropEffect = 'copy';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Allow the drop event
+    e.dataTransfer.dropEffect = 'copy'; // Specify the type of operation
   };
 
   const handleDropOnWord = async (e) => {
@@ -134,11 +140,16 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1]; // Get the base64 string
-        await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image });
-        console.log('SVG image inserted into Word document');
+        const base64data = reader.result.split(',')[1]; // Extract base64 string from Data URL
+        await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image }, (result) => {
+          if (result.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('SVG image inserted into Word document.');
+          } else {
+            console.error('Error inserting SVG into Word document:', result.error);
+          }
+        });
       };
-      reader.readAsDataURL(svgBlob); // Read the SVG Blob as a data URL
+      reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
@@ -149,9 +160,9 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       <SvgWrapper
         draggable
         onDragStart={handleDragStart}
-        onDrop={handleDropOnWord}
-        onDragOver={(e) => e.preventDefault()} // Allow drop
-        dangerouslySetInnerHTML={{ __html: svgContent }}
+        onDragOver={handleDragOver} // Allow drop
+        onDrop={handleDropOnWord} // Handle drop
+        dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
     </StyledSvgCard>
   ) : (
