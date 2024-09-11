@@ -17,6 +17,7 @@
     "@reduxjs/toolkit": "^2.2.7",
     "@types/office-js": "^1.0.418",
     "axios": "^1.7.4",
+    "dom-to-image": "^2.6.0",
     "fast-xml-parser": "^4.4.1",
     "rc-tree": "^5.8.8",
     "react": "^18.3.1",

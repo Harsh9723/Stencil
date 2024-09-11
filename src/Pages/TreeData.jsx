@@ -1,5 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Tree from 'rc-tree';
+import { toPng } from 'dom-to-image';
 import '../App.css';
 import 'rc-tree/assets/index.css';
 import data from '../Links.json';
@@ -17,7 +18,7 @@ import { handleSearch, transformToTreeData } from '../Components/utils.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const navigate = useNavigate();
-  
+
   const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree } = useTreeData();
 
   const [expandedKeys, setExpandedKeys] = useState([]);
@@ -51,17 +52,17 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     }
   }, []);
 
-  
 
- 
 
-    // const handleClick = () => {
-    //   window.open(data.logourl, '_blank');
-    // };
 
-    // const handleBackClick = () => {
-    //   navigate('');
-    // };
+
+  // const handleClick = () => {
+  //   window.open(data.logourl, '_blank');
+  // };
+
+  // const handleBackClick = () => {
+  //   navigate('');
+  // };
 
   const switcherIcon = ({ expanded, isLeaf }) => {
     if (isLeaf) {
@@ -70,7 +71,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
     return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
   };
- 
+
   const autoExpandNode = (node, expandedKeys = []) => {
     if (node.children && node.children.length === 1) {
       const singleChild = node.children[0];
@@ -358,39 +359,39 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const handleExpand = (expandedKeys, { node }) => {
     let newExpandedKeys = [...expandedKeys];
     const eqid = node.key;
-  
+
     // Auto-expand nodes if necessary
     newExpandedKeys = autoExpandNode(node, newExpandedKeys);
     setExpandedKeys(newExpandedKeys);
-  
+
     // Check for matching data
     const matchingShapeData = shapeData?.find((shape) => shape.ShapeID = eqid);
     const matchingTreeData = searchData?.find((data) => data.EQID === eqid);
     const matchingRelatedTree = relatedtreedata?.find((data) => data.EQID === eqid);
-  
+
     // If any matching data is found, call handleSelect
     if (matchingShapeData || matchingTreeData || matchingRelatedTree) {
       handleSelect([eqid], { node });
     }
   };
-  
+
   const handleSelect = async (selectedKeys, info) => {
     const selectedNode = info.node;
     const eqid = selectedNode.key;
-  
+
     // Check if the node is already expanded
     const isNodeExpanded = expandedKeys.includes(eqid);
-  
+
     // Find matching data
     const matchingShapeData = shapeData?.find((shape) => shape.ShapeID === eqid);
     const matchingTreeData = searchData?.find((data) => data.EQID === eqid);
     const matchingRelatedTree = relatedtreedata?.find((data) => data.EQID === eqid);
-  
+
     // Toggle node expansion
     const newExpandedKeys = isNodeExpanded
       ? expandedKeys.filter((key) => key !== eqid) // Collapse node
       : [...expandedKeys, eqid]; // Expand node
-  
+
     // Update expanded and selected keys
     setExpandedKeys(newExpandedKeys);
     setSelectedKeys([eqid]);
@@ -399,17 +400,17 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       selectedNode.onClick(); // Trigger download
       return;
     }
-  
+
     // Perform API calls based on matching data
     if (matchingShapeData) {
       // console.log('Shape data matches for ShapeID:', eqid);
       await callApiForGetDevicePreview(eqid); // API call for shape preview
     }
-  
-    if (matchingTreeData || matchingRelatedTree ) {
+
+    if (matchingTreeData || matchingRelatedTree) {
       // console.log('Node selected with EQID in treeData or relatedTree:', eqid);
       setSvgContent(null); // Reset SVG content
-  
+
       // If the node is being collapsed, call the appropriate API
       if (isNodeExpanded) {
         // console.log('Collapsing node and calling API:', eqid);
@@ -417,12 +418,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       } else {
         // If the node is being expanded, call APIs for expansion
         // console.log('Expanding node and calling APIs:', eqid);
-  
+
         // Only call APIs if the node has no children
         if (!selectedNode.children || selectedNode.children.length === 0) {
           await callApiforDeviceShapeStencilEqid(selectedNode); // API call for stencil EQID
           await RelatedandLibraryProperty(eqid); // API call for related library property
-  
+
           // Auto-expand node if it has a single child
           if (selectedNode.children && selectedNode.children.length === 1) {
             const expandedChildKeys = autoExpandNode(selectedNode, newExpandedKeys);
@@ -437,9 +438,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       // console.log('No matching EQID found in treeData or relatedTree:', eqid);
     }
   };
-  
-  
-  
+
+
+
 
 
 
@@ -573,7 +574,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   const handleDragStart = async (info) => {
     const { node } = info;
-
+  
     // Check if the node is a leaf
     if (!node.isLeaf || !node.key) {
       console.log("Cannot drag this node. It is not a leaf node or does not have a ShapeID.");
@@ -581,9 +582,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       info.event.preventDefault();
       return;
     }
-
+  
     console.log("Drag start allowed for node:", node);
-
+  
     // Call the API to get the SVG content
     try {
       const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
@@ -591,24 +592,31 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         SubNo: '000000000000000000001234',
         ShapeID: node.key,
       });
-
+  
       const svgContent = response.data; // Assuming response.data contains the SVG content
       console.log('API SVG response:', svgContent);
-
+  
       if (svgContent) {
-        // Convert SVG content to a base64 string
-        const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-        const reader = new FileReader();
-
-        reader.onloadend = () => {
-          const base64data = reader.result.split(',')[1];
-
-          // Set the drag data to be the SVG image as a base64-encoded image
-          info.event.dataTransfer.setData('image/svg+xml', base64data);
-          info.event.dataTransfer.effectAllowed = 'copy';
-        };
-
-        reader.readAsDataURL(svgBlob);
+        // Create a new div to render the SVG for conversion
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = svgContent;
+        document.body.appendChild(tempDiv);
+  
+        // Convert SVG to PNG using dom-to-image library
+        toPng(tempDiv.firstChild)
+          .then((dataUrl) => {
+            // Remove the temporary div after conversion
+            document.body.removeChild(tempDiv);
+  
+            // Set the drag data to be the PNG image as a base64-encoded image
+            info.event.dataTransfer.setData('image/png', dataUrl);
+            info.event.dataTransfer.effectAllowed = 'copy';
+          })
+          .catch((error) => {
+            console.error('Error converting SVG to PNG:', error);
+            info.event.dataTransfer.effectAllowed = 'none';
+            info.event.preventDefault();
+          });
       } else {
         console.warn('No SVG content found in API response.');
         info.event.dataTransfer.effectAllowed = 'none';
@@ -620,27 +628,29 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       info.event.preventDefault();
     }
   };
+  
 
   const handleDrop = async (info) => {
     try {
-      // Get the base64-encoded SVG data from the drag event
-      const svgBase64 = info.event.dataTransfer.getData('image/svg+xml');
-
-      if (svgBase64) {
-        // Insert the SVG image into Word
+      // Get the base64-encoded PNG data from the drag event
+      const pngDataUrl = info.event.dataTransfer.getData('image/png');
+      console.log('PNG data URL:', pngDataUrl);
+      
+      if (pngDataUrl) {
+        // Insert the PNG image into Word
         await Office.context.document.setSelectedDataAsync(
-          svgBase64,
+          pngDataUrl,
           { coercionType: Office.CoercionType.Image },
           (asyncResult) => {
             if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image inserted into Word document.');
+              console.log('Image inserted into Word document.');
             } else {
-              console.error('Failed to insert SVG:', asyncResult.error.message);
+              console.error('Failed to insert image:', asyncResult.error.message);
             }
           }
         );
       } else {
-        console.warn('No SVG data available for drop.');
+        console.warn('No PNG data available for drop.');
       }
     } catch (error) {
       console.error('Error during drop:', error);
@@ -654,10 +664,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       // Convert SVG content to a base64 string
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
-  
+
       reader.onloadend = async () => {
         const base64data = reader.result.split(',')[1];
-  
+
         // Insert the SVG image as a base64-encoded image into Word
         await Office.context.document.setSelectedDataAsync(
           base64data,
@@ -671,13 +681,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
           }
         );
       };
-  
+
       reader.readAsDataURL(svgBlob);
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
   };
-  
+
 
 
 
@@ -773,61 +783,61 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         </Backdrop>
 
         <div>
-  {tabValue === 0 && (
-    <>
-      <Tree
-        treeData={treeData}
-        switcherIcon={switcherIcon}
-        defaultExpandAll={false}
-        showIcon={true}
-        className="custom-rc-tree"
-        expandedKeys={expandedKeys}
-        onSelect={handleSelect}
-        onExpand={handleExpand}
-        selectedKeys={selectedKeys}
-        draggable
-        onDragStart={handleDragStart}
-        onDrop={handleDrop}
-      />
+          {tabValue === 0 && (
+            <>
+              <Tree
+                treeData={treeData}
+                switcherIcon={switcherIcon}
+                defaultExpandAll={false}
+                showIcon={true}
+                className="custom-rc-tree"
+                expandedKeys={expandedKeys}
+                onSelect={handleSelect}
+                onExpand={handleExpand}
+                selectedKeys={selectedKeys}
+                draggable
+                onDragStart={handleDragStart}
+                onDrop={handleDrop}
+              />
 
-      {/* Show PropertyTable if either propertyData or svgContent is available */}
-      {(Array.isArray(propertyData) && propertyData.length > 0) && (
-        <PropertyTable propertyData={propertyData} svgContent={svgContent} stencilResponse={stencilResponse} />
-      )}
+              {/* Show PropertyTable if either propertyData or svgContent is available */}
+              {(Array.isArray(propertyData) && propertyData.length > 0) && (
+                <PropertyTable propertyData={propertyData} svgContent={svgContent} stencilResponse={stencilResponse} />
+              )}
 
-      {/* Show SVG Content Table if only svgContent is available */}
-      {(!Array.isArray(propertyData) || propertyData.length === 0) && Array.isArray(svgContent) && svgContent.length > 0 && (
-        <PropertyTable propertyData={[]} svgContent={svgContent} stencilResponse={stencilResponse} />
-      )}
-    </>
-  )}
-  
-  {tabValue === 1 && relatedDevicesVisible && (
-    <>
-      <Tree
-        treeData={relatedTree}
-        switcherIcon={switcherIcon}
-        defaultExpandAll={false}
-        showIcon={true}
-        className="custom-rc-tree"
-        expandedKeys={expandedKeys}
-        onExpand={handleExpand}
-        onSelect={handleSelect}
-        selectedKeys={selectedKeys}
-      />
+              {/* Show SVG Content Table if only svgContent is available */}
+              {(!Array.isArray(propertyData) || propertyData.length === 0) && Array.isArray(svgContent) && svgContent.length > 0 && (
+                <PropertyTable propertyData={[]} svgContent={svgContent} stencilResponse={stencilResponse} />
+              )}
+            </>
+          )}
 
-      {/* Show PropertyTable if either propertyData or svgContent is available */}
-      {(Array.isArray(propertyData) && propertyData.length > 0) && (
-        <PropertyTable propertyData={propertyData} svgContent={svgContent} stencilResponse={stencilResponse} />
-      )}
+          {tabValue === 1 && relatedDevicesVisible && (
+            <>
+              <Tree
+                treeData={relatedTree}
+                switcherIcon={switcherIcon}
+                defaultExpandAll={false}
+                showIcon={true}
+                className="custom-rc-tree"
+                expandedKeys={expandedKeys}
+                onExpand={handleExpand}
+                onSelect={handleSelect}
+                selectedKeys={selectedKeys}
+              />
 
-      {/* Show SVG Content Table if only svgContent is available */}
-      {(!Array.isArray(propertyData) || propertyData.length === 0) && Array.isArray(svgContent) && svgContent.length > 0 && (
-        <PropertyTable propertyData={[]} svgContent={svgContent} stencilResponse={stencilResponse} />
-      )}
-    </>
-  )}
-</div>
+              {/* Show PropertyTable if either propertyData or svgContent is available */}
+              {(Array.isArray(propertyData) && propertyData.length > 0) && (
+                <PropertyTable propertyData={propertyData} svgContent={svgContent} stencilResponse={stencilResponse} />
+              )}
+
+              {/* Show SVG Content Table if only svgContent is available */}
+              {(!Array.isArray(propertyData) || propertyData.length === 0) && Array.isArray(svgContent) && svgContent.length > 0 && (
+                <PropertyTable propertyData={[]} svgContent={svgContent} stencilResponse={stencilResponse} />
+              )}
+            </>
+          )}
+        </div>
 
 
       </div>
