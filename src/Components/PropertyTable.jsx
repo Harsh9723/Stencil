@@ -117,50 +117,41 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 
 const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '' }) => {
   useEffect(() => {
-    // Initialize Office when the component mounts
-    Office.initialize = () => {
-      console.log('Office is ready.');
-    };
+    Office.onReady((info) => {
+      if (info.host === Office.HostType.Word) {
+        console.log('Office is ready.');
+      }
+    });
   }, []);
 
-  const copyToClipboard = (value) => {
-    navigator.clipboard.writeText(value)
-      .then(() => {
-        console.log('Copied to clipboard:', value);
-      })
-      .catch((error) => {
-        console.error('Failed to copy:', error);
-      });
-  };
-
   const handleDragStart = (e) => {
-    // Set the SVG data for drag
-    e.dataTransfer.setData('image/svg+xml', svgContent);
-    e.dataTransfer.dropEffect = 'copy';
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault(); // Allow the drop event
-    e.dataTransfer.dropEffect = 'copy'; // Specify the type of operation
+    // Convert SVG content to a base64 string
+    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64data = reader.result.split(',')[1]; // Extract base64 string
+      e.dataTransfer.setData('image/svg+xml', base64data); // Set data for drag event
+      e.dataTransfer.dropEffect = 'copy';
+    };
+    reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
   };
 
   const handleDropOnWord = async (e) => {
     e.preventDefault(); // Prevent default behavior
     try {
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1]; // Extract base64 string from Data URL
-       console.log('base64', base64data)
-        await Office.context.document.setSelectedDataAsync(base64data, { coercionType: Office.CoercionType.Image }, (result) => {
+      const base64data = e.dataTransfer.getData('image/svg+xml');
+      if (base64data) {
+        const imageUrl = `data:image/svg+xml;base64,${base64data}`;
+        await Office.context.document.setSelectedDataAsync(imageUrl, {
+          coercionType: Office.CoercionType.Image,
+        }, (result) => {
           if (result.status === Office.AsyncResultStatus.Succeeded) {
             console.log('SVG image inserted into Word document.');
           } else {
             console.error('Error inserting SVG into Word document:', result.error);
           }
         });
-      };
-      reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
+      }
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
@@ -171,7 +162,7 @@ const PropertyTable = ({ propertyData = [], svgContent = '', stencilResponse = '
       <SvgWrapper
         draggable
         onDragStart={handleDragStart}
-        onDragOver={handleDragOver} // Allow drop
+        onDragOver={(e) => e.preventDefault()}// Allow drop
         onDrop={handleDropOnWord} // Handle drop
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
