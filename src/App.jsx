@@ -29,10 +29,6 @@ useEffect(() => {
 
   Office.initialize = function () {
     console.log("Office is ready.");
-    $(document).ready(function () {
-      console.log("Document is ready.");
-     
-    });
   };
 })
 
