@@ -99,7 +99,7 @@ const SvgContent = ({ svgContent }) => {
         onDrop={handleDropOnWord} // Handle drop
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
-      <button onClick={handleInsertText}></button>
+      <button onClick={handleInsertText}>Insert Image</button>
     </StyledSvgCard>
   );
 };
