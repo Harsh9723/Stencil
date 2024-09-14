@@ -42,6 +42,8 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 
 const SvgContent = ({ svgContent }) => {
   // Handle drag start and convert SVG content to base64
+
+  
   const handleDragStart = (e) => {
     console.log('Drag started'); // Track drag start event
     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });

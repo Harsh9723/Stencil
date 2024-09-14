@@ -431,6 +431,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         ShapeID: shapeId,
       });
       setSvgContent(response.data.Data.SVGFile);
+      console.log('svgfile', response.data.Data.SVGFile)
       setPropertyData([])
 
       const resposedevice = response.data.Data.SVGFile

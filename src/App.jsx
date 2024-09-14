@@ -5,6 +5,7 @@ import MainPage from './Pages/MainPage';
 import Setting from './Pages/Setting';
 import './App.css';
 import Treedata from './Pages/TreeData';
+import TestSvg from './Pages/TestSvg';
 
 
 function App() {
@@ -43,13 +44,14 @@ useEffect(() => {
 
   return (
     <div className="App">
-      <Routes>
+      {/* <Routes>
         <Route path="/" element={showMainPage ? <MainPage /> : <PreloadPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path="/tree" element={<Treedata />} />
         <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
+      </Routes> */}
+      <TestSvg />
     </div>
   );
 }
