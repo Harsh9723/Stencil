@@ -43,13 +43,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     if (initialTreeData) {
       setTreeData(initialTreeData);
       autoExpandDefaultNodesOfTree(initialTreeData).then(async ({ expandedKeys, selectedKeys, selectedNode, IsSelected }) => {
-        debugger
+  
         setExpandedKeys(expandedKeys);
         // setSelectedKeys(selectedNode.key)
         if (selectedNode.Type && selectedNode.EQID && IsSelected == false) {
 
           let result = await callApiforDeviceShapeStencilEqid(selectedNode)
-          debugger
+      
           if (result && result.shapenodes?.length > 0) {
             setSelectedKeys([result.shapenodes[0].key])
             if (result && result.shapenodes[0].ShapeID) {
@@ -527,7 +527,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     } else if (selectedNode.Type && selectedNode.EQID && IsSelected === false) {
      
       let result = await callApiforDeviceShapeStencilEqid(selectedNode);
-      debugger
+  
       if (result && result.shapenodes?.length > 0) {
         setRelatedSelectedKeys([result.shapenodes[0].key]);
         if (result.shapenodes[0].ShapeID) {
@@ -571,7 +571,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     setExpandedKeys(newExpandedKeys);
 
     // Set the selected key to the first child node's key if children exist
-    debugger
+  
     if (autoSelectedKeys.length > 0) {
       setSelectedKeys(autoSelectedKeys);
     }
@@ -619,7 +619,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   
     // Call API to get device preview if ShapeID is present
     if (selectedNode.ShapeID) {
-      debugger
+  
       await callApiForGetDevicePreview(selectedNode.ShapeID);
     }
       else if (selectedNode.Type && selectedNode.EQID) {
@@ -670,8 +670,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       setSvgContent(null)
 
       // setSelectedKeys([]);
-      setIsLoading(true);
       handleSearch({ Eqid, related: true }, onRelatedSuccess);
+      setIsLoading(true);
+
     }
 
     if (newValue === 0) {
@@ -680,6 +681,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       setSvgContent(null)
       // setRelatedSelectedKeys([]); // Clear selected keys for related tree
     }
+    setIsLoading(false) 
   };
   useEffect(() => {
     console.log('resultSelected', selectedKeys)
@@ -716,8 +718,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     
         setRelatedExpandedKeys(expandedKeys);
         if (selectedNode.Type == 'ProductNumber' && selectedNode.EQID && IsSelected == false) {
-          let resultRelated = await callApiforDeviceShapeStencilEqid(selectedNode, isRelatedTree= false)
-          debugger
+          let resultRelated = await callApiforDeviceShapeStencilEqid(selectedNode)
+          
           if (resultRelated && resultRelated.shapenodes?.length > 0) {
             setRelatedSelectedKeys([resultRelated.shapenodes[0].key])
             if (resultRelated && resultRelated.shapenodes[0].ShapeID) {

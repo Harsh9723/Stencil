@@ -60,7 +60,7 @@ const SvgContent = ({ svgContent }) => {
     e.preventDefault(); // Prevent default behavior
     console.log('Drop event triggered'); // Track drop event
     try {
-      const base64data = e.dataTransfer.getData('image/svg+xml');
+      const base64data = e.dataTransfer.getData(svgContent);
       if (base64data) {
         const imageUrl = `data:image/svg+xml;base64,${base64data}`;
         console.log('Base64 data retrieved from drop event:', base64data); // Log base64 data
@@ -112,7 +112,7 @@ const SvgContent = ({ svgContent }) => {
     try {
       // Directly insert the raw SVG content as HTML into Word
       await Office.context.document.setSelectedDataAsync(svgContent, {
-        coercionType: Office.CoercionType.Html, // Insert as HTML content
+        coercionType: Office.CoercionType.XmlSvg, // Insert as HTML content
       }, (result) => {
         if (result.status === Office.AsyncResultStatus.Succeeded) {
           console.log('SVG content inserted into Word document.');
