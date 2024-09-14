@@ -15,22 +15,34 @@ function TestSvg() {
   }, []);
 
   // Function to handle double-click and insert the SVG into Word
-  const handleDoubleClick = async () => {
+ // Function to handle drag-and-drop into Word
+const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/plain', ''); // Required for drag-and-drop to work in some browsers
+  };
+  
+  // Function to handle drop into Word
+  const handleDrop = async (e) => {
+    e.preventDefault();
+  
     try {
-      const svgHtml = `<img src="data:image/svg+xml;base64,${btoa(svg)}" alt="SVG Image" />`;
       await Office.context.document.setSelectedDataAsync(svg, {
         coercionType: Office.CoercionType.XmlSvg,
       });
+      console.log('SVG inserted into Word');
     } catch (error) {
       console.error('Error inserting SVG into Word:', error);
     }
   };
-
-  // Function to handle drag-and-drop into Word
-  const handleDragStart = (e) => {
-    e.dataTransfer.setData('text/html', svg);
+  
+  // Function to prevent default dragover behavior (necessary for drop event)
+  const handleDragOver = (e) => {
+    e.preventDefault();
   };
-
+  
+  // Adding event listeners to handle the drag and drop events
+  document.addEventListener('dragover', handleDragOver);
+  document.addEventListener('drop', handleDrop);
+  
   return (
     <div>
       <div
@@ -41,7 +53,7 @@ function TestSvg() {
         dangerouslySetInnerHTML={{ __html: svg }}
         style={{ width: '100px', height: '100px', cursor: 'pointer' }}
       />
-      <div style={{color: 'white'}}>Double-click or drag the image into Word</div>
+      <div style={{color: 'greenyellow'}}>Double-click or drag the image into Word</div>
     </div>
   );
 }
