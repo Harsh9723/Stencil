@@ -55,6 +55,15 @@ const SvgContent = ({ svgContent }) => {
     reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
   };
 
+  useEffect(() => {
+    Office.onReady((info) => {
+      if (info.host === Office.HostType.Word) {
+        console.log('Office.js is ready');
+      }
+    });
+  }, []);
+  
+
   // Handle drop on Word
   const handleDropOnWord = async (e) => {
     e.preventDefault(); // Prevent default behavior
@@ -82,48 +91,55 @@ const SvgContent = ({ svgContent }) => {
   };
 
   // Handle double-click to insert the image into Word
+  const handleDoubleClick = async () => {
+    console.log('Double-click event triggered');
+    if (!Office.context || !Office.context.document) {
+      console.error('Office context or document is not available.');
+      return;
+    }
+  
+    try {
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1];
+        const imageUrl = `data:image/svg+xml;base64,${base64data}`;
+        console.log('Base64 data prepared for double-click insertion:', base64data);
+  
+        await Office.context.document.setSelectedDataAsync(imageUrl, {
+          coercionType: Office.CoercionType.Image,
+        }, (result) => {
+          if (result.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('SVG image inserted into Word document via double-click.');
+          } else {
+            console.error('Error inserting SVG into Word document:', result.error);
+          }
+        });
+      };
+      reader.readAsDataURL(svgBlob);
+    } catch (error) {
+      console.error('Failed to insert SVG into Word via double-click:', error);
+    }
+  };
+  
+
   // const handleDoubleClick = async () => {
   //   console.log('Double-click event triggered'); // Track double-click event
   //   try {
-  //     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-  //     const reader = new FileReader();
-  //     reader.onloadend = async () => {
-  //       const base64data = reader.result.split(',')[1]; // Extract base64 string
-  //       const imageUrl = `data:image/svg+xml;base64,${base64data}`;
-  //       console.log('Base64 data prepared for double-click insertion:', base64data); // Log base64 data
-  //       await Office.context.document.setSelectedDataAsync(imageUrl, {
-  //         coercionType: Office.CoercionType.Image,
-  //       }, (result) => {
-  //         if (result.status === Office.AsyncResultStatus.Succeeded) {
-  //           console.log('SVG image inserted into Word document via double-click.');
-  //         } else {
-  //           console.error('Error inserting SVG into Word document:', result.error);
-  //         }
-  //       });
-  //     };
-  //     reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
+  //     // Directly insert the raw SVG content as HTML into Word
+  //     await Office.context.document.setSelectedDataAsync(svgContent, {
+  //       coercionType: Office.CoercionType.Image, // Insert as HTML content
+  //     }, (result) => {
+  //       if (result.status === Office.AsyncResultStatus.Succeeded) {
+  //         console.log('SVG content inserted into Word document.');
+  //       } else {
+  //         console.error('Error inserting SVG into Word document:', result.error);
+  //       }
+  //     });
   //   } catch (error) {
-  //     console.error('Failed to insert SVG into Word via double-click:', error);
+  //     console.error('Failed to insert SVG into Word:', error);
   //   }
   // };
-
-  const handleDoubleClick = async () => {
-    console.log('Double-click event triggered'); // Track double-click event
-    try {
-      // Directly insert the raw SVG content as HTML into Word
-      await Office.context.document.setSelectedDataAsync(svgContent, {
-        coercionType: Office.CoercionType.XmlSvg, // Insert as HTML content
-      }, (result) => {
-        if (result.status === Office.AsyncResultStatus.Succeeded) {
-          console.log('SVG content inserted into Word document.');
-        } else {
-          console.error('Error inserting SVG into Word document:', result.error);
-        }
-      });
-    } catch (error) {
-      console.error('Failed to insert SVG into Word:', error);
-    }
-  };
 
 
   return (
