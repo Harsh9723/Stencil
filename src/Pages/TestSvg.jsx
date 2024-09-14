@@ -13,7 +13,15 @@ function TestSvg() {
       console.log('Office is ready');
     });
   }, []);
-
+  const handleDoubleClick = async () => {
+    try {
+      await Office.context.document.setSelectedDataAsync(svg, {
+        coercionType: Office.CoercionType.XmlSvg,
+      });
+    } catch (error) {
+      console.error('Error inserting SVG into Word:', error);
+    }
+  };
   // Function to handle double-click and insert the SVG into Word
  // Function to handle drag-and-drop into Word
 const handleDragStart = (e) => {
