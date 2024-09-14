@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
 
@@ -92,37 +92,18 @@ const SvgContent = ({ svgContent }) => {
     }
   };
 
+  const svg = useRef(null)
+  
   // Handle double-click to insert the image into Word
-  const handleDoubleClick = async () => {
-    console.log('Double-click event triggered');
-    if (!Office.context || !Office.context.document) {
-      console.error('Office context or document is not available.');
-      return;
-    }
-
-    try {
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1];
-        const imageUrl = `data:image/svg+xml;base64,${base64data}`;
-        console.log('Base64 data prepared for double-click insertion:', base64data);
-
-        await Office.context.document.setSelectedDataAsync(base64data, {
-          coercionType: Office.CoercionType.Image,
-        }, (result) => {
-          if (result.status === Office.AsyncResultStatus.Succeeded) {
-            console.log('SVG image inserted into Word document via double-click.');
-          } else {
-            console.error('Error inserting SVG into Word document:', result.error);
-          }
-        });
-      };
-      reader.readAsDataURL(svgBlob);
-    } catch (error) {
-      console.error('Failed to insert SVG into Word via double-click:', error);
-    }
-  };
+const handleDoubleClick =async () => {
+  try{
+await Office.context.document.setSelectedDataAsync(svgContent,{
+  coercionType: Office.CoercionType.XmlSvg,
+})
+  }catch(error){
+    console.error("error on doubleclick")
+  }
+}
   
 
   // const handleDoubleClick = async () => {
@@ -147,6 +128,7 @@ const SvgContent = ({ svgContent }) => {
   return (
     <StyledSvgCard>
       <SvgWrapper
+      ref={svg}
         draggable
         onDragStart={handleDragStart} // Handle drag start for drag-and-drop
         onDragOver={(e) => {

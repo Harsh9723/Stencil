@@ -44,14 +44,14 @@ useEffect(() => {
 
   return (
     <div className="App">
-      {/* <Routes>
+      <Routes>
         <Route path="/" element={showMainPage ? <MainPage /> : <PreloadPage />} />
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path="/tree" element={<Treedata />} />
         <Route path="*" element={<Navigate to="/" />} />
-      </Routes> */}
-      <TestSvg />
+      </Routes>
+      {/* <TestSvg /> */}
     </div>
   );
 }
