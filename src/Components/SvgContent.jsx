@@ -74,6 +74,22 @@ const SvgContent = ({ svgContent }) => {
     }
   };
 
+  const handleInsertText = () => {
+    const textToInsert = "Hello, this text was inserted from a React app!";
+    
+    // Insert the text into the Word document
+    Office.context.document.setSelectedDataAsync(svgContent, {
+      coercionType: Office.CoercionType.Image
+    }, (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) {
+        console.log('Text inserted into Word document.');
+      } else {
+        console.error('Error inserting text into Word document:', result.error);
+      }
+    });
+  };
+
+
   return (
     <StyledSvgCard>
       <SvgWrapper
@@ -83,6 +99,7 @@ const SvgContent = ({ svgContent }) => {
         onDrop={handleDropOnWord} // Handle drop
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
+      <button onClick={handleInsertText}></button>
     </StyledSvgCard>
   );
 };

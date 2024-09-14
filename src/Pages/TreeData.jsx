@@ -1,12 +1,9 @@
-import React, { useContext, useEffect, useState, useMemo } from 'react';
+import React, {useEffect, useState, useMemo } from 'react';
 import Tree from 'rc-tree';
-import { toPng } from 'dom-to-image';
 import '../App.css';
 import 'rc-tree/assets/index.css';
-import data from '../Links.json';
 import { useNavigate } from 'react-router';
-import { Box, Tooltip, IconButton, Typography, Tabs, Tab, Table, TableBody, TableCell, TableContainer, TableRow, Paper, Button } from '@mui/material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Tabs, Tab,  } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
@@ -15,7 +12,6 @@ import PropertyTable from '../Components/PropertyTable';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
 import { handleSearch, transformToTreeData } from '../Components/utils.jsx';
-import { SingleBedRounded } from '@mui/icons-material';
 import SvgContent from '../Components/SvgContent.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
@@ -757,13 +753,16 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       });
   
       const svgContent = response.data.Data.SVGFile; // Assuming this is the SVG content
-      console.log('API SVG response:', svgContent);
+      // console.log('API SVG response:', svgContent);
   
-      // Attach the SVG content to the drag event using a DataTransfer object
-      const dragElement = document.getElementById(node.key); // Assuming the node has an associated DOM element with id as key
+      // Convert SVG to base64 format
+      const base64SvgDataUrl = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+      
+      // Attach the SVG content to the drag event using dataTransfer
+      const dragElement = document.getElementById(node.key); // Assuming the node has a DOM element
       if (dragElement) {
         dragElement.addEventListener('dragstart', (event) => {
-          event.dataTransfer.setData('text/html', svgContent); // Setting SVG as text/html
+          event.dataTransfer.setData('text/html', base64SvgDataUrl); // Store SVG content in drag event
           event.dataTransfer.effectAllowed = 'copyMove';
         });
       }
@@ -772,21 +771,20 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     }
   };
   
+  
   // Handle the drop event
   const handleDrop = async (info) => {
     try {
-      // Get the data transferred during the drag event
-      const svgContent = info.event.dataTransfer.getData('text/html');
-      const pngDataUrl = info.event.dataTransfer.getData('image/png');
+      // Retrieve the SVG data from the drag event
+      const svgDataUrl = info.event.dataTransfer.getData('text/html'); // For SVG content
+      
+      if (svgDataUrl) {
+        console.log('SVG data URL:', svgDataUrl);
   
-      if (svgContent) {
-        // If SVG content is available, insert it into Word as an image
-        const base64SvgDataUrl = `data:image/svg+xml;base64,${btoa(svgContent)}`;
-        console.log('SVG data URL:', base64SvgDataUrl);
-  
+        // Insert the SVG image into Word
         await Office.context.document.setSelectedDataAsync(
-          base64SvgDataUrl,
-          { coercionType: Office.CoercionType.Image },
+          svgDataUrl,
+          { coercionType: Office.CoercionType.Image }, // Ensure the coercion type is set to Image
           (asyncResult) => {
             if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
               console.log('SVG image inserted into Word document.');
@@ -795,59 +793,45 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
             }
           }
         );
-      } else if (pngDataUrl) {
-        // Insert the PNG image into Word if available
-        console.log('PNG data URL:', pngDataUrl);
-  
-        await Office.context.document.setSelectedDataAsync(
-          pngDataUrl,
-          { coercionType: Office.CoercionType.Image },
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('PNG image inserted into Word document.');
-            } else {
-              console.error('Failed to insert PNG image:', asyncResult.error.message);
-            }
-          }
-        );
       } else {
-        console.warn('No image data available for drop.');
+        console.warn('No SVG data available for drop.');
       }
     } catch (error) {
       console.error('Error during drop:', error);
     }
   };
   
+  
     
 
-  const insertSvgIntoWord = async (svgContent) => {
-    try {
-      // Convert SVG content to a base64 string
-      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-      const reader = new FileReader();
+  // const insertSvgIntoWord = async (svgContent) => {
+  //   try {
+  //     // Convert SVG content to a base64 string
+  //     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+  //     const reader = new FileReader();
 
-      reader.onloadend = async () => {
-        const base64data = reader.result.split(',')[1];
+  //     reader.onloadend = async () => {
+  //       const base64data = reader.result.split(',')[1];
 
-        // Insert the SVG image as a base64-encoded image into Word
-        await Office.context.document.setSelectedDataAsync(
-          base64data,
-          { coercionType: Office.CoercionType.Image },
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image inserted into Word document.');
-            } else {
-              console.error('Failed to insert SVG:', asyncResult.error.message);
-            }
-          }
-        );
-      };
+  //       // Insert the SVG image as a base64-encoded image into Word
+  //       await Office.context.document.setSelectedDataAsync(
+  //         base64data,
+  //         { coercionType: Office.CoercionType.Image },
+  //         (asyncResult) => {
+  //           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+  //             console.log('SVG image inserted into Word document.');
+  //           } else {
+  //             console.error('Failed to insert SVG:', asyncResult.error.message);
+  //           }
+  //         }
+  //       );
+  //     };
 
-      reader.readAsDataURL(svgBlob);
-    } catch (error) {
-      console.error('Failed to insert SVG into Word:', error);
-    }
-  };
+  //     reader.readAsDataURL(svgBlob);
+  //   } catch (error) {
+  //     console.error('Failed to insert SVG into Word:', error);
+  //   }
+  // };
 
 
 
