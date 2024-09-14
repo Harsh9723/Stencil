@@ -41,24 +41,29 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 }));
 
 const SvgContent = ({ svgContent }) => {
+  // Handle drag start and convert SVG content to base64
   const handleDragStart = (e) => {
-    // Convert SVG content to a base64 string
+    console.log('Drag started'); // Track drag start event
     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64data = reader.result.split(',')[1]; // Extract base64 string
       e.dataTransfer.setData('image/svg+xml', base64data); // Set data for drag event
       e.dataTransfer.dropEffect = 'copy';
+      console.log('Base64 data set for drag event:', base64data); // Log base64 data
     };
     reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
   };
 
+  // Handle drop on Word
   const handleDropOnWord = async (e) => {
     e.preventDefault(); // Prevent default behavior
+    console.log('Drop event triggered'); // Track drop event
     try {
       const base64data = e.dataTransfer.getData('image/svg+xml');
       if (base64data) {
         const imageUrl = `data:image/svg+xml;base64,${base64data}`;
+        console.log('Base64 data retrieved from drop event:', base64data); // Log base64 data
         await Office.context.document.setSelectedDataAsync(imageUrl, {
           coercionType: Office.CoercionType.Image,
         }, (result) => {
@@ -68,38 +73,53 @@ const SvgContent = ({ svgContent }) => {
             console.error('Error inserting SVG into Word document:', result.error);
           }
         });
+      } else {
+        console.log('No data found during drop event.');
       }
     } catch (error) {
       console.error('Failed to insert SVG into Word:', error);
     }
   };
 
-  const handleInsertText = () => {
-    const textToInsert = "Hello, this text was inserted from a React app!";
-    
-    // Insert the text into the Word document
-    Office.context.document.setSelectedDataAsync(svgContent, {
-      coercionType: Office.CoercionType.Image
-    }, (result) => {
-      if (result.status === Office.AsyncResultStatus.Succeeded) {
-        console.log('Text inserted into Word document.');
-      } else {
-        console.error('Error inserting text into Word document:', result.error);
-      }
-    });
+  // Handle double-click to insert the image into Word
+  const handleDoubleClick = async () => {
+    console.log('Double-click event triggered'); // Track double-click event
+    try {
+      const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64data = reader.result.split(',')[1]; // Extract base64 string
+        const imageUrl = `data:image/svg+xml;base64,${base64data}`;
+        console.log('Base64 data prepared for double-click insertion:', base64data); // Log base64 data
+        await Office.context.document.setSelectedDataAsync(imageUrl, {
+          coercionType: Office.CoercionType.Image,
+        }, (result) => {
+          if (result.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('SVG image inserted into Word document via double-click.');
+          } else {
+            console.error('Error inserting SVG into Word document:', result.error);
+          }
+        });
+      };
+      reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
+    } catch (error) {
+      console.error('Failed to insert SVG into Word via double-click:', error);
+    }
   };
-
 
   return (
     <StyledSvgCard>
       <SvgWrapper
         draggable
-        onDragStart={handleDragStart}
-        onDragOver={(e) => e.preventDefault()} // Allow drop
+        onDragStart={handleDragStart} // Handle drag start for drag-and-drop
+        onDragOver={(e) => {
+          e.preventDefault(); 
+          console.log('Dragging over the target'); // Track dragging over
+        }} // Allow drop
         onDrop={handleDropOnWord} // Handle drop
+        onDoubleClick={handleDoubleClick} // Handle double-click
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
-      <button onClick={handleInsertText}>Insert Image</button>
     </StyledSvgCard>
   );
 };
