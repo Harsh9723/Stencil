@@ -715,6 +715,47 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
    }
  };
  
+ const handleDoubleClick = async (info) => {
+  console.log('Node double-clicked:', info);
+  const node = info.node
+  // Example condition check before calling API
+  if (node && node.key && node.ShapeID) { 
+    console.log('Condition met. Fetching SVG for node:', node.key);
+
+    try {
+      // Call the API to get the SVG content
+      const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+        Email: '', 
+        SubNo: '000000000000000000001234', // Adjust SubNo as necessary
+        ShapeID: node.ShapeID, // Use ShapeID from node
+      });
+
+      if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
+        const svgContent = response.data.Data.SVGFile;
+        console.log('Received SVG content:', svgContent);
+
+        // Insert the SVG into Word document
+        await Office.context.document.setSelectedDataAsync(
+          svgContent,
+          { coercionType: Office.CoercionType.XmlSvg }, // Ensure coercion type is set to SVG
+          (asyncResult) => {
+            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+              console.log('SVG image successfully inserted into Word document.');
+            } else {
+              console.error('Failed to insert SVG image:', asyncResult.error.message);
+            }
+          }
+        );
+      } else {
+        console.error('No SVG content found in API response');
+      }
+    } catch (error) {
+      console.error('API Error:', error);
+    }
+  } else {
+    console.warn('Condition not met, skipping API call.');
+  }
+};
 
   
 
@@ -823,6 +864,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         expandedKeys={expandedKeys}
         onSelect={handleSelectMainTree}
         onExpand={handleExpandMainTree}
+        onDoubleClick={handleDoubleClick}
         selectedKeys={selectedKeys}
         draggable
         onDragStart={handleDragStart}
@@ -850,6 +892,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         expandedKeys={relatedExpandedKeys}
         onSelect={handleSelectRelatedTree}
         onExpand={handleExpandRelatedTree}
+      
         selectedKeys={relatedSelectedKeys}
       />
 
