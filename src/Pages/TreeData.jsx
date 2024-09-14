@@ -659,62 +659,62 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
 
  // Handle the drag start event
-const handleDragStart = async (info) => {
-  const { node } = info;
-  console.log('Drag started on node:', node);
-  
-  try {
-    // Call the API to get the SVG content
-    const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
-      Email: '', 
-      SubNo: '000000000000000000001234', 
-      ShapeID: node.key,
-    });
-    
-    if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
-      const svgContent = response.data.Data.SVGFile;
-      console.log('Received SVG content:', svgContent);
-      
-      // Store the SVG content in the drag event
-      info.event.dataTransfer.setData('text/html', svgContent); // Store the SVG content for later use in the drop event
-    } else {
-      console.error('No SVG content found in API response');
-    }
-    
-    return response;
-  } catch (error) {
-    console.error('API Error:', error);
-  }
-};
+ let draggedSvgContent = ''; 
 
-// Handle the drop event
-const handleDrop = async (info) => {
-  try {
-    // Retrieve the SVG data from the drag event
-    const svgContent = info.event.dataTransfer.getData('text/html'); // Retrieve the stored SVG content
-
-    if (svgContent) {
-      console.log('SVG content for drop:', svgContent);
-
-      // Insert the SVG image into Word
-      await Office.context.document.setSelectedDataAsync(
-        svgContent,
-        { coercionType: Office.CoercionType.XmlSvg }, 
-        (asyncResult) => {
-          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            console.log('SVG image inserted into Word document.');
-          } else {
-            console.error('Failed to insert SVG image:', asyncResult.error.message);
-          }
-        }
-      );
-    } else {
-      console.warn('No SVG data available for drop.');
-    }
-  } catch (error) {
-    console.error('Error during drop:', error);
-  }
-};
+ // Handle the drag start event
+ const handleDragStart = async (info) => {
+   const { node } = info;
+   console.log('Drag started on node:', node);
+ 
+   try {
+     // Call the API to get the SVG content
+     const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+       Email: '', 
+       SubNo: '000000000000000000001234', 
+       ShapeID: node.key,
+     });
+ 
+     if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
+       // Store the SVG content in a global variable
+       draggedSvgContent = response.data.Data.SVGFile;
+       console.log('SVG content fetched and stored:', draggedSvgContent);
+     } else {
+       console.error('No SVG content found in API response');
+     }
+ 
+     return response;
+   } catch (error) {
+     console.error('API Error:', error);
+   }
+ };
+ 
+ // Handle the drop event
+ const handleDrop = async (info) => {
+   try {
+     // Check if the SVG content is available
+     if (draggedSvgContent) {
+       console.log('Inserting SVG into Word document:', draggedSvgContent);
+ 
+       // Insert the SVG image into Word
+       await Office.context.document.setSelectedDataAsync(
+         draggedSvgContent,
+         { coercionType: Office.CoercionType.XmlSvg }, // Ensure the coercion type is set to XML/SVG
+         (asyncResult) => {
+           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+             console.log('SVG image successfully inserted into Word document.');
+           } else {
+             console.error('Failed to insert SVG image:', asyncResult.error.message);
+           }
+         }
+       );
+     } else {
+       console.warn('No SVG content available for drop.');
+     }
+   } catch (error) {
+     console.error('Error during drop:', error);
+   }
+ };
+ 
 
   
 
