@@ -97,7 +97,7 @@ const SvgContent = ({ svgContent }) => {
       console.error('Office context or document is not available.');
       return;
     }
-  
+
     try {
       const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
       const reader = new FileReader();
@@ -105,7 +105,7 @@ const SvgContent = ({ svgContent }) => {
         const base64data = reader.result.split(',')[1];
         const imageUrl = `data:image/svg+xml;base64,${base64data}`;
         console.log('Base64 data prepared for double-click insertion:', base64data);
-  
+
         await Office.context.document.setSelectedDataAsync(imageUrl, {
           coercionType: Office.CoercionType.Image,
         }, (result) => {
