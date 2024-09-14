@@ -31,14 +31,14 @@ useEffect(() => {
     console.log("Office is ready.");
   };
 })
+useEffect(() => {
+  Office.onReady((info) =>{
+    if(info.host === Office.HostType.Word){
+  console.log('word is ready')
+    }
+  })
+})
 
-Office.onReady((info) =>{
-  if(info.host === Office.HostType.Word){
-Word.run((context) => {
-  
-})
-  }
-})
 
 
   return (
