@@ -148,3 +148,11 @@ font-family: 'Segoe UI', sans-serif;
 .MuiTabs-indicator.css-1aquho2-MuiTabs-indicator {
   background-color: white !important; /* Set indicator background color to white */
 }
+
+.rc-tree .rc-tree-treenode .rc-tree-node-content-wrapper{
+  vertical-align: middle !important; 
+}
+
+span.rc-tree-iconEle{
+  margin-top: 4px !important;
+}

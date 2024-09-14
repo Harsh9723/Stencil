@@ -44,18 +44,18 @@ const SvgContent = ({ svgContent }) => {
   // Handle drag start and convert SVG content to base64
 
 
-  const handleDragStart = (e) => {
-    console.log('Drag started'); // Track drag start event
-    const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64data = reader.result.split(',')[1]; // Extract base64 string
-      e.dataTransfer.setData('image/svg+xml', base64data); // Set data for drag event
-      e.dataTransfer.dropEffect = 'copy';
-      console.log('Base64 data set for drag event:', base64data); // Log base64 data
-    };
-    reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
-  };
+  // const handleDragStart = (e) => {
+  //   console.log('Drag started'); // Track drag start event
+  //   const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
+  //   const reader = new FileReader();
+  //   reader.onloadend = () => {
+  //     const base64data = reader.result.split(',')[1]; // Extract base64 string
+  //     e.dataTransfer.setData('image/svg+xml', base64data); // Set data for drag event
+  //     e.dataTransfer.dropEffect = 'copy';
+  //     console.log('Base64 data set for drag event:', base64data); // Log base64 data
+  //   };
+  //   reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
+  // };
 
   useEffect(() => {
     Office.onReady((info) => {
@@ -68,32 +68,18 @@ const SvgContent = ({ svgContent }) => {
 
   // Handle drop on Word
   const handleDropOnWord = async (e) => {
-    e.preventDefault(); // Prevent default behavior
-    console.log('Drop event triggered'); // Track drop event
-    try {
-      const base64data = e.dataTransfer.getData(svgContent);
-      if (base64data) {
-        const imageUrl = `data:image/svg+xml;base64,${base64data}`;
-        console.log('Base64 data retrieved from drop event:', base64data); // Log base64 data
-        await Office.context.document.setSelectedDataAsync(imageUrl, {
-          coercionType: Office.CoercionType.Image,
-        }, (result) => {
-          if (result.status === Office.AsyncResultStatus.Succeeded) {
-            console.log('SVG image inserted into Word document.');
-          } else {
-            console.error('Error inserting SVG into Word document:', result.error);
-          }
-        });
-      } else {
-        console.log('No data found during drop event.');
-      }
-    } catch (error) {
-      console.error('Failed to insert SVG into Word:', error);
-    }
+    // e.preventDefault(); // Prevent default behavior
+   try {
+    await Office.context.document.setSelectedDataAsync(svgContent,{
+      coercionType : Office.CoercionType.XmlSvg
+    })
+   } catch (error) {
+    console.log('error while drang and drop')
+   }
   };
 
   const svg = useRef(null)
-  
+
   // Handle double-click to insert the image into Word
 const handleDoubleClick =async () => {
   try{
@@ -106,31 +92,13 @@ await Office.context.document.setSelectedDataAsync(svgContent,{
 }
   
 
-  // const handleDoubleClick = async () => {
-  //   console.log('Double-click event triggered'); // Track double-click event
-  //   try {
-  //     // Directly insert the raw SVG content as HTML into Word
-  //     await Office.context.document.setSelectedDataAsync(svgContent, {
-  //       coercionType: Office.CoercionType.Image, // Insert as HTML content
-  //     }, (result) => {
-  //       if (result.status === Office.AsyncResultStatus.Succeeded) {
-  //         console.log('SVG content inserted into Word document.');
-  //       } else {
-  //         console.error('Error inserting SVG into Word document:', result.error);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error('Failed to insert SVG into Word:', error);
-  //   }
-  // };
-
 
   return (
     <StyledSvgCard>
       <SvgWrapper
       ref={svg}
         draggable
-        onDragStart={handleDragStart} // Handle drag start for drag-and-drop
+        // onDragStart={handleDragStart} // Handle drag start for drag-and-drop
         onDragOver={(e) => {
           e.preventDefault(); 
           console.log('Dragging over the target'); // Track dragging over
