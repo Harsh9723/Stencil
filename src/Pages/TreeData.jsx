@@ -128,39 +128,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
     return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
   };
-
-  // useEffect(() => {
-  //   if (treeData.length) {
-  //     const initialExpandedKeys = [...expandedKeys]; // Preserve current expanded keys
-
-  //     // Manually ensure the first node is expanded
-  //     const firstNode = treeData[0]; // Assuming this is your "Search Results" node
-  //     if (!initialExpandedKeys.includes(firstNode.key)) {
-  //       initialExpandedKeys.push(firstNode.key);
-  //     }
-
-  //     treeData.forEach((node) => {
-  //       // autoExpandNode(node, initialExpandedKeys, false);
-  //     });
-  //     // debugger
-  //     setExpandedKeys(initialExpandedKeys);
-  //     // setSelectedKeys(...expandedKeys)
-  //   }
-
-  //   if (relatedTree.length) {
-  //     const initialRelatedExpandedKeys = [...relatedExpandedKeys];
-  //     const firstnode = relatedTree[0]
-  //     if (!initialRelatedExpandedKeys.includes(firstnode.key)) {
-  //       initialRelatedExpandedKeys.push(firstnode.key)
-  //     }
-
-  //     relatedTree.forEach((node) => {
-  //       // autoExpandNode(node, initialRelatedExpandedKeys, true);
-  //     });
-  //     setRelatedExpandedKeys(initialRelatedExpandedKeys);
-  //   }
-  // }, [treeData, relatedTree])
-
   const memoizedTreeData = useMemo(() => treeData, [treeData]);
   const memoizedRelatedTreeData = useMemo(() => relatedTree, [relatedTree]);
 
@@ -265,37 +232,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       console.log('stencildata', stencilData)
       // const visioDownloadUrl = response.data?.Data[0]?.URL;
       SetStencilResponse(stencilData)
-      // const handleVisioDownload = () => {
-      //   if (visioDownloadUrl) {
-      //     const link = document.createElement('a');
-      //     link.target = '_blank'
-      //     link.href = visioDownloadUrl;
-      //     link.download = 'visio_image.png';
-      //     document.body.appendChild(link);
-      //     link.click();
-
-      //     document.body.removeChild(link);
-      //   } else {
-      //     console.error('Visio download URL is not available');
-      //   }
-      // };
-
-      // const stencilLeafNode = {
-      //   key: generateUniqueKey(),
-      //   title: 'visio',
-      //   icon: <img src='/assets/visio.png' alt="icon" />,
-      //   isLeaf: true,
-      //   children: [],
-      //   visioDownloadUrl: visioDownloadUrl,
-      //   onClick: handleVisioDownload,
-      // };
-
-      // // Add the Visio node to the correct tree
-      // addLeafNode(selectedNode.key, stencilLeafNode);
-      // if(relatedTree.length > 0 ){
-      // addLeafNodeToRelatedTree(selectedNode.key, stencilLeafNode)
-
-      // }
       return stencilData
     } catch (error) {
       console.error('Error fetching stencil name:', error);
@@ -351,27 +287,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       let stencilNode = await getStencilNameByEQID(selectedNode, addLeafNodeFn, eqId); // Pass only the necessary addLeafNode function
 
       return { shapenodes, stencilNode }
-      // Set expanded keys for the correct tree
-      // if (isRelatedTree) {
-      //   // Update related tree expanded keys
-      //   setRelatedExpandedKeys((prevExpandedKeys) => {
-      //     if (!prevExpandedKeys.includes(selectedNode.key)) {
-      //       return [...prevExpandedKeys, selectedNode.key];
-      //     }
-      //     return prevExpandedKeys;
-      //   });
-      // } else {
-      //   // Update result tree expanded keys
-      //   setExpandedKeys((prevExpandedKeys) => {
-      //     if (!prevExpandedKeys.includes(selectedNode.key)) {
-      //       return [...prevExpandedKeys, selectedNode.key];
-      //     }
-      //     return prevExpandedKeys;
-      //   });
-      // }
-
-
-
     } catch (error) {
       console.error('API Error:', error);
     } finally {
@@ -580,7 +495,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     console.log('Selected Node:', selectedNode);
     console.log('Auto-selected keys:', autoSelectedKeys);
 
-    // Implement the logic for calling APIs based on conditions similar to initial binding logic
+    
     if (selectedNode.Type && selectedNode.EQID && IsSelected === true) {
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
@@ -743,100 +658,65 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
 
 
-  const handleDragStart = async (info) => {
-    const { node } = info;
-    console.log('Drag started on node:', node);
+ // Handle the drag start event
+const handleDragStart = async (info) => {
+  const { node } = info;
+  console.log('Drag started on node:', node);
   
-    try {
-      // Call the API to get the SVG content
-      const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
-        Email: '', // Add email if needed
-        SubNo: '000000000000000000001234', // Adjust as per your requirements
-        ShapeID: node.key,
-      });
-  
-      const svgContent = response.data.Data.SVGFile; // Assuming this is the SVG content
-      // console.log('API SVG response:', svgContent);
-  
-      // Convert SVG to base64 format
-      const base64SvgDataUrl = `data:image/svg+xml;base64,${btoa(svgContent)}`;
-      
-      // Attach the SVG content to the drag event using dataTransfer
-      const dragElement = document.getElementById(node.key); // Assuming the node has a DOM element
-      if (dragElement) {
-        dragElement.addEventListener('dragstart', (event) => {
-          event.dataTransfer.setData('text/html', base64SvgDataUrl); // Store SVG content in drag event
-          event.dataTransfer.effectAllowed = 'copyMove';
-        });
-      }
-    } catch (error) {
-      console.error('API Error:', error);
-    }
-  };
-  
-  
-  // Handle the drop event
-  const handleDrop = async (info) => {
-    try {
-      // Retrieve the SVG data from the drag event
-      const svgDataUrl = info.event.dataTransfer.getData('text/html'); // For SVG content
-      
-      if (svgDataUrl) {
-        console.log('SVG data URL:', svgDataUrl);
-  
-        // Insert the SVG image into Word
-        await Office.context.document.setSelectedDataAsync(
-          svgDataUrl,
-          { coercionType: Office.CoercionType.Image }, // Ensure the coercion type is set to Image
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image inserted into Word document.');
-            } else {
-              console.error('Failed to insert SVG image:', asyncResult.error.message);
-            }
-          }
-        );
-      } else {
-        console.warn('No SVG data available for drop.');
-      }
-    } catch (error) {
-      console.error('Error during drop:', error);
-    }
-  };
-  
-  
+  try {
+    // Call the API to get the SVG content
+    const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+      Email: '', 
+      SubNo: '000000000000000000001234', 
+      ShapeID: node.key,
+    });
     
+    if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
+      const svgContent = response.data.Data.SVGFile;
+      console.log('Received SVG content:', svgContent);
+      
+      // Store the SVG content in the drag event
+      info.event.dataTransfer.setData('text/html', svgContent); // Store the SVG content for later use in the drop event
+    } else {
+      console.error('No SVG content found in API response');
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('API Error:', error);
+  }
+};
 
-  // const insertSvgIntoWord = async (svgContent) => {
-  //   try {
-  //     // Convert SVG content to a base64 string
-  //     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-  //     const reader = new FileReader();
+// Handle the drop event
+const handleDrop = async (info) => {
+  try {
+    // Retrieve the SVG data from the drag event
+    const svgContent = info.event.dataTransfer.getData('text/html'); // Retrieve the stored SVG content
 
-  //     reader.onloadend = async () => {
-  //       const base64data = reader.result.split(',')[1];
+    if (svgContent) {
+      console.log('SVG content for drop:', svgContent);
 
-  //       // Insert the SVG image as a base64-encoded image into Word
-  //       await Office.context.document.setSelectedDataAsync(
-  //         base64data,
-  //         { coercionType: Office.CoercionType.Image },
-  //         (asyncResult) => {
-  //           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-  //             console.log('SVG image inserted into Word document.');
-  //           } else {
-  //             console.error('Failed to insert SVG:', asyncResult.error.message);
-  //           }
-  //         }
-  //       );
-  //     };
+      // Insert the SVG image into Word
+      await Office.context.document.setSelectedDataAsync(
+        svgContent,
+        { coercionType: Office.CoercionType.XmlSvg }, 
+        (asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('SVG image inserted into Word document.');
+          } else {
+            console.error('Failed to insert SVG image:', asyncResult.error.message);
+          }
+        }
+      );
+    } else {
+      console.warn('No SVG data available for drop.');
+    }
+  } catch (error) {
+    console.error('Error during drop:', error);
+  }
+};
 
-  //     reader.readAsDataURL(svgBlob);
-  //   } catch (error) {
-  //     console.error('Failed to insert SVG into Word:', error);
-  //   }
-  // };
-
-
+  
 
 
   return (
