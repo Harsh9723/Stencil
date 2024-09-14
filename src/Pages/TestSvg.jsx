@@ -18,8 +18,8 @@ function TestSvg() {
   const handleDoubleClick = async () => {
     try {
       const svgHtml = `<img src="data:image/svg+xml;base64,${btoa(svg)}" alt="SVG Image" />`;
-      await Office.context.document.setSelectedDataAsync(svgHtml, {
-        coercionType: Office.CoercionType.Html,
+      await Office.context.document.setSelectedDataAsync(svg, {
+        coercionType: Office.CoercionType.XmlSvg,
       });
     } catch (error) {
       console.error('Error inserting SVG into Word:', error);
@@ -41,7 +41,7 @@ function TestSvg() {
         dangerouslySetInnerHTML={{ __html: svg }}
         style={{ width: '100px', height: '100px', cursor: 'pointer' }}
       />
-      <div>Double-click or drag the image into Word</div>
+      <div style={{color: 'white'}}>Double-click or drag the image into Word</div>
     </div>
   );
 }
