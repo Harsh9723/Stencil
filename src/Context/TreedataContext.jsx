@@ -55,7 +55,7 @@ export const TreeDataProvider = ({ children }) => {
                 ...node,
                 children: [
                   ...(node.children || []),
-                  ...uniqueNewNodes,  // Add new unique nodes only once
+                  ...uniqueNewNodes, 
                 ],
               };
             }

@@ -1,9 +1,5 @@
 // utils.js
 import axios from 'axios';
-import mainNodeIcon from '../../public/assets/main_node.png';
-import productline from '../../public/assets/product_line.png'
-import productno from '../../public/assets/product_no.gif'
-import manufacturer from '../../public/assets/manufacturer.png'
 // import eqtype from '../../public/assets/EqType'
 //  base API URL
 const API_URL = 'http://localhost:8000/library/';
@@ -87,11 +83,12 @@ export const transformToTreeData = (result, addLeafNode) => {
   const tree = [
     {
       title: `Search Results [${result.length}]`,
-      key: 'search-results',
+      key: `search-results-${Date.now()}`, // Unique key with timestamp
       icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
       children: [],
     },
   ];
+  
 
   const searchResultsNode = tree[0];
 
@@ -160,6 +157,8 @@ export const transformToTreeData = (result, addLeafNode) => {
         key: productNumberKey,
         icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
         children: [],
+        EQID: productNumberKey,
+        Type:'ProductNumber',
         isLeaf:false
       };
       prodLineNode.children.push(productnoNode);
