@@ -43,7 +43,7 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 const SvgContent = ({ svgContent }) => {
   // Handle drag start and convert SVG content to base64
 
-  
+
   const handleDragStart = (e) => {
     console.log('Drag started'); // Track drag start event
     const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
@@ -108,7 +108,7 @@ const SvgContent = ({ svgContent }) => {
         const imageUrl = `data:image/svg+xml;base64,${base64data}`;
         console.log('Base64 data prepared for double-click insertion:', base64data);
 
-        await Office.context.document.setSelectedDataAsync(imageUrl, {
+        await Office.context.document.setSelectedDataAsync(base64data, {
           coercionType: Office.CoercionType.Image,
         }, (result) => {
           if (result.status === Office.AsyncResultStatus.Succeeded) {
