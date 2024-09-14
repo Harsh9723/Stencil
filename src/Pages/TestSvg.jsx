@@ -5,7 +5,7 @@ import { useRef, useEffect } from 'react';
 function TestSvg() {
 
 
-    const svg = `svgfile <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  version="1.1" preserveAspectRatio="xMidYMid meet" viewBox="0 0 75 166" id="10000"   >
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  version="1.1" preserveAspectRatio="xMidYMid meet" viewBox="0 0 75 166" id="10000"   >
 <!--For Scale and Centering, change translate X = (x*(1-scale))/2 and Y = (y*(1-scale))/2 then scale factor-->
 <g ID="SVGBody" transform="translate(0 0) scale(1) " buffered-rendering="static">
 <g transform="scale(0.0750) translate(-133,-133)">
@@ -152,21 +152,26 @@ useEffect(() => {
 }, []);
 
 // Function to handle double-click and insert the SVG into Word
-const handleDoubleClick = async () => {
-  try {
-    const svgHtml = `<img src="data:image/svg+xml;base64,${btoa(svg)}" alt="SVG Image" />`;
-    await Office.context.document.setSelectedDataAsync(svgHtml, {
-      coercionType: Office.CoercionType.Html,
-    });
-  } catch (error) {
-    console.error('Error inserting SVG into Word:', error);
-  }
-};
+ const handleDoubleClick = async () => {
+    try {
+      const encodedSvg = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+      const svgHtml = `<img src="${encodedSvg}" alt="SVG Image" />`;
+      
+      await Office.context.document.setSelectedDataAsync(svgHtml, {
+        coercionType: Office.CoercionType.Html,
+      });
+    } catch (error) {
+      console.error('Error inserting SVG into Word:', error);
+    }
+  };
+
+  // Function to handle drag-and-drop into Word
+  const handleDragStart = (e) => {
+    e.dataTransfer.setData('text/html', svg);
+  };
 
 // Function to handle drag-and-drop into Word
-const handleDragStart = (e) => {
-  e.dataTransfer.setData('text/html', svg);
-};
+
   return (
     <div>
     <div
