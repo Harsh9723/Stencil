@@ -715,9 +715,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
    }
  };
  
- const handleDoubleClick = async (info) => {
-  console.log('Node double-clicked:', info);
-  const node = info.node
+ const handleDoubleClick = async (node) => {
+  console.log('Node double-clicked:', node);
+
   // Example condition check before calling API
   if (node && node.key && node.ShapeID) { 
     console.log('Condition met. Fetching SVG for node:', node.key);
