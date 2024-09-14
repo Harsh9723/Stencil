@@ -99,7 +99,7 @@ await Office.context.document.setSelectedDataAsync(svgContent,{
       <SvgWrapper
       ref={svg}
         draggable
-        onDragStart={handleDragStart} // Handle drag start for drag-and-drop
+        // onDragStart={handleDragStart} // Handle drag start for drag-and-drop
         onDragOver={(e) => {
           e.preventDefault(); 
           console.log('Dragging over the target'); // Track dragging over
