@@ -746,60 +746,44 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   const handleDragStart = async (info) => {
     const { node } = info;
-
-    // Check if the node is a leaf
-    if (!node.isLeaf || !node.key) {
-      console.log("Cannot drag this node. It is not a leaf node or does not have a ShapeID.");
-      info.event.dataTransfer.effectAllowed = 'none';
-      info.event.preventDefault();
-      return;
-    }
-
-    console.log("Drag start allowed for node:", node);
-
+    console.log('node', node);
+  
     try {
       // Call the API to get the SVG content
       const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
-        Email: '',
-        SubNo: '000000000000000000001234',
+        Email: '', // Add email if needed
+        SubNo: '000000000000000000001234', // Adjust as per your requirements
         ShapeID: node.key,
       });
-
-      const svgContent = response.data.Data.SVGFile; // Assuming response.data contains the SVG content
+  
+      const svgContent = response.data.Data.SVGFile; // Assuming this is the SVG content
       console.log('API SVG response:', svgContent);
-
-      if (svgContent) {
-        // Create a new div to render the SVG for conversion
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = svgContent;
-        document.body.appendChild(tempDiv);
-
-        // Convert SVG to PNG using dom-to-image library
-        toPng(tempDiv.firstChild)
-          .then((dataUrl) => {
-            // Remove the temporary div after conversion
-            document.body.removeChild(tempDiv);
-
-            // Set the drag data to be the PNG image as a base64-encoded image
-            info.event.dataTransfer.setData('image/png', dataUrl);
-            info.event.dataTransfer.effectAllowed = 'copy';
-          })
-          .catch((error) => {
-            console.error('Error converting SVG to PNG:', error);
-            info.event.dataTransfer.effectAllowed = 'none';
-            info.event.preventDefault();
-          });
-      } else {
-        console.warn('No SVG content found in API response.');
-        info.event.dataTransfer.effectAllowed = 'none';
-        info.event.preventDefault();
-      }
+  
+      // Attach the SVG content to the drag event
+      info.event.dataTransfer.setData('text/html', svgContent); // You can use text/html or another suitable MIME type
     } catch (error) {
       console.error('API Error:', error);
-      info.event.dataTransfer.effectAllowed = 'none';
-      info.event.preventDefault();
     }
   };
+  
+
+  Office.onReady((info) => {
+    if (info.host === Office.HostType.Word) {
+      document.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const svgData = e.dataTransfer.getData('text/html'); // Retrieve the dragged SVG content
+  
+        Word.run((context) => {
+          const body = context.document.body;
+          body.insertHtml(svgData, Word.InsertLocation.end); // Insert the SVG at the end of the document
+          return context.sync();
+        }).catch((error) => {
+          console.log('Error inserting SVG:', error);
+        });
+      });
+    }
+  });
+  
 
   // Handle the drop event
   const handleDrop = async (info) => {

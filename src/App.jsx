@@ -32,6 +32,14 @@ useEffect(() => {
   };
 })
 
+Office.onReady((info) =>{
+  if(info.host === Office.HostType.Word){
+Word.run((context) => {
+  
+})
+  }
+})
+
 
   return (
     <div className="App">
