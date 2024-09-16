@@ -700,11 +700,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
  const handleDoubleClick = async (info) => {
   console.log('Double-click event info:', info); // Log the entire info object
 
-  if (info && info.node) { // Ensure info and node exist
-    const { node }= info.node;
+  // Ensure info and node exist
+    const { node }= info;
     console.log('Condition met. Fetching SVG for node:', node.key);
 
-    if (node.key && node.ShapeID) { // Ensure node has key and ShapeID
+     // Ensure node has key and ShapeID
       try {
         const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
           Email: '',
@@ -733,12 +733,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       } catch (error) {
         console.error('API Error:', error);
       }
-    } else {
-      console.warn('Node is missing key or ShapeID:', node);
-    }
-  } else {
-    console.warn('Condition not met. Node or key is undefined.');
-  }
+    
+  
 };
 
 
