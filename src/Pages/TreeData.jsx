@@ -854,7 +854,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         selectedKeys={selectedKeys}
         draggable
         onDragStart={handleDragStart}
-        onDrop={handleDrop}
+        // onDrop={handleDrop}
       />
 
       {/* Conditionally render PropertyTable or SvgContent */}
