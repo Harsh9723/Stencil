@@ -728,9 +728,9 @@ const svg = response.data.Data.SVGFile
  const handleDoubleClick = async (info) => {
   console.log('Double-click event info:', info); // Log the entire info object
   
-  const { node } = info || {}; // Safely destructure node
+  const  node  = info.node || {}; // Safely destructure node
 
-  if (node && node.key) {
+  if ( node.ShapeID) {
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     try {
