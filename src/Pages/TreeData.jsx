@@ -695,47 +695,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
  };
  
  // Handle the drop event
- const handleDrop = async (info) => {
-  const {node } = info
-  console.log('dropped  node', node)
-   try {
 
-    const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
-      Email: '', 
-      SubNo: '000000000000000000001234', 
-      ShapeID: node.ShapeID
-    });
-
-const svg = response.data.Data.SVGFile
-     // Check if the SVG content is available
-     if (svg) {
-       console.log('Inserting SVG into Word document:', svg);
- 
-       // Insert the SVG image into Word
-       await Office.context.document.setSelectedDataAsync(
-         svg,
-         { coercionType: Office.CoercionType.XmlSvg }, // Ensure the coercion type is set to XML/SVG
-         (asyncResult) => {
-           if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-             console.log('SVG image successfully inserted into Word document.');
-           } else {
-             console.error('Failed to insert SVG image:', asyncResult.error.message);
-           }
-         }
-       );
-     } else {
-       console.warn('No SVG content available for drop.');
-     }
-   } catch (error) {
-     console.error('Error during drop:', error);
-   }
- };
  
  const handleDoubleClick = async (info) => {
   console.log('Double-click event info:', info); // Log the entire info object
 
   if (info && info.node) { // Ensure info and node exist
-    const node = info.node;
+    const { node }= info.node;
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     if (node.key && node.ShapeID) { // Ensure node has key and ShapeID
