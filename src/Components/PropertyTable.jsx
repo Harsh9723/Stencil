@@ -84,20 +84,7 @@ const PropertyTable = ({ propertyData = [], stencilResponse = '' }) => {
     console.log('Copied to clipboard:', text);
   };
 
-  const handleInsertText = () => {
-    const textToInsert = "Hello, this text was inserted from a React app!";
-    
-    // Insert the text into the Word document
-    Office.context.document.setSelectedDataAsync(textToInsert, {
-      coercionType: Office.CoercionType.Text
-    }, (result) => {
-      if (result.status === Office.AsyncResultStatus.Succeeded) {
-        console.log('Text inserted into Word document.');
-      } else {
-        console.error('Error inserting text into Word document:', result.error);
-      }
-    });
-  };
+ 
 
   return (
     <StyledPropertyCard>
@@ -147,9 +134,6 @@ const PropertyTable = ({ propertyData = [], stencilResponse = '' }) => {
           </Table>
         </StyledTableContainer>
       </CardContent>
-      <button onClick={handleInsertText}>
-        Insert Text into Word
-      </button>
     </StyledPropertyCard>
   );
 };

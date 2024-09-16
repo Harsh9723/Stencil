@@ -62,19 +62,18 @@ const navigate = useNavigate()
     SetDtresultData(dtResultdata)
 
    
-    if (dtresultdata && dtresultdata.length > 0) {
-      setDtManufacturers(dtresultdata);
+    if (dtResultdata && dtResultdata.length > 0) {
+      setDtManufacturers(dtResultdata);
       setIsDialogOpen(true);
     }
 
     console.log('treeHierarchy', treeHierarchy);
     setTreeData(treeHierarchy);
 
-    if (!resultData && !dtresultdata) {
+    if (!resultData && !dtResultdata) {
       setSnackbarMessage(`No results were found for ${keyword}`);
       setSnackbarOpen(true);
     } else if (treeHierarchy && treeHierarchy.length > 0) {
-      // Set loading and show tree component if there are results
       setShowTreeComponent(true);
     } else {
       console.error('treeHierarchy is undefined or empty');
@@ -311,6 +310,7 @@ const navigate = useNavigate()
         display: 'flex',
         overflow: 'hidden',
         flexDirection: 'column',
+        overflowY: 'auto',
         justifyContent: 'flex-start',
         fontFamily: ['Segoe UI', 'sans-serif'],
         alignItems: 'center',
@@ -538,13 +538,13 @@ const navigate = useNavigate()
                     return <h1>All</h1>;
                   }
                   const selectedManufacturer = manufacturers.find(manufacturer => manufacturer.MfgAcronym === selected);
-                  return selectedManufacturer ? selectedManufacturer.Manufacturer : '';
+                  return selectedManufacturer ? selectedManufacturer.Manufacturer : 'All';
                 }}
 
               >
                 {manufacturers.length > 0 && (
 
-                  <MenuItem value="all"  >
+                  <MenuItem value="All"  >
                     <h1>All</h1>
                   </MenuItem>
                 )}
@@ -613,7 +613,7 @@ const navigate = useNavigate()
                 }}
               >
                 {eqTypes.length > 0 && (
-                  <MenuItem value="all">
+                  <MenuItem value="All">
                     <h1>All</h1>
                   </MenuItem>
                 )}
@@ -667,7 +667,7 @@ const navigate = useNavigate()
               >
                 {productLine.length > 0 && (
 
-                  <MenuItem value="" sx={{ fontSize: '12px' }}>
+                  <MenuItem value="All" sx={{ fontSize: '12px' }}>
                     <h1>All</h1>
                   </MenuItem>
                 )}
@@ -717,7 +717,7 @@ const navigate = useNavigate()
               >
                 {productNumber.length > 0 && (
 
-                  <MenuItem value="" sx={{ fontSize: '12px' }}>
+                  <MenuItem value="All" sx={{ fontSize: '12px' }}>
                     <h1>All</h1>
                   </MenuItem>
                 )}
@@ -737,8 +737,10 @@ const navigate = useNavigate()
           <Typography
             sx={{
               marginTop: '20px',
-              fontSize: { xs: '12px', sm: '14px' },
+              fontSize: { xs: '12px', sm: '15px' },
+              fontWeight:'bold',
               textAlign: 'center',
+              fontFamily:'Segoe UI, sans-serif',
               padding: '0 12px',
             }}
           >
@@ -752,16 +754,17 @@ const navigate = useNavigate()
 
         <Box
           sx={{
-            display: showTreeComponent ? 'block' : 'none', // Control display based on showTreeComponent state
+            display: showTreeComponent ? 'block' : 'none', 
             width: '100%',
             height: '100vh',
             marginTop: '0px',
-            padding: '0px'
+            padding: '0px',
+            // overflowY:'auto'
           }}
         >
           {showTreeComponent && treeData.length > 0 ? (
              <>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center',}}>
 
             
              <Tooltip title="setting" placement="bottom-end">

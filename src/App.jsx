@@ -5,7 +5,7 @@ import MainPage from './Pages/MainPage';
 import Setting from './Pages/Setting';
 import './App.css';
 import Treedata from './Pages/TreeData';
-import TestSvg from './Pages/TestSvg';
+
 
 
 function App() {
@@ -59,4 +59,3 @@ useEffect(() => {
 export default App;
 
 
-// export function run<T>(batch:(Context: Word.RequestContext) =>)

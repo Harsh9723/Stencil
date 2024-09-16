@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { styled } from '@mui/system';
-import { Card } from '@mui/material';
+import { Card, Tooltip } from '@mui/material';
 
 // Styled component for the SVG card
 const StyledSvgCard = styled(Card)(({ theme }) => ({
@@ -41,9 +41,6 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 }));
 
 const SvgContent = ({ svgContent }) => {
-  // Handle drag start and convert SVG content to base64
-
-
   useEffect(() => {
     Office.onReady((info) => {
       if (info.host === Office.HostType.Word) {
@@ -51,50 +48,51 @@ const SvgContent = ({ svgContent }) => {
       }
     });
   }, []);
-  
 
-  // Handle drop on Word
-  const handleDragStart = async () => {
-    // e.preventDefault(); // Prevent default behavior
-   try {
-    await Office.context.document.setSelectedDataAsync(svgContent,{
-      coercionType : Office.CoercionType.XmlSvg
-    })
-    console.log('inserted via drag and drop')
-   } catch (error) {
-    console.log('error while drang and drop')
-   }
+  // Handle drag start and insert SVG content into Word
+  const handleDragStart = async (e) => {
+    e.dataTransfer.setData('text/plain', 'Dragging SVG'); // Optional: Set drag data if needed
+    try {
+      await Office.context.document.setSelectedDataAsync(svgContent, {
+        coercionType: Office.CoercionType.XmlSvg,
+        asyncContext: { insertType: 'drag' }
+      });
+      console.log('SVG inserted via drag and drop');
+    } catch (error) {
+      console.error('Error during drag and drop:', error);
+    }
   };
 
-  const svg = useRef(null)
+  const svg = useRef(null);
 
-const handleDoubleClick =async () => {
-  try{
-await Office.context.document.setSelectedDataAsync(svgContent,{
-  coercionType: Office.CoercionType.XmlSvg,
-})
-  }catch(error){
-    console.error("error on doubleclick")
-  }
-}
-  
-
+  const handleDoubleClick = async () => {
+    try {
+      await Office.context.document.setSelectedDataAsync(svgContent, {
+        coercionType: Office.CoercionType.XmlSvg,
+        asyncContext: { insertType: 'double-click' }
+      });
+      console.log('SVG inserted via double-click');
+    } catch (error) {
+      console.error('Error during double-click:', error);
+    }
+  };
 
   return (
     <StyledSvgCard>
+    <Tooltip title="Drag and drop or double-click to insert" placement="bottom-end">
       <SvgWrapper
-      ref={svg}
+        ref={svg}
         draggable
-        // onDragStart={handleDragStart} // Handle drag start for drag-and-drop
         onDragOver={(e) => {
-          e.preventDefault(); 
-          console.log('Dragging over the target'); // Track dragging over
-        }} // Allow drop
-        onDragStart={handleDragStart} // Handle drop
-        onDoubleClick={handleDoubleClick} // Handle double-click
-        dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
+          e.preventDefault(); // Allow drop
+          console.log('Dragging over the target');
+        }}
+        onDragStart={handleDragStart}
+        onDoubleClick={handleDoubleClick}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
       />
-    </StyledSvgCard>
+    </Tooltip>
+  </StyledSvgCard>
   );
 };
 
