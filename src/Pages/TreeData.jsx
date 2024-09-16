@@ -727,6 +727,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
               }
             }
           );
+          return response
         } else {
           console.error('No SVG content found in API response');
         }
