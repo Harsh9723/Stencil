@@ -726,7 +726,7 @@ const svg = response.data.Data.SVGFile
  };
  
  const handleDoubleClick = async (node) => {
-  console.log('Node double-clicked:', node);
+  console.log('Node double-clicked:', node.key);
 
 
   if (node && node.key ) { 
