@@ -698,10 +698,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
  
  const handleDoubleClick = async (info) => {
-  console.log('Double-click event info:', node); // Log the entire info object
+  const { node }= info;
+
+  console.log('Double-click event node:', node); // Log the entire info object
 
   // Ensure info and node exist
-    const { node }= info;
     // console.log('Condition met. Fetching SVG for node:', node);
 
      // Ensure node has key and ShapeID
