@@ -346,7 +346,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         ShapeID: shapeId,
       });
       setSvgContent(response.data.Data.SVGFile);
-      console.log('svgfile', response.data.Data.SVGFile)
+      // console.log('svgfile', response.data.Data.SVGFile)
       setPropertyData([])
 
       const resposedevice = response.data.Data.SVGFile
@@ -726,32 +726,30 @@ const svg = response.data.Data.SVGFile
  };
  
  const handleDoubleClick = async (info) => {
-const {node} = info
+  console.log('Double-click event info:', info); // Log the entire info object
+  
+  const { node } = info || {}; // Safely destructure node
 
-  console.log('Node double-clicked:', info);
-
-  if (node && node.key ) { 
+  if (node && node.key) {
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     try {
-    
       const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
-        Email: '', 
-        SubNo: '000000000000000000001234', 
-        ShapeID: node.ShapeID, 
+        Email: '',
+        SubNo: '000000000000000000001234',
+        ShapeID: node.ShapeID, // Assuming ShapeID exists on the node
       });
 
       if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
         const svgContent = response.data.Data.SVGFile;
         console.log('Received SVG content:', svgContent);
 
-        
         await Office.context.document.setSelectedDataAsync(
           svgContent,
-          { coercionType: Office.CoercionType.XmlSvg }, 
+          { coercionType: Office.CoercionType.XmlSvg },
           (Result) => {
             if (Result.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image successfully inserted into Word .');
+              console.log('SVG image successfully inserted into Word.');
             } else {
               console.error('Failed to insert SVG image:', Result.error.message);
             }
@@ -764,9 +762,10 @@ const {node} = info
       console.error('API Error:', error);
     }
   } else {
-    console.warn('Condition not met');
+    console.warn('Condition not met. Node or key is undefined.');
   }
 };
+
 
   
 
