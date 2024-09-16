@@ -702,10 +702,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   console.log('Double-click event node:', node); // Log the entire info object
 
-  // Ensure info and node exist
-    // console.log('Condition met. Fetching SVG for node:', node);
-
-     // Ensure node has key and ShapeID
+  
       try {
         const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
           Email: '',

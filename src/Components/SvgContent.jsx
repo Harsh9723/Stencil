@@ -68,7 +68,7 @@ const SvgContent = ({ svgContent }) => {
 
   // Handle drop on Word
   const handleDropOnWord = async (e) => {
-    e.preventDefault(); // Prevent default behavior
+    // e.preventDefault(); // Prevent default behavior
    try {
     await Office.context.document.setSelectedDataAsync(svgContent,{
       coercionType : Office.CoercionType.XmlSvg
@@ -104,7 +104,7 @@ await Office.context.document.setSelectedDataAsync(svgContent,{
           e.preventDefault(); 
           console.log('Dragging over the target'); // Track dragging over
         }} // Allow drop
-        onDrop={handleDropOnWord} // Handle drop
+        onDragStart={handleDropOnWord} // Handle drop
         onDoubleClick={handleDoubleClick} // Handle double-click
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
