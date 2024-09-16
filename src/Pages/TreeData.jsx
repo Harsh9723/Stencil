@@ -729,7 +729,7 @@ const svg = response.data.Data.SVGFile
   console.log('Node double-clicked:', node);
 
 
-  if (node && node.key && node.ShapeID) { 
+  if (node && node.key ) { 
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     try {
