@@ -730,7 +730,7 @@ const svg = response.data.Data.SVGFile
   
   const  node  = info.node || {}; // Safely destructure node
 
-  if ( node.ShapeID) {
+  if (node) {
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     try {
