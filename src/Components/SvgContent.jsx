@@ -67,7 +67,7 @@ const SvgContent = ({ svgContent }) => {
   
 
   // Handle drop on Word
-  const handleDropOnWord = async (e) => {
+  const handleDropOnWord = async () => {
     // e.preventDefault(); // Prevent default behavior
    try {
     await Office.context.document.setSelectedDataAsync(svgContent,{
