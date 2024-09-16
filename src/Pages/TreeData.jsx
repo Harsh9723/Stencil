@@ -673,15 +673,21 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
        SubNo: '000000000000000000001234', 
        ShapeID: node.ShapeID
      });
- 
-     if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
-       // Store the SVG content in a global variable
-       draggedSvgContent = response.data.Data.SVGFile;
-       console.log('SVG content fetched and stored:', draggedSvgContent);
-     } else {
-       console.error('No SVG content found in API response');
-     }
- 
+ const svgonDragstart = response.data.Data.SVGFile
+    
+      
+      await Office.context.document.setSelectedDataAsync(
+        svgonDragstart,
+        { coercionType: Office.CoercionType.XmlSvg }, // Ensure the coercion type is set to XML/SVG
+        (asyncResult) => {
+          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+            console.log('SVG image successfully inserted into Word document.');
+          } else {
+            console.error('Failed to insert SVG image:', asyncResult.error.message);
+          }
+        }
+      );
+    
      return response;
    } catch (error) {
      console.error('API Error:', error);
