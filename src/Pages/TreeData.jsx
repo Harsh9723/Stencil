@@ -733,44 +733,48 @@ const svg = response.data.Data.SVGFile
  
  const handleDoubleClick = async (info) => {
   console.log('Double-click event info:', info); // Log the entire info object
-  
-  const  node  = info.node || {}; // Safely destructure node
 
-  if (node) {
+  if (info && info.node) { // Ensure info and node exist
+    const node = info.node;
     console.log('Condition met. Fetching SVG for node:', node.key);
 
-    try {
-      const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
-        Email: '',
-        SubNo: '000000000000000000001234',
-        ShapeID: node.ShapeID, // Assuming ShapeID exists on the node
-      });
+    if (node.key && node.ShapeID) { // Ensure node has key and ShapeID
+      try {
+        const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
+          Email: '',
+          SubNo: '000000000000000000001234',
+          ShapeID: node.ShapeID, // Ensure ShapeID exists on the node
+        });
 
-      if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
-        const svgContent = response.data.Data.SVGFile;
-        console.log('Received SVG content:', svgContent);
+        if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
+          const svgContent = response.data.Data.SVGFile;
+          console.log('Received SVG content:', svgContent);
 
-        await Office.context.document.setSelectedDataAsync(
-          svgContent,
-          { coercionType: Office.CoercionType.XmlSvg },
-          (Result) => {
-            if (Result.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image successfully inserted into Word.');
-            } else {
-              console.error('Failed to insert SVG image:', Result.error.message);
+          await Office.context.document.setSelectedDataAsync(
+            svgContent,
+            { coercionType: Office.CoercionType.XmlSvg },
+            (Result) => {
+              if (Result.status === Office.AsyncResultStatus.Succeeded) {
+                console.log('SVG image successfully inserted into Word.');
+              } else {
+                console.error('Failed to insert SVG image:', Result.error.message);
+              }
             }
-          }
-        );
-      } else {
-        console.error('No SVG content found in API response');
+          );
+        } else {
+          console.error('No SVG content found in API response');
+        }
+      } catch (error) {
+        console.error('API Error:', error);
       }
-    } catch (error) {
-      console.error('API Error:', error);
+    } else {
+      console.warn('Node is missing key or ShapeID:', node);
     }
   } else {
     console.warn('Condition not met. Node or key is undefined.');
   }
 };
+
 
 
   
