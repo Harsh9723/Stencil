@@ -726,9 +726,10 @@ const svg = response.data.Data.SVGFile
  };
  
  const handleDoubleClick = async (info) => {
-  console.log('Node double-clicked:', info.node);
-
 const {node} = info
+
+  console.log('Node double-clicked:', info);
+
   if (node && node.key ) { 
     console.log('Condition met. Fetching SVG for node:', node.key);
 
