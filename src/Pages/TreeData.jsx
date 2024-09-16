@@ -737,7 +737,7 @@ const svg = response.data.Data.SVGFile
       const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
         Email: '', 
         SubNo: '000000000000000000001234', 
-        ShapeID: node.ShapeID, 
+        ShapeID: node.key, 
       });
 
       if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
