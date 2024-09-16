@@ -658,8 +658,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
 
 
- // Handle the drag start event
- let draggedSvgContent = ''; 
+
 
  // Handle the drag start event
  const handleDragStart = async (info) => {
@@ -694,53 +693,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
    }
  };
  
- // Handle the drop event
+
 
  
- const handleDoubleClick = async (info) => {
-  const { node }= info;
-
-  console.log('Double-click event node:', node); // Log the entire info object
-
-  
-      try {
-        const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
-          Email: '',
-          SubNo: '000000000000000000001234',
-          ShapeID: node.ShapeID, // Ensure ShapeID exists on the node
-        });
-
-        if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
-          const svgContent = response.data.Data.SVGFile;
-          console.log('Received SVG content:', svgContent);
-
-          await Office.context.document.setSelectedDataAsync(
-            svgContent,
-            { coercionType: Office.CoercionType.XmlSvg },
-            (Result) => {
-              if (Result.status === Office.AsyncResultStatus.Succeeded) {
-                console.log('SVG image successfully inserted into Word.');
-              } else {
-                console.error('Failed to insert SVG image:', Result.error.message);
-              }
-            }
-          );
-          return response
-        } else {
-          console.error('No SVG content found in API response');
-        }
-      } catch (error) {
-        console.error('API Error:', error);
-      }
-    
-  
-};
-
-
-
-  
-
-
   return (
     <div style={{
       height: '100vh'
@@ -845,14 +800,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         expandedKeys={expandedKeys}
         onSelect={handleSelectMainTree}
         onExpand={handleExpandMainTree}
-        onDoubleClick={handleDoubleClick}
         selectedKeys={selectedKeys}
         draggable
         onDragStart={handleDragStart}
-        // onDrop={handleDrop}
+ 
       />
 
-      {/* Conditionally render PropertyTable or SvgContent */}
       {propertyData && propertyData.length > 0 ? (
         <PropertyTable propertyData={propertyData} stencilResponse={stencilResponse} />
       ) : (
@@ -873,7 +826,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
         expandedKeys={relatedExpandedKeys}
         onSelect={handleSelectRelatedTree}
         onExpand={handleExpandRelatedTree}
-      
+        onDragStart={handleDragStart}
+        draggable
         selectedKeys={relatedSelectedKeys}
       />
 

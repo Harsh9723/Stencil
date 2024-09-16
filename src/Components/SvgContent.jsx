@@ -44,19 +44,6 @@ const SvgContent = ({ svgContent }) => {
   // Handle drag start and convert SVG content to base64
 
 
-  // const handleDragStart = (e) => {
-  //   console.log('Drag started'); // Track drag start event
-  //   const svgBlob = new Blob([svgContent], { type: 'image/svg+xml' });
-  //   const reader = new FileReader();
-  //   reader.onloadend = () => {
-  //     const base64data = reader.result.split(',')[1]; // Extract base64 string
-  //     e.dataTransfer.setData('image/svg+xml', base64data); // Set data for drag event
-  //     e.dataTransfer.dropEffect = 'copy';
-  //     console.log('Base64 data set for drag event:', base64data); // Log base64 data
-  //   };
-  //   reader.readAsDataURL(svgBlob); // Convert Blob to Data URL
-  // };
-
   useEffect(() => {
     Office.onReady((info) => {
       if (info.host === Office.HostType.Word) {
@@ -67,7 +54,7 @@ const SvgContent = ({ svgContent }) => {
   
 
   // Handle drop on Word
-  const handleDropOnWord = async () => {
+  const handleDragStart = async () => {
     // e.preventDefault(); // Prevent default behavior
    try {
     await Office.context.document.setSelectedDataAsync(svgContent,{
@@ -81,7 +68,6 @@ const SvgContent = ({ svgContent }) => {
 
   const svg = useRef(null)
 
-  // Handle double-click to insert the image into Word
 const handleDoubleClick =async () => {
   try{
 await Office.context.document.setSelectedDataAsync(svgContent,{
@@ -104,7 +90,7 @@ await Office.context.document.setSelectedDataAsync(svgContent,{
           e.preventDefault(); 
           console.log('Dragging over the target'); // Track dragging over
         }} // Allow drop
-        onDragStart={handleDropOnWord} // Handle drop
+        onDragStart={handleDragStart} // Handle drop
         onDoubleClick={handleDoubleClick} // Handle double-click
         dangerouslySetInnerHTML={{ __html: svgContent }} // Display SVG
       />
