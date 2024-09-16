@@ -702,7 +702,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   // Ensure info and node exist
     const { node }= info;
-    console.log('Condition met. Fetching SVG for node:', node.key);
+    // console.log('Condition met. Fetching SVG for node:', node);
 
      // Ensure node has key and ShapeID
       try {
