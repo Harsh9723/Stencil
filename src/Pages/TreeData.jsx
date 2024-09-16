@@ -698,7 +698,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
  
  const handleDoubleClick = async (info) => {
-  console.log('Double-click event info:', info); // Log the entire info object
+  console.log('Double-click event info:', node); // Log the entire info object
 
   // Ensure info and node exist
     const { node }= info;
