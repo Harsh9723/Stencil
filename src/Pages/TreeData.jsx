@@ -725,10 +725,10 @@ const svg = response.data.Data.SVGFile
    }
  };
  
- const handleDoubleClick = async (node) => {
-  console.log('Node double-clicked:', node.key);
+ const handleDoubleClick = async (info) => {
+  console.log('Node double-clicked:', info.node);
 
-
+const {node} = info
   if (node && node.key ) { 
     console.log('Condition met. Fetching SVG for node:', node.key);
 
@@ -737,7 +737,7 @@ const svg = response.data.Data.SVGFile
       const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
         Email: '', 
         SubNo: '000000000000000000001234', 
-        ShapeID: node.key, 
+        ShapeID: node.ShapeID, 
       });
 
       if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
