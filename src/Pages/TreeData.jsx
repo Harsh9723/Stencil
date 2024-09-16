@@ -139,7 +139,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const getDeviceShapes = async (selectedNode, addLeafNode, eqid, setSelectedNode) => {
     try {
       const eqId = selectedNode.key;
-      const response = await axios.post('http://localhost:8000/library/GetDeviceShapes', {
+      const response = await axios.post('http://localhost:5000/api/library/GetDeviceShapes', {
         Email: '',
         SubNo: '000000000000000000001234',
         EQID: eqId,
@@ -177,7 +177,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   // Function to call GetStencilNameByEQID API and handle stencil response
   const getStencilNameByEQID = async (selectedNode, addLeafNode, eqid) => {
     try {
-      const response = await axios.post('http://localhost:8000/library/GetStencilNameByEQID', {
+      const response = await axios.post('http://localhost:5000/api/library/GetStencilNameByEQID', {
         EQID: [eqid],
       });
 
@@ -224,7 +224,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   };
   const getStencilName = async (eqid) => {
     try {
-      const response = await axios.post('http://localhost:8000/library/GetStencilNameByEQID', {
+      const response = await axios.post('http://localhost:5000/api/library/GetStencilNameByEQID', {
         EQID: [eqid],
       });
 
@@ -243,7 +243,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
   const getStencilNameByEQIDoncollaps = async (selectedNode, eqid) => {
     try {
       // const eqId = selectedNode.key;
-      const response = await axios.post('http://localhost:8000/library/GetStencilNameByEQID', {
+      const response = await axios.post('http://localhost:5000/api/library/GetStencilNameByEQID', {
         EQID: [eqid],
       });
 
@@ -298,12 +298,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
     setIsLoading(true);
     try {
       const [relatedDevicesResponse, libraryPropertyResponse] = await Promise.all([
-        axios.post('http://localhost:8000/library/HasRelatedDevices', {
+        axios.post('http://localhost:5000/api/library/HasRelatedDevices', {
           Email: '',
           SubNo: '000000000000000000001234',
           EQID: eqId,
         }),
-        axios.post('http://localhost:8000/library/GetLibraryPropertyWithSkeleton', {
+        axios.post('http://localhost:5000/api/library/GetLibraryPropertyWithSkeleton', {
           Email: '',
           SubNo: '000000000000000000001234',
           EQID: eqId,
@@ -340,7 +340,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
 
   const callApiForGetDevicePreview = async (shapeId) => {
     try {
-      const response = await axios.post('http://localhost:8000/library/GetDevicePreview', {
+      const response = await axios.post('http://localhost:5000/api/library/GetDevicePreview', {
         Email: '',
         SubNo: '000000000000000000001234',
         ShapeID: shapeId,
@@ -668,10 +668,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
  
    try {
      // Call the API to get the SVG content
-     const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+     const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
        Email: '', 
        SubNo: '000000000000000000001234', 
-       ShapeID: node.key,
+       ShapeID: node.ShapeID
      });
  
      if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
@@ -690,14 +690,24 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
  
  // Handle the drop event
  const handleDrop = async (info) => {
+  const {node } = info
+  console.log('dropped  node', node)
    try {
+
+    const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
+      Email: '', 
+      SubNo: '000000000000000000001234', 
+      ShapeID: node.ShapeID
+    });
+
+const svg = response.data.Data.SVGFile
      // Check if the SVG content is available
-     if (draggedSvgContent) {
-       console.log('Inserting SVG into Word document:', draggedSvgContent);
+     if (svg) {
+       console.log('Inserting SVG into Word document:', svg);
  
        // Insert the SVG image into Word
        await Office.context.document.setSelectedDataAsync(
-         draggedSvgContent,
+         svg,
          { coercionType: Office.CoercionType.XmlSvg }, // Ensure the coercion type is set to XML/SVG
          (asyncResult) => {
            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
@@ -718,31 +728,31 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
  const handleDoubleClick = async (node) => {
   console.log('Node double-clicked:', node);
 
-  // Example condition check before calling API
+
   if (node && node.key && node.ShapeID) { 
     console.log('Condition met. Fetching SVG for node:', node.key);
 
     try {
-      // Call the API to get the SVG content
-      const response = await axios.post('http://localhost:8000/library/GetDevicePreviewToDrawOnSlide', {
+    
+      const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
         Email: '', 
-        SubNo: '000000000000000000001234', // Adjust SubNo as necessary
-        ShapeID: node.ShapeID, // Use ShapeID from node
+        SubNo: '000000000000000000001234', 
+        ShapeID: node.ShapeID, 
       });
 
       if (response && response.data && response.data.Data && response.data.Data.SVGFile) {
         const svgContent = response.data.Data.SVGFile;
         console.log('Received SVG content:', svgContent);
 
-        // Insert the SVG into Word document
+        
         await Office.context.document.setSelectedDataAsync(
           svgContent,
-          { coercionType: Office.CoercionType.XmlSvg }, // Ensure coercion type is set to SVG
-          (asyncResult) => {
-            if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-              console.log('SVG image successfully inserted into Word document.');
+          { coercionType: Office.CoercionType.XmlSvg }, 
+          (Result) => {
+            if (Result.status === Office.AsyncResultStatus.Succeeded) {
+              console.log('SVG image successfully inserted into Word .');
             } else {
-              console.error('Failed to insert SVG image:', asyncResult.error.message);
+              console.error('Failed to insert SVG image:', Result.error.message);
             }
           }
         );
@@ -753,7 +763,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, }) => {
       console.error('API Error:', error);
     }
   } else {
-    console.warn('Condition not met, skipping API call.');
+    console.warn('Condition not met');
   }
 };
 

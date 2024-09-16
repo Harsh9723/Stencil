@@ -94,7 +94,7 @@ const navigate = useNavigate()
     const fetchManufacturers = async () => {
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:8000/library/GetLibraryAvailableManufacturersNew', {
+        const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableManufacturersNew', {
           Email: "",
           SubNo: "000000000000000000001234",
           FullLibrary: false,
@@ -120,7 +120,7 @@ const navigate = useNavigate()
       const fetchEqTypes = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:8000/library/GetLibraryAvailableEqTypesNew', {
+          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableEqTypesNew', {
             Email: "",
             Subno: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,
@@ -149,7 +149,7 @@ const navigate = useNavigate()
       const fetchProductLine = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:8000/library/GetLibraryAvailableProdLinesNew', {
+          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableProdLinesNew', {
             Email: "",
             SubNo: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,
@@ -178,7 +178,7 @@ const navigate = useNavigate()
       const fetchProductNumber = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:8000/library/GetLibraryAvailableProdNumbersNew', {
+          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableProdNumbersNew', {
             Email: "",
             SubNo: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,

@@ -2,7 +2,7 @@
 import axios from 'axios';
 // import eqtype from '../../public/assets/EqType'
 //  base API URL
-const API_URL = 'http://localhost:8000/library/';
+const API_URL = 'http://localhost:5000/api/library/';
 
 /**
  * Handles searching by making an API request based on provided parameters and processes the response data.
