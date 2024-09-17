@@ -391,7 +391,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       // Add the Visio node to the correct tree
       addLeafNode(selectedNode.key, stencilLeafNode);
       
-      if(relatedTree.length > 0 ){
+      if(relatedTree){
       addLeafNodeToRelatedTree(selectedNode.key, stencilLeafNode)
 
       }
@@ -593,6 +593,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setRelatedSelectedKeys(autoSelectedKeys);
       SetRelatesSelectedNode([selectedNode])
     } else if (selectedNode.Type && selectedNode.EQID && IsSelected === false) {
+
       let result = await callApiforDeviceShapeStencilEqid(selectedNode);
       if (result && result.shapenodes?.length > 0) {
         setRelatedSelectedKeys([result.shapenodes[0].key]);
