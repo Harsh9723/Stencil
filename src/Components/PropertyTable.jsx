@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 
-// Styled components for the property table
 const StyledPropertyCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
   marginTop: '20px',
@@ -94,7 +93,7 @@ const PropertyTable = ({ propertyData = [], stencilResponse = '' }) => {
             <TableBody>
               {propertyData
                 .filter((item) => item.GroupName === 'Basic')
-                .map((item, index) => (
+                 .map((item, index) => (
                   <StyledTableRow key={index}>
                     <StyledTableCellHeader component="th" scope="row">
                       {item.pLabel}
@@ -134,6 +133,7 @@ const PropertyTable = ({ propertyData = [], stencilResponse = '' }) => {
           </Table>
         </StyledTableContainer>
       </CardContent>
+
     </StyledPropertyCard>
   );
 };

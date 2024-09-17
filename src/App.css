@@ -156,3 +156,20 @@ font-family: 'Segoe UI', sans-serif;
 span.rc-tree-iconEle{
   margin-top: 4px !important;
 }
+
+/* For Webkit browsers */
+::-webkit-scrollbar {
+  width: 5px; /* Adjust width of the scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Scrollbar thumb color */
+  border-radius: 3px; /* Rounded corners for the scrollbar thumb */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color); /* Track color */
+}
+.rc-tree .rc-tree-treenode{
+  line-height: 0px;
+}

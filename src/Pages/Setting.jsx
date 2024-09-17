@@ -35,7 +35,7 @@ const Setting = () => {
         justifyContent: 'flex-start',
         alignItems: 'center',
         color: 'var(--font-color)',
-        padding: '20px',
+        padding: '5px',
         boxSizing: 'border-box',
       }}
     >

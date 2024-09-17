@@ -51,7 +51,7 @@ const SvgContent = ({ svgContent }) => {
 
   // Handle drag start and insert SVG content into Word
   const handleDragStart = async (e) => {
-    e.dataTransfer.setData('text/plain', 'Dragging SVG'); // Optional: Set drag data if needed
+    e.dataTransfer.setData('text/plain', ''); // Optional: Set drag data if needed
     try {
       await Office.context.document.setSelectedDataAsync(svgContent, {
         coercionType: Office.CoercionType.XmlSvg,

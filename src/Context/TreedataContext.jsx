@@ -5,6 +5,8 @@ const TreeDataContext = createContext();
 export const TreeDataProvider = ({ children }) => {
   const [treeData, setTreeData] = useState([]);
   const [relatedTree, setRelatedTree] = useState([]);
+  const  [  PropertyData, SetPropertydata] = useState([])
+  const[tooltip , SetTooltip, ] = useState([])
 
   // Function to add leaf node to treeData
   const addLeafNode = (parentKey, ...newNodes) => {
@@ -74,7 +76,7 @@ export const TreeDataProvider = ({ children }) => {
       return addNodes(prevData);
     });
   };
-  
+  console.log('789456',PropertyData)
 
   // Function to set initial data for treeData
   const setInitialTreeData = (data) => {
@@ -96,6 +98,10 @@ export const TreeDataProvider = ({ children }) => {
       setRelatedTree,
       addLeafNodeToRelatedTree,
       setInitialRelatedTreeData,
+      SetPropertydata,
+      PropertyData,
+      SetTooltip, 
+      tooltip
     }}>
       {children}
     </TreeDataContext.Provider>

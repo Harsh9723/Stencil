@@ -49,9 +49,8 @@ useEffect(() => {
         <Route path="/setting" element={<Setting />} />
         <Route path="/mainpage" element={<MainPage />} />
         <Route path="/tree" element={<Treedata />} />
-        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
-      {/* <TestSvg /> */}
+    
     </div>
   );
 }
