@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgress, Box } from '@mui/material';
-
+import useTheme from './Theme';
 import data from '../Links.json';
 
 function PreloadPage() {
@@ -32,7 +32,7 @@ function PreloadPage() {
   const handleclick = () => {
     window.open(data.logourl, '_blank');
   }
-
+  useTheme(data.colortheme)
   if (!isLoading) {
     return null;
   }
@@ -65,18 +65,7 @@ function PreloadPage() {
         <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px' }}>
           Add-In for Stencils
         </h1>
-        <Box sx={{ position: 'relative', display: 'inline-block' }}>
-          <CircularProgress
-            variant="indeterminate"
-            disableShrink
-            sx={{
-              color: (theme) => (theme.palette.mode === 'light' ? '#ffffff' : '#308fe8'),
-              animationDuration: '650ms',
-            }}
-            size={70}
-            thickness={3}
-          />
-        </Box>
+      
       </div>
     </div>
   );

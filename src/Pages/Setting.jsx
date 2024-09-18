@@ -34,30 +34,6 @@ const Setting = () => {
         boxSizing: 'border-box',
       }}
     >
-      {/* <Box
-        sx={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          marginBottom: '20px',
-        }}
-      >
-     
-          <IconButton sx={{ color: 'var(--font-color)' }} onClick={handleBackClick} title='Visit VisioStencil Website'>
-            <ArrowBackIcon />
-          </IconButton>
-        <Typography sx={{ marginLeft: '8px', fontSize:'12px' }}>
-          Visit
-        </Typography>
-          <Typography
-            sx={{ marginLeft: '8px', cursor: 'pointer', textDecoration: 'underline', fontSize:'12px' }}
-            onClick={handleClick}
-            title='Visit VisioStencil'
-          >
-            VisioStencils.com
-          </Typography>
-      </Box> */}
-
       <Box 
         sx={{
           width: '100%',

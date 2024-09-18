@@ -1008,7 +1008,7 @@ const SearchComponent = () => {
            ): showSetting ?( 
             <>
              <Box
-          sx={{
+            sx={{
             width: '100%',
             height: '100vh',
             marginTop: '0px',

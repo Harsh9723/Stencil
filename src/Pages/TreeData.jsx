@@ -660,6 +660,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
       setRelatedDevicesVisible(true); 
+
       SetEqId(selectedNode.EqId)
     }
     else if (selectedNode.Type && selectedNode.EQID) {
@@ -676,6 +677,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setPropertyData([])
       setSvgContent(null)
       setRelatedDevicesVisible(false)
+
     }
     console.log('Selected Keys:', selectedKeys);
   };
