@@ -7,22 +7,15 @@ function App() {
   const [showMainPage, setShowMainPage] = useState(false);
 
   useEffect(() => {
-    const hasVisited = localStorage.getItem('hasVisited');
+    
+    const timer = setTimeout(() => {
+      setShowMainPage(true);
+    }, 3000);
 
-    if (!hasVisited) {
-      const timer = setTimeout(() => {
-        setShowMainPage(true); // Show MainPage after the timeout
-        localStorage.setItem('hasVisited', 'true');
-      }, 2000); // Delay of 1 second
-
-      return () => clearTimeout(timer); // Cleanup timeout
-    } else {
-      setShowMainPage(true); // If visited, directly show MainPage
-    }
+    return () => clearTimeout(timer); 
   }, []);
 
   useEffect(() => {
-    // Initialize Office
     Office.initialize = function () {
       console.log('Office is ready.');
     };
