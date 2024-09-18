@@ -212,6 +212,7 @@ const SearchComponent = () => {
   const [dtresultdata, SetDtresultData] = useState([])
   const [showTreeComponent, setShowTreeComponent] = useState(false)
   const [kwdSearchType, setKwdSearchType] = useState('0');
+  const [showSetting, setShowSetting] = useState(false)
   const navigate = useNavigate()
   const API_URL = 'http://localhost:5000/api/library/';
 
@@ -629,9 +630,11 @@ const SearchComponent = () => {
 
   }
   const handleSettingClick = () => {
-    navigate('/setting');
+  navigate('/setting')
   };
-
+  const backfromsetting =() => {
+    setShowSetting(false)
+  }
   const handleClick = () => {
     window.open(data.logourl, '_blank');
   };
@@ -1073,7 +1076,7 @@ const SearchComponent = () => {
                     </MenuItem>
                   ))
                 ) : (
-                  <MenuItem disabled>No Equipment Types Available</MenuItem>
+                  <MenuItem disabled sx={{fontSize:'12px', fontFamily:'Segoe UI, sans-serif'}} >No Equipment Types Available</MenuItem>
                 )}
               </Select>
             </FormControl>
@@ -1127,7 +1130,7 @@ const SearchComponent = () => {
                     </MenuItem>
                   ))
                 ) : (
-                  <MenuItem disabled>No product line available</MenuItem>
+                  <MenuItem disabled sx={{fontSize:'12px', fontFamily:'Segoe UI, sans-serif'}}>No product line available</MenuItem>
                 )}
               </Select>
             </FormControl>
