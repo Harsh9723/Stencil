@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import data from '../Links.json';
-import { IconButton, Tooltip, Typography, Box, Link, TextField, Button } from '@mui/material';
+import { IconButton,  Typography, Box, Link, TextField, Button } from '@mui/material';
 import useTheme from '../Components/Theme';
 
 const Setting = () => {
@@ -47,22 +47,20 @@ const Setting = () => {
           marginBottom: '20px',
         }}
       >
-        <Tooltip title="Back" placement="bottom-end">
-          <IconButton sx={{ color: 'var(--font-color)' }} onClick={handleBackClick}>
+     
+          <IconButton sx={{ color: 'var(--font-color)' }} onClick={handleBackClick} title='Visit VisioStencil Website'>
             <ArrowBackIcon />
           </IconButton>
-        </Tooltip>
         <Typography sx={{ marginLeft: '8px', fontSize:'12px' }}>
           Visit
         </Typography>
-        <Tooltip title="Visit VisioStencils website" placement="bottom-end">
           <Typography
             sx={{ marginLeft: '8px', cursor: 'pointer', textDecoration: 'underline', fontSize:'12px' }}
             onClick={handleClick}
+            title='Visit VisioStencil'
           >
             VisioStencils.com
           </Typography>
-        </Tooltip>
       </Box>
 
       <Box 

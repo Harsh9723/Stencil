@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Box, TextField, Typography, IconButton, Grid, Tooltip, CircularProgress, Snackbar } from '@mui/material';
+import { Box, TextField, Typography, IconButton, Grid, CircularProgress, Snackbar } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Backdrop from '@mui/material/Backdrop';
 import data from '../Links.json';
@@ -211,11 +211,8 @@ const SearchComponent = () => {
   const [resultData, setResultData] = useState([])
   const [dtresultdata, SetDtresultData] = useState([])
   const [showTreeComponent, setShowTreeComponent] = useState(false)
-  const [property, SetProperty] = useState([])
+  const [kwdSearchType, setKwdSearchType] = useState('0');
   const navigate = useNavigate()
-const { SetPropertydata, PropertyData, SetTooltip, tooltip} = useTreeData() 
-console.log('prop', PropertyData)
-console.log('tooltip', tooltip)
   const API_URL = 'http://localhost:5000/api/library/';
 
   /**
@@ -227,22 +224,31 @@ console.log('tooltip', tooltip)
    */
 
   const handleSearch = async (searchParams, onSuccess, onError) => {
-    const { keyword, related, Eqid, selectedManufacturer, setSnackbarMessage, setSnackbarOpen, selectedEqType, selectedProductLine, selectedProductNumber, selectedDtManufacturers, } = searchParams;
+    const {
+      keyword,
+      related,
+      Eqid,
+      selectedManufacturer,
+      setSnackbarMessage,
+      setSnackbarOpen,
+      selectedEqType,
+      selectedProductLine,
+      selectedProductNumber,
+      selectedDtManufacturers,
+    } = searchParams;
+
     let searchType = 'Solution';
     let paramXml = '';
 
-
     if (keyword) {
       searchType = 'Kwd';
-      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selectedDtManufacturers.length > 0 ? selectedDtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-    }
-    else if (selectedManufacturer || selectedEqType || selectedProductLine || selectedProductNumber) {
+      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>${kwdSearchType}</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selectedDtManufacturers.length > 0 ? selectedDtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
+    } else if (selectedManufacturer || selectedEqType || selectedProductLine || selectedProductNumber) {
       paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductLine || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedProductNumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
     } else if (related || '') {
-      paramXml = ` <Search><NotificationCount>500</NotificationCount><SearchType>Related</SearchType><EQID>${Eqid}</EQID><MfgFilterList></MfgFilterList><IncludeRelatedMfg>true</IncludeRelatedMfg><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`
+      paramXml = ` <Search><NotificationCount>500</NotificationCount><SearchType>Related</SearchType><EQID>${Eqid}</EQID><MfgFilterList></MfgFilterList><IncludeRelatedMfg>true</IncludeRelatedMfg><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
     }
+
     try {
       const response = await axios.post(`${API_URL}SearchLibraryNew`, {
         Email: "",
@@ -270,22 +276,20 @@ console.log('tooltip', tooltip)
       console.log('Result Data:', resultData);
       console.log('dtResult Data:', dtResultdata);
 
-      if (resultData.length > 0) {
-        // If there are search results, call onSuccess with resultData
-        onSuccess(resultData);
-      } else if (dtResultdata.length > 0) {
-        onSuccess(dtResultdata);
+      if (resultData.length > 0 || dtResultdata.length > 0) {
+        // Pass both resultData and dtResultdata to onSuccess
+        onSuccess(resultData, dtResultdata);
       } else {
         console.log('No relevant data found');
         // Handle cases where no data is available
-        onFailure('No results found');
+        onError('No results found');
       }
     } catch (error) {
       console.error('Related not shown:', error.message);
-      onFailure('An error occurred while fetching data');
+      onError('An error occurred while fetching data');
     }
-
   };
+
 
   /**
    * 
@@ -314,6 +318,7 @@ console.log('tooltip', tooltip)
         MFGPRODLINE = '',
         MFGPRODNO = '',
         EQID = '',
+        MFGDESC = ''
       } = item;
 
       let manufacturerNode = searchResultsNode.children.find(
@@ -365,40 +370,37 @@ console.log('tooltip', tooltip)
       let productnoNode = prodLineNode.children.find(
         (child) => child.key === productNumberKey
       );
-     
-      if (!productnoNode)  {
-        // Filter propertyData for items with GroupName 'Basic' and find the item with pName 'MfgDesc'
-        // Create the product node and set the tooltip
+
+      if (!productnoNode) {
         productnoNode = {
-        //  title: (
-        //     <Tooltip title= {tooltip || 'not passed correctly'}>
-        //       <span>{MFGPRODNO}</span>
-        //     </Tooltip>
-        //   ),
-          title: MFGPRODNO,
+          title: (
+            <span title={MFGDESC} placement='bottom-end'>
+              <span>{MFGPRODNO}</span>
+            </span>
+          ),
+          // title: MFGPRODNO,
           key: productNumberKey,
           icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
           children: [],
           EQID: productNumberKey,
           Type: 'ProductNumber',
           isLeaf: false,
-          tooltip: ''
         };
-      
+
         // Add the new product node to the children of prodLineNode
         prodLineNode.children.push(productnoNode);
-      
-        // Optional: Log the tooltip value for debugging
+
+
       }
-      
+
     });
 
     return tree;
   };
-const handleProperty= (value) => {
-  SetProperty(value)
-}
 
+  const handleKwdSearchTypeChange = (event) => {
+    setKwdSearchType(event.target.value);
+  };
 
   const searchParams = {
     keyword,
@@ -412,30 +414,48 @@ const handleProperty= (value) => {
   };
 
   const onSuccess = (resultData, dtResultdata) => {
-    const treeHierarchy = transformToTreeData(resultData);
-    setResultData(resultData);
-    SetDtresultData(dtResultdata)
-
-
     if (dtResultdata && dtResultdata.length > 0) {
+      console.log('Processing dtResultdata:', dtResultdata);
+
+      // Update state with dtResultdata
+      SetDtresultData(dtResultdata);
       setDtManufacturers(dtResultdata);
       setIsDialogOpen(true);
+
+
+      return;
     }
 
-    console.log('treeHierarchy', treeHierarchy);
-    setTreeData(treeHierarchy);
+    // If dtResultdata is not available, process resultData instead
+    if (resultData && resultData.length > 0) {
+      console.log('Processing resultData:', resultData);
 
-    if (!resultData && !dtResultdata) {
-      setSnackbarMessage(`No results were found for ${keyword}`);
-      setSnackbarOpen(true);
-    } else if (treeHierarchy && treeHierarchy.length > 0) {
-      setShowTreeComponent(true);
+      // Transform the resultData into tree format
+      const treeHierarchy = transformToTreeData(resultData);
+      setResultData(resultData);
+
+      // Log and set the transformed tree data
+      console.log('treeHierarchy:', treeHierarchy);
+      setTreeData(treeHierarchy);
+
+      // Show the tree component if data is available
+      if (treeHierarchy.length > 0) {
+        setShowTreeComponent(true);
+      } else {
+        // If treeHierarchy is empty, show a snackbar message
+        setSnackbarMessage('No relevant tree data found');
+        setSnackbarOpen(true);
+        setShowTreeComponent(false);
+      }
     } else {
-      console.error('treeHierarchy is undefined or empty');
-      setLoading(false);
+      // Handle case where neither resultData nor dtResultdata are available
+      console.error('No data available');
+      setSnackbarMessage('No results found');
+      setSnackbarOpen(true);
       setShowTreeComponent(false);
     }
   };
+
 
   const onError = (message) => {
     setSnackbarMessage(message);
@@ -625,10 +645,18 @@ const handleProperty= (value) => {
   const handleDialogSubmit = () => {
     console.log('Selected Manufacturers:', selectedDtManufacturers);
     setIsDialogOpen(false);
+    setSelectedDtManufacturers([])
     handlesearch()
   };
+
+  const handledialogclose = () => {
+    setIsDialogOpen(false)
+    setSelectedDtManufacturers([])
+  }
+
   const handlebuttonclick = () => {
     setSnackbarOpen(false)
+
   }
 
   const CustomTypography = ({ children, ...props }) => (
@@ -644,7 +672,7 @@ const handleProperty= (value) => {
   }
   const handlesearch = () => {
     // if (searchParams.keyword && searchParams.keyword.trim() !== "") {
-      handleSearch(searchParams, onSuccess, onError);
+    handleSearch(searchParams, onSuccess, onError);
     // }
   };
   // const handleKeyPress = (event) => {
@@ -688,11 +716,41 @@ const handleProperty= (value) => {
         <CircularProgress color="inherit" />
       </Backdrop>
 
-      <Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)} sx={{ fontSize: '12px' }}  >
-        <DialogTitle sx={{ fontSize: '12px' }}>Select Manufacturers</DialogTitle>
-        <DialogContent sx={{ fontSize: '12px' }} >
-          <FormControl component="fieldset" sx={{ fontSize: '12px' }} >
-            <FormGroup sx={{ fontSize: '12px' }} >
+      <Dialog
+        open={isDialogOpen}
+        onClose={() => handledialogclose()}
+        sx={{
+          fontSize: { xs: '10px', sm: '12px' },
+          fontFamily: '"Segoe UI", sans-serif'
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontSize: { xs: '10px', sm: '12px' },
+            fontFamily: '"Segoe UI", sans-serif'
+          }}
+        >
+          Select Manufacturers
+        </DialogTitle>
+        <DialogContent
+          sx={{
+            fontSize: { xs: '10px', sm: '12px' },
+            fontFamily: '"Segoe UI", sans-serif'
+          }}
+        >
+          <FormControl
+            component="fieldset"
+            sx={{
+              fontSize: { xs: '10px', sm: '12px' },
+              fontFamily: '"Segoe UI", sans-serif'
+            }}
+          >
+            <FormGroup
+              sx={{
+                fontSize: { xs: '10px', sm: '12px' },
+                fontFamily: '"Segoe UI", sans-serif'
+              }}
+            >
               {dtManufacturers.map((manufacturer, index) => (
                 <FormControlLabel
                   key={index}
@@ -700,21 +758,44 @@ const handleProperty= (value) => {
                     <Checkbox
                       checked={selectedDtManufacturers.includes(manufacturer.MfgAcronym)}
                       onChange={() => handleManufacturerSelection(manufacturer.MfgAcronym)}
-                      sx={{ fontSize: '12px' }}
+                      sx={{
+                        fontSize: { xs: '10px', sm: '12px' },
+                        fontFamily: '"Segoe UI", sans-serif'
+                      }}
                     />
                   }
                   label={manufacturer.Manufacturer}
-                  sx={{ fontSize: '12px' }}
+                  sx={{
+                    fontSize: { xs: '10px', sm: '12px' },
+                    fontFamily: '"Segoe UI", sans-serif'
+                  }}
                 />
               ))}
             </FormGroup>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsDialogOpen(false)} sx={{ fontSize: '12px' }}>Cancel</Button>
-          <Button onClick={() => handleDialogSubmit()} sx={{ fontSize: '12px' }}>OK</Button>
+          <Button
+            onClick={() => handledialogclose()}
+            sx={{
+              fontSize: { xs: '10px', sm: '12px' },
+              fontFamily: '"Segoe UI", sans-serif'
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleDialogSubmit()}
+            sx={{
+              fontSize: { xs: '10px', sm: '12px' },
+              fontFamily: '"Segoe UI", sans-serif'
+            }}
+          >
+            OK
+          </Button>
         </DialogActions>
       </Dialog>
+
 
 
       <Box
@@ -729,26 +810,29 @@ const handleProperty= (value) => {
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <>
-            <Tooltip title="setting" placement="bottom-end">
-              <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleSettingClick}>
-                <SettingsIcon />
-              </IconButton>
-            </Tooltip>
+            <IconButton
+              title="Setting"
+              sx={{ color: 'var(--font-color)', padding: 0 }}
+              onClick={handleSettingClick}
+            >
+              <SettingsIcon />
+            </IconButton>
+
             <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
-            <Tooltip title="visit visiostencil website" placement="bottom-end">
-              <Typography
-                sx={{
-                  marginLeft: '8px',
-                  cursor: 'pointer',
-                  textDecoration: 'underline',
-                  whiteSpace: 'nowrap',
-                  fontSize: '12px'
-                }}
-                onClick={handleClick}
-              >
-                VisioStencils.com
-              </Typography>
-            </Tooltip>
+            <Typography
+              title="Visit VisioStencil website"
+              sx={{
+                marginLeft: '8px',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+                fontSize: '12px',
+              }}
+              onClick={handleClick}
+            >
+              VisioStencils.com
+            </Typography>
+
           </>
 
         </Box>
@@ -857,16 +941,16 @@ const handleProperty= (value) => {
                   color: 'var(--font-color)',
                   fontSize: '12px'
                 }}
+                onChange={handleKwdSearchTypeChange}
+                value={kwdSearchType}
               >
                 <FormControlLabel
                   sx={{ fontSize: '12px' }}
-                  value="anyWord"
-                  control={<Radio sx={{ color: 'var(--font-color)', fontSize: '12px' }} color='default' />}
+                  control={<Radio sx={{ color: 'var(--font-color)', fontSize: '12px' }} color='default' value="0" />}
                   label={<CustomTypography>Any Word</CustomTypography>}
                 />
                 <FormControlLabel
-                  value="allWords"
-                  control={<Radio sx={{ color: 'var(--font-color)' }} color='default' />}
+                  control={<Radio sx={{ color: 'var(--font-color)' }} color='default' value="1" />}
                   label={<CustomTypography>All Words</CustomTypography>}
                 />
               </RadioGroup>
@@ -1132,29 +1216,28 @@ const handleProperty= (value) => {
               <Box sx={{ display: 'flex', alignItems: 'center', }}>
 
 
-                <Tooltip title="Back" placement="bottom-end">
-                  <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} onClick={handleBackClick}>
-                    <ArrowBackIcon />
-                  </IconButton>
-                </Tooltip>
+
+                <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={handleBackClick}>
+                  <ArrowBackIcon />
+                </IconButton>
+
                 <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
-                <Tooltip title="visit visiostencil website" placement="bottom-end">
-                  <Typography
-                    sx={{
-                      marginLeft: '8px',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      whiteSpace: 'nowrap',
-                      fontSize: '12px'
-                    }}
-                    onClick={handleClick}
-                  >
-                    VisioStencils.com
-                  </Typography>
-                </Tooltip>
+                <Typography
+                  sx={{
+                    marginLeft: '8px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                    fontSize: '12px'
+                  }}
+                  onClick={handleClick}
+
+                >
+                  VisioStencils.com
+                </Typography>
 
               </Box>
-              <Treedata treeData={treeData} searchResult={resultData} handleprop={handleProperty} />
+              <Treedata treeData={treeData} searchResult={resultData} />
             </>
           ) : (
             <div>No data available for the tree.</div>

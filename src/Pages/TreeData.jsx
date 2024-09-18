@@ -2,7 +2,7 @@ import React, {useEffect, useState, useMemo } from 'react';
 import Tree from 'rc-tree';
 import '../App.css';
 import 'rc-tree/assets/index.css';
-import { Tabs, Tab, Tooltip  } from '@mui/material';
+import { Tabs, Tab,} from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
@@ -15,8 +15,8 @@ import SvgContent from '../Components/SvgContent.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handleprop }) => {
 
-  const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree,  SetPropertydata,
-    PropertyData,  SetTooltip, tooltip } = useTreeData();
+  const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree,  
+   } = useTreeData();
 
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [selectedKeys, setSelectedKeys] = useState([]);
@@ -133,6 +133,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       MFGPRODLINE = '',
       MFGPRODNO = '',
       EQID = '',
+      MFGDESC='',
     } = item;
 
     let manufacturerNode = searchResultsNode.children.find(
@@ -184,27 +185,15 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     let productnoNode = prodLineNode.children.find(
       (child) => child.key === productNumberKey
     );
-    const getProductDescription = () => {
-      // Filter the propertyData for items in the 'Basic' group
-      const basicGroup = propertyData
-        .filter((item) => item.GroupName === 'Basic') // Filter for 'Basic' group
-        .map((item) => item.MfgDesc); // Map to MfgDesc
-    
-      console.log('data123', basicGroup);
-      
-      // Return the first MfgDesc if found, otherwise return 'No description available'
-      return basicGroup.length > 0 ? basicGroup : 'No description available';
-    };
     
     
     
     if (!productnoNode) {
-       const productDescription = getProductDescription();
       productnoNode = {
         title: (
-          <Tooltip title={productDescription}>
+          <span title={MFGDESC} placement="bottom-end" >
             <span>{MFGPRODNO}</span>
-          </Tooltip>
+          </span>
         ),
         key: productNumberKey,
         icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
@@ -319,9 +308,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       const shapeLeafNodes = shapesData.map((shape) => ({
         key: shape.ShapeID,
         title: (
-          <Tooltip title={`Drag and Drop to insert ${shape.Description} view`} placement='bottom-end'>
+          <span title={`Drag and Drop to insert ${shape.Description} view`} placement='bottom-end'>
             <span>{shape.Description}</span>
-          </Tooltip>
+          </span>
         ),
         ShapeID: shape.ShapeID,
         icon: shape.Description.toLowerCase().includes('front') ? (
@@ -377,9 +366,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       const stencilLeafNode = {
         key: generateUniqueKey(),
         title:  (
-          <Tooltip title={`Drag and Drop to save`} placement='bottom-end'>
+          <span title={`Drag and Drop to save`} placement='bottom-end'>
             <span>Visio Stencil</span>
-          </Tooltip>
+          </span>
         ),
         icon: <img src='/assets/visio.png' alt="icon" />,
         isLeaf: true,
@@ -524,7 +513,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       });
 
       setPropertyData(updatedPropertyData);
-      SetPropertydata(updatedPropertyData)
     } catch (error) {
       console.error('Error parsing XML or setting property values:', error);
     }
@@ -692,7 +680,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
   
   
     if (selectedNode.ShapeID) {
-  
       await callApiForGetDevicePreview(selectedNode.ShapeID);
     }
       else if (selectedNode.Type && selectedNode.EQID) {
@@ -702,18 +689,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
         setSelectedKeys([selectedNode.key]);
         SetSelectedNode([selectedNode])
-
-   debugger
-        const basicProperties = propertyData.filter(item => item.GroupName === 'Basic');
-
-        const mfgDescItem = basicProperties.find(item => item.pName === 'MfgDesc');
-    
-        if (mfgDescItem) {
-          const mfgDescValue = mfgDescItem.pValue;
-          selectedNode.tooltip = mfgDescValue; 
-          console.log('MfgDesc Value:', mfgDescValue);
-          SetTooltip(mfgDescValue)
-        }
+      } 
+      
+      if (!selectedNode.Type && !selectedNode.EQID && !selectedNode.ShapeID ){
+        setPropertyData([])
+        setSvgContent(null) 
       }
     console.log('Selected Keys:', selectedKeys);
   }; 
@@ -723,7 +703,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     console.log('relatedExpanded', relatedExpandedKeys)
   }, [expandedKeys, relatedExpandedKeys])
 
-  const handleSelectRelatedTree = async (selectedKeys, info) => {
+  const handleSelectRelatedTree = async (info) => {
     if (tabValue !== 1) return;
 
     const selectedNode = info.node;
@@ -741,10 +721,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setRelatedSelectedKeys([selectedNode.key])
       SetRelatesSelectedNode([selectedNode])
     } else if(selectedNode.ShapeID){
-    
       await callApiForGetDevicePreview(selectedNode.ShapeID)
-
-      // setRelatedSelectedKeys([selectedNode.key])
     }
     console.log('related selected node', selectedNode.key)
   };
@@ -758,7 +735,6 @@ const handleTabChange = async (event, newValue) => {
 
     setIsLoading(true);
     setPropertyData([]);
-    // SetSelectedNode([])
     setSvgContent(null);
     handleSearch({ Eqid, related: true }, onRelatedSuccess);
     setIsLoading(false);
@@ -773,7 +749,7 @@ const handleTabChange = async (event, newValue) => {
     setExpandedKeys(expandedKeys);
 // setselectednode()
 
- debugger
+ 
     if (selectednode) {
       if (selectednode[0]?.ShapeID) {
         await callApiForGetDevicePreview(selectednode[0]?.ShapeID);

@@ -173,3 +173,8 @@ span.rc-tree-iconEle{
 .rc-tree .rc-tree-treenode{
   line-height: 0px;
 }
+
+.MuiFormControlLabel-root .MuiFormControlLabel-label{
+  font-size: 12px;
+  font-family: 'Segoe UI', sans-serif;
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { styled } from '@mui/system';
-import { Card, Tooltip } from '@mui/material';
+import { Card, } from '@mui/material';
 
 // Styled component for the SVG card
 const StyledSvgCard = styled(Card)(({ theme }) => ({
@@ -79,7 +79,6 @@ const SvgContent = ({ svgContent }) => {
 
   return (
     <StyledSvgCard>
-    <Tooltip title="Drag and drop or double-click to insert" placement="bottom-end">
       <SvgWrapper
         ref={svg}
         draggable
@@ -90,8 +89,8 @@ const SvgContent = ({ svgContent }) => {
         onDragStart={handleDragStart}
         onDoubleClick={handleDoubleClick}
         dangerouslySetInnerHTML={{ __html: svgContent }}
+        title='Drag and Drop Or Double click To Insert '
       />
-    </Tooltip>
   </StyledSvgCard>
   );
 };
