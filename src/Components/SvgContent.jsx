@@ -49,9 +49,8 @@ const SvgContent = ({ svgContent }) => {
     });
   }, []);
 
-  // Handle drag start and insert SVG content into Word
   const handleDragStart = async (e) => {
-    e.dataTransfer.setData('text/plain', ''); // Optional: Set drag data if needed
+    e.dataTransfer.setData('text/plain', '');
     try {
       await Office.context.document.setSelectedDataAsync(svgContent, {
         coercionType: Office.CoercionType.XmlSvg,
@@ -83,7 +82,7 @@ const SvgContent = ({ svgContent }) => {
         ref={svg}
         draggable
         onDragOver={(e) => {
-          e.preventDefault(); // Allow drop
+          e.preventDefault();
           console.log('Dragging over the target');
         }}
         onDragStart={handleDragStart}

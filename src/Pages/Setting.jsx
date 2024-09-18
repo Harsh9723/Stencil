@@ -1,12 +1,9 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import data from '../Links.json';
 import { IconButton,  Typography, Box, Link, TextField, Button } from '@mui/material';
 import useTheme from '../Components/Theme';
 
 const Setting = () => {
-  const navigate = useNavigate();
 
   useTheme(data.colortheme);
 
@@ -14,9 +11,7 @@ const Setting = () => {
     window.open(data.logourl, '_blank');
   };
 
-  const handleBackClick = () => { 
-    navigate('/mainpage');
-  };
+  
 
   const CustomTypography = ({ children, ...props }) => (
     <Typography variant="body2" sx={{ fontSize: '12px', fontFamily:['Segoe UI', 'sans-serif'] }} {...props}>
@@ -39,7 +34,7 @@ const Setting = () => {
         boxSizing: 'border-box',
       }}
     >
-      <Box
+      {/* <Box
         sx={{
           width: '100%',
           display: 'flex',
@@ -61,7 +56,7 @@ const Setting = () => {
           >
             VisioStencils.com
           </Typography>
-      </Box>
+      </Box> */}
 
       <Box 
         sx={{

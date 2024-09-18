@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
 import PreloadPage from './Components/PreloadPage';
 import MainPage from './Pages/MainPage';
-import Setting from './Pages/Setting';
 import './App.css';
-import Treedata from './Pages/TreeData';
-
-
 
 function App() {
   const [showMainPage, setShowMainPage] = useState(false);
@@ -16,45 +11,37 @@ function App() {
 
     if (!hasVisited) {
       const timer = setTimeout(() => {
-        setShowMainPage(true);
+        setShowMainPage(true); // Show MainPage after the timeout
         localStorage.setItem('hasVisited', 'true');
-      }, 1000);
+      }, 2000); // Delay of 1 second
 
-      return () => clearTimeout(timer); // Clean up the timer on unmount
+      return () => clearTimeout(timer); // Cleanup timeout
     } else {
-      setShowMainPage(true);
+      setShowMainPage(true); // If visited, directly show MainPage
     }
   }, []);
 
-useEffect(() => {
+  useEffect(() => {
+    // Initialize Office
+    Office.initialize = function () {
+      console.log('Office is ready.');
+    };
+  }, []);
 
-  Office.initialize = function () {
-    console.log("Office is ready.");
-  };
-})
-useEffect(() => {
-  Office.onReady((info) =>{
-    if(info.host === Office.HostType.Word){
-  console.log('word is ready')
-    }
-  })
-})
-
-
+  useEffect(() => {
+    // Check if Office is ready for Word
+    Office.onReady((info) => {
+      if (info.host === Office.HostType.Word) {
+        console.log('Word is ready');
+      }
+    });
+  }, []);
 
   return (
     <div className="App">
-      <Routes>
-        <Route path="/" element={showMainPage ? <MainPage /> : <PreloadPage />} />
-        <Route path="/setting" element={<Setting />} />
-        <Route path="/mainpage" element={<MainPage />} />
-        <Route path="/tree" element={<Treedata />} />
-      </Routes>
-    
+      {showMainPage ? <MainPage /> : <PreloadPage />} {/* Show MainPage or PreloadPage */}
     </div>
   );
 }
 
 export default App;
-
-

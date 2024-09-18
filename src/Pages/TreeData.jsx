@@ -10,7 +10,6 @@ import { useTreeData } from '../Context/TreedataContext';
 import PropertyTable from '../Components/PropertyTable';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
-// import { handleSearch, transformToTreeData } from './MainPage.jsx';
 import SvgContent from '../Components/SvgContent.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handleprop }) => {
@@ -215,7 +214,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setTreeData(initialTreeData);
       autoExpandDefaultNodesOfTree(initialTreeData).then(async ({ expandedKeys, selectedKeys, selectedNode, IsSelected }) => {
         setExpandedKeys(expandedKeys);
-        // setSelectedKeys(selectedNode.key)
         if (selectedNode.Type && selectedNode.EQID && IsSelected === false) {
 
           let result = await callApiforDeviceShapeStencilEqid(selectedNode)
@@ -274,7 +272,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       }
     };
     await ExpandAuto(treeData);
-
     return { expandedKeys: expKeys, selectedKeys: selKeys, selectedNode: selNodes, IsSelected };
   };
 
@@ -283,7 +280,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     if (isLeaf) {
       return null;
     }
-
     return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
   };
 
@@ -292,9 +288,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
   const generateUniqueKey = () => {
     return `visio_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   };
-  const getDeviceShapes = async (selectedNode, addLeafNode, eqid, setSelectedNode, isRelatedTree = false) => {
-  debugger
 
+
+  const getDeviceShapes = async (selectedNode, addLeafNode, eqid, setSelectedNode, isRelatedTree = false) => {
+    
     try {
       const eqId = selectedNode.key;
       const response = await axios.post('http://localhost:5000/api/library/GetDeviceShapes', {
@@ -315,6 +312,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
           </span>
         ),
         ShapeID: shape.ShapeID,
+        EqId: eqId,
         icon: shape.Description.toLowerCase().includes('front') ? (
           <img src='./assets/Front.png' alt="Front icon" />
         ) : shape.Description.toLowerCase().includes('rear') ? (
@@ -377,7 +375,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
         visioDownloadUrl: visioDownloadUrl,
         onClick: handleVisioDownload,
       };
-  
       if (!isRelatedTree && treeData) {
         addLeafNode(selectedNode.key, stencilLeafNode);
       }
@@ -414,9 +411,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
     try {
       const eqId = selectedNode.EQID;
-      debugger
       const addLeafNodeFn = isRelatedTree ? addLeafNodeToRelatedTree : addLeafNode;
-
 
       // Call the two APIs in parallel and include the logic for adding nodes
       let shapenodes = await getDeviceShapes(selectedNode, addLeafNodeFn, eqId);
@@ -457,13 +452,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       const relatedDevice = relatedDevicesResponse.data === true;
       console.log('Related Device:', relatedDevice);
 
-      SetEqId(eqId); // Ensure eqId is stored for further use
-
-      // Setting property values from the response XML
+      SetEqId(eqId);
       setPropertyValuesFromXML(librarypropertywithskeloton, PropertyXMLString);
 
       if (relatedDevice) {
-        setRelatedDevicesVisible(true); // Show Related Devices tab if there are related devices
+        setRelatedDevicesVisible(true); 
       } else {
         setRelatedDevicesVisible(false);
       }
@@ -482,11 +475,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
         ShapeID: shapeId,
       });
       setSvgContent(response.data.Data.SVGFile);
-      // console.log('svgfile', response.data.Data.SVGFile)
       setPropertyData([])
 
-      const resposedevice = response.data.Data.SVGFile
-      // console.log('device ', resposedevice)
       console.log('Device Preview Response:', response.data);
     } catch (error) {
       console.error('Error fetching device preview:', error);
@@ -507,7 +497,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
           const numericValue = parseFloat(newValue);
           newValue = isNaN(numericValue) ? item.pValue : numericValue;
         }
-
         return {
           ...item,
           pValue: newValue,
@@ -520,27 +509,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
   };
 
-  const findMatchingNodeInTree = (tree, eqid) => {
-    for (const node of tree) {
-      if (node.key === eqid) {
-        return node;
-      }
-      if (node.children && node.children.length > 0) {
-        const foundNode = findMatchingNodeInTree(node.children, eqid);
-        if (foundNode) {
-          return foundNode;
-        }
-      }
-    }
-    return null;
-  };
 
   const handleExpandRelatedTree = async (expandedKeys, { node, expanded }) => {
     let newExpandedKeys = [...expandedKeys];
     const eqid = node.EQID;
     console.log('Expand/Collapse related tree node:', eqid);
 
-    // If the node is collapsed, remove it from the expanded keys
     if (!expanded) {
       newExpandedKeys = newExpandedKeys.filter(key => key !== node.key);
       setRelatedExpandedKeys(newExpandedKeys);
@@ -553,7 +527,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
         SetEqId(null);
       }
       if (node.EQID && node.Type) {
-        // console.log('Calling RelatedandLibraryProperty for node EQID:', node.EQID);
         await RelatedandLibraryProperty(node.EQID);
         await getStencilName(node.EQID);
       }
@@ -577,7 +550,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     console.log('Auto-selected related keys:', autoSelectedKeys);
 
     if (selectedNode.Type && selectedNode.EQID && IsSelected === true) {
-      // Call API for related device shape/stencil
+      // Call API for related device & shape/stencil
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
       setRelatedSelectedKeys(autoSelectedKeys);
@@ -592,8 +565,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
           callApiForGetDevicePreview(result.shapenodes[0].ShapeID);
         }
       }
-    } else if (selectedNode.ShapeID) {
+    } else if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
+      setRelatedDevicesVisible(true)
+      SetEqId(selectedNode.EqId)
     }
 
     console.log('Related Tree Expanded Keys:', newExpandedKeys);
@@ -654,8 +629,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
         }
       }
     }
-    else if (selectedNode.ShapeID) {
+    else if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
+      setRelatedDevicesVisible(true)
     }
 
     console.log('Expanded Keys:', newExpandedKeys);
@@ -681,8 +657,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     console.log('Auto-selected keys:', selectedNode);
 
 
-    if (selectedNode.ShapeID) {
+    if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
+      setRelatedDevicesVisible(true); 
+      SetEqId(selectedNode.EqId)
     }
     else if (selectedNode.Type && selectedNode.EQID) {
       await RelatedandLibraryProperty(selectedNode.EQID);
@@ -694,6 +672,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
 
     if (!selectedNode.Type && !selectedNode.EQID && !selectedNode.ShapeID) {
+      debugger
       setPropertyData([])
       setSvgContent(null)
       setRelatedDevicesVisible(false)
@@ -732,23 +711,18 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
       await callApiForGetDevicePreview(selectedNodeRelated.ShapeID)
 
-      // setRelatedSelectedKeys([selectedNode.key])
     }
     if (!selectedNodeRelated.Type && !selectedNodeRelated.EQID && !selectedNodeRelated.ShapeID) {
       setPropertyData([])
       setSvgContent(null)
-
+      setRelatedDevicesVisible(false)
     }
     console.log('related selected node', relatedSelectedKeys)
   };
 
-
-
-
   const handleTabChange = async (event, newValue) => {
     setTabValue(newValue);
     if (newValue === 1) {
-
       setIsLoading(true);
       setPropertyData([]);
       setSvgContent(null);
@@ -778,18 +752,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       }
     }
   };
-
-
-
-
-  // useEffect(() => {
-  //   console.log('resultSelected', selectedKeys);
-  //   console.log('selectednode', selectednode);
-  //   console.log('relatedseletednode', relatedselectednode)
-  //   console.log('relatedSelected', relatedSelectedKeys);
-  // }, [selectedKeys, relatedSelectedKeys]);
-
-
 
   const onRelatedSuccess = async (resultData) => {
     try {
@@ -824,56 +786,18 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
   };
 
-  // useEffect(() => {
-
-
-  //   if (relatedTree) {
-  //     setRelatedTree(relatedTree); 
-  //     console.log() 
-  //     autoExpandDefaultNodesOfTree(relatedTree).then(async ({ expandedKeys, selectedKeys, selectedNode, IsSelected }) => {
-  //       // setRelatedExpandedKeys(expandedKeys);
-  //       if (selectedNode.Type && selectedNode.EQID && IsSelected == false) {
-  //         let resultRelated = await callApiforDeviceShapeStencilEqid(selectedNode)
-
-  //         if (resultRelated && resultRelated.shapenodes?.length > 0) {
-  //           setRelatedSelectedKeys([resultRelated.shapenodes[0].key])
-  //           if (resultRelated && resultRelated.shapenodes[0].ShapeID) {
-  //             callApiForGetDevicePreview(resultRelated.shapenodes[0].ShapeID)
-  //           }
-  //         }
-  //       } else if ( selectedNode.Type && selectedNode.EQID && IsSelected == true) {
-  //         RelatedandLibraryProperty(selectedNode.EQID)
-  //         setRelatedSelectedKeys(selectedKeys);  
-  //       getStencilName(selectedNode.EQID)
-
-
-  //       }
-  //       console.log('exRelated', expandedKeys)
-  //       console.log('SkRelated', selectedKeys)
-  //       console.log('selectednode', selectedNode)
-  //     });
-  //     console.log('initial treeData', relatedTree);
-  //   }
-  // }, [relatedTree]);
-
-
-
-
-
   // Handle the drag start event
   const handleDragStart = async (info) => {
     const { node } = info;
     console.log('Drag started on node:', node);
 
     try {
-
       const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
         Email: '',
         SubNo: '000000000000000000001234',
         ShapeID: node.ShapeID
       });
       const svgonDragstart = response.data.Data.SVGFile
-
 
       await Office.context.document.setSelectedDataAsync(
         svgonDragstart,
@@ -886,14 +810,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
           }
         }
       );
-
       return response;
     } catch (error) {
       console.error('API Error:', error);
     }
   };
-
-
 
 
   return (
@@ -985,7 +906,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
                 onDragStart={handleDragStart}
               />
 
-              {/* Conditionally render PropertyTable or SvgContent */}
               {Array.isArray(propertyData) && propertyData.length > 0 ? (
                 <PropertyTable propertyData={propertyData} stencilResponse={stencilResponse} />
               ) : (

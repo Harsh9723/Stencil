@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CircularProgress, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+
 import data from '../Links.json';
 
 function PreloadPage() {
   const [isLoading, setIsLoading] = useState(true);
-  // const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setIsLoading(false);
-  //     navigate('/mainpage'); // Navigate after loading
-  //   }, 3000); // Adjust the delay as needed
-
-  //   return () => clearTimeout(timer);
-  // }, [navigate]);
 
   const Color = `${data.colortheme.split(',')[0]}80`;
 
@@ -40,7 +30,7 @@ function PreloadPage() {
   const themeClass = getThemeClass(Color);
 
   const handleclick = () => {
-    window.open(data.logourl, '_blank'); // Fixed typo '_blank'
+    window.open(data.logourl, '_blank');
   }
 
   if (!isLoading) {
@@ -64,7 +54,6 @@ function PreloadPage() {
         }}
       ></div>
 
-      {/* Logo at top left */}
       <div 
         className="absolute top-4 left-12 cursor-pointer"
         onClick={handleclick}
@@ -72,7 +61,6 @@ function PreloadPage() {
         <img src={data.logoicon} alt={data.logoalt} className="h-14"/>
       </div>
 
-      {/* Centered content */}
       <div className="relative text-center text-white">
         <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px' }}>
           Add-In for Stencils

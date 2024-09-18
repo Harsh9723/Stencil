@@ -8,7 +8,6 @@ import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import { useNavigate } from 'react-router';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -20,175 +19,7 @@ import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, For
 import Treedata from './TreeData';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useTreeData } from '../Context/TreedataContext';
-
-// const API_URL = 'http://localhost:5000/api/library/';
-
-// /**
-//  * Handles searching by making an API request based on provided parameters and processes the response data.
-//  * 
-//  * @param {Object} searchParams -  for the search API call.
-//  * @param {Function} onSuccess - Callback to handle successful search response.
-//  * @param {Function} onError - Callback to handle errors.
-//  */
-
-// export const handleSearch = async (searchParams, onSuccess, onError) => {
-//   const { keyword, related,Eqid ,selectedManufacturer, setSnackbarMessage, setSnackbarOpen, selectedEqType, selectedProductLine, selectedProductNumber, selectedDtManufacturers, } = searchParams;
-//   let searchType = 'Solution';
-//     let paramXml = '';
-
-
-//   if (keyword) {
-//           searchType = 'Kwd';
-//           paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selectedDtManufacturers.length > 0 ? selectedDtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-//         }
-//         else if (selectedManufacturer || selectedEqType || selectedProductLine || selectedProductNumber) {
-//           paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductLine || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedProductNumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-//         }else if (related || '') {
-//           paramXml=` <Search><NotificationCount>500</NotificationCount><SearchType>Related</SearchType><EQID>${Eqid}</EQID><MfgFilterList></MfgFilterList><IncludeRelatedMfg>true</IncludeRelatedMfg><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`
-//         }
-//         try {
-//           const response = await axios.post(`${API_URL}SearchLibraryNew`, {
-//             Email: "",
-//             SubNo: "000000000000000000001234",
-//             FullLib: false,
-//             ParamXML: paramXml,
-//             Settings: {
-//               RememberLastSearchCount: 16,
-//               IncludeRelatedManufacturers: true,
-//               NotifyResultsExceedCount: 10,
-//               NotifyResultsExceedCountCheck: true,
-//               RememberLastSearchCountCheck: true,
-//               IsGroupOrderAsc1: true,
-//               TreeGroupBy1: "Manufacturer",
-//               TreeGroupBy2: "Equipment Type",
-//               TreeGroupBy3: "Product Line",
-//               TreeGroupBy4: "Product/Model Number",
-//             },
-//           });
-
-//           const searchData = response.data.Data.SearchData;
-//           const resultData = searchData?.dtSearchResults || []; // Safely handle if data is missing
-//           const dtResultdata = searchData?.dtManufacturers || []; // Safely handle if data is missing
-
-//           console.log('Result Data:', resultData);
-//           console.log('dtResult Data:', dtResultdata);
-
-//           if (resultData.length > 0) {
-//             // If there are search results, call onSuccess with resultData
-//             onSuccess(resultData);
-//           } else if (dtResultdata.length > 0) {
-//             onSuccess(dtResultdata);
-//           } else {
-//             console.log('No relevant data found');
-//             // Handle cases where no data is available
-//             onFailure('No results found');
-//           }
-//         } catch (error) {
-//           console.error('Related not shown:', error.message);
-//           onFailure('An error occurred while fetching data');
-//         }
-
-// };
-
-// /**
-
-//  * 
-//  * @param {Array} result - The search results to transform.
-//  * @returns {Array} - The transformed tree data.
-//  */
-
-// export const transformToTreeData = (result,) => {
-//   const tree = [
-//     {
-//       title: `Search Results [${result.length}]`,
-//       key: `search-results-${Date.now()}`, 
-//       icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
-//       children: [],
-//     },
-//   ];
-
-
-//   const searchResultsNode = tree[0];
-
-//   result.forEach((item) => {
-//     const {
-//       MfgAcronym = '',
-//       Manufacturer = '',
-//       EQTYPE = '',
-//       MFGPRODLINE = '',
-//       MFGPRODNO = '',
-//       EQID = '',
-//     } = item;
-
-//     let manufacturerNode = searchResultsNode.children.find(
-//       (child) => child.key === MfgAcronym
-//     );
-
-//     if (!manufacturerNode) {
-//       manufacturerNode = {
-//         title: Manufacturer,
-//         key: MfgAcronym,
-//         icon: <img src="./assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
-//         children: [],
-//       };
-//       searchResultsNode.children.push(manufacturerNode);
-//     }
-
-//     const eqTypeKey = `${MfgAcronym}-${EQTYPE}`;
-//     let eqTypeNode = manufacturerNode.children.find(
-//       (child) => child.key === eqTypeKey
-//     );
-
-//     if (!eqTypeNode) {
-//       eqTypeNode = {
-//         title: EQTYPE,
-//         key: eqTypeKey,
-//         icon: <img src={`./assets/EqType/${EQTYPE}.png`} alt="EQTYPE" style={{ width: 16, height: 16 }} />,
-//         children: [],
-//       };
-//       manufacturerNode.children.push(eqTypeNode);
-//     }
-
-//     const prodLineKey = `${MfgAcronym}-${EQTYPE}-${MFGPRODLINE}`;
-//     let prodLineNode = eqTypeNode.children.find(
-//       (child) => child.key === prodLineKey
-//     );
-
-//     if (!prodLineNode) {
-//       prodLineNode = {
-//         title: MFGPRODLINE,
-//         key: prodLineKey,
-//         icon: <img src="./assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
-//         children: [],
-
-//       };
-//       eqTypeNode.children.push(prodLineNode);
-//     }
-
-//     const productNumberKey = EQID;
-//     let productnoNode = prodLineNode.children.find(
-//       (child) => child.key === productNumberKey
-//     );
-
-//     if (!productnoNode) {
-//       productnoNode = {
-//         title: MFGPRODNO,
-//         key: productNumberKey,
-//         tooltip:'hello',
-//         icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
-//         children: [],
-//         EQID: productNumberKey,
-//         Type:'ProductNumber',
-//         isLeaf:false
-//       };
-//       prodLineNode.children.push(productnoNode);
-//     }
-//   });
-
-//   return tree;
-// };
+import Setting from './Setting';
 
 
 const SearchComponent = () => {
@@ -213,12 +44,10 @@ const SearchComponent = () => {
   const [showTreeComponent, setShowTreeComponent] = useState(false)
   const [kwdSearchType, setKwdSearchType] = useState('0');
   const [showSetting, setShowSetting] = useState(false)
-  const navigate = useNavigate()
+  
   const API_URL = 'http://localhost:5000/api/library/';
 
-  /**
-   * Handles searching by making an API request based on provided parameters and processes the response data.
-   * 
+  /** 
    * @param {Object} searchParams -
    * @param {Function} onSuccess -
    * @param {Function} onError 
@@ -271,18 +100,15 @@ const SearchComponent = () => {
       });
 
       const searchData = response.data.Data.SearchData;
-      const resultData = searchData?.dtSearchResults || []; // Safely handle if data is missing
-      const dtResultdata = searchData?.dtManufacturers || []; // Safely handle if data is missing
-
+      const resultData = searchData?.dtSearchResults || []; 
+      const dtResultdata = searchData?.dtManufacturers || []; 
       console.log('Result Data:', resultData);
       console.log('dtResult Data:', dtResultdata);
 
       if (resultData.length > 0 || dtResultdata.length > 0) {
-        // Pass both resultData and dtResultdata to onSuccess
         onSuccess(resultData, dtResultdata);
       } else {
         console.log('No relevant data found');
-        // Handle cases where no data is available
         onError('No results found');
       }
     } catch (error) {
@@ -293,12 +119,11 @@ const SearchComponent = () => {
 
 
   /**
-   * 
    * @param {Array} result
    * @returns {Array}
    */
 
-  const transformToTreeData = (result,) => {
+  const transformToTreeData = (result) => {
     const tree = [
       {
         title: `Search Results [${result.length}]`,
@@ -379,7 +204,6 @@ const SearchComponent = () => {
               <span>{MFGPRODNO}</span>
             </span>
           ),
-          // title: MFGPRODNO,
           key: productNumberKey,
           icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
           children: [],
@@ -387,11 +211,7 @@ const SearchComponent = () => {
           Type: 'ProductNumber',
           isLeaf: false,
         };
-
-        // Add the new product node to the children of prodLineNode
         prodLineNode.children.push(productnoNode);
-
-
       }
 
     });
@@ -402,7 +222,6 @@ const SearchComponent = () => {
   const handleKwdSearchTypeChange = (event) => {
     setKwdSearchType(event.target.value);
   };
-
   const searchParams = {
     keyword,
     selectedManufacturer,
@@ -422,35 +241,27 @@ const SearchComponent = () => {
       SetDtresultData(dtResultdata);
       setDtManufacturers(dtResultdata);
       setIsDialogOpen(true);
-
-
       return;
     }
 
-    // If dtResultdata is not available, process resultData instead
     if (resultData && resultData.length > 0) {
       console.log('Processing resultData:', resultData);
 
-      // Transform the resultData into tree format
       const treeHierarchy = transformToTreeData(resultData);
       setResultData(resultData);
 
-      // Log and set the transformed tree data
       console.log('treeHierarchy:', treeHierarchy);
       setTreeData(treeHierarchy);
 
-      // Show the tree component if data is available
+
       if (treeHierarchy.length > 0) {
         setShowTreeComponent(true);
       } else {
-        // If treeHierarchy is empty, show a snackbar message
         setSnackbarMessage('No relevant tree data found');
         setSnackbarOpen(true);
         setShowTreeComponent(false);
       }
     } else {
-      // Handle case where neither resultData nor dtResultdata are available
-      console.error('No data available');
       setSnackbarMessage('No results found');
       setSnackbarOpen(true);
       setShowTreeComponent(false);
@@ -630,7 +441,7 @@ const SearchComponent = () => {
 
   }
   const handleSettingClick = () => {
-  navigate('/setting')
+  setShowSetting(true)
   };
   const backfromsetting =() => {
     setShowSetting(false)
@@ -674,15 +485,10 @@ const SearchComponent = () => {
     setSnackbarOpen(false);
   }
   const handlesearch = () => {
-    // if (searchParams.keyword && searchParams.keyword.trim() !== "") {
+  
     handleSearch(searchParams, onSuccess, onError);
-    // }
   };
-  // const handleKeyPress = (event) => {
-  //   if (event.key === 'Enter') {
-  //     handleSearch();
-  //   }
-  // };
+
 
   const handleBackClick = () => {
     setShowTreeComponent(false);
@@ -792,8 +598,7 @@ const SearchComponent = () => {
             sx={{
               fontSize: { xs: '10px', sm: '12px' },
               fontFamily: '"Segoe UI", sans-serif'
-            }}
-          >
+            }}>
             OK
           </Button>
         </DialogActions>
@@ -801,7 +606,13 @@ const SearchComponent = () => {
 
 
 
-      <Box
+     
+
+      {!showTreeComponent && !showSetting ? (
+
+        <>
+
+         <Box
         sx={{
           position: 'relative',
           top: '0px',
@@ -809,8 +620,7 @@ const SearchComponent = () => {
           alignItems: 'center',
           overflow: 'hidden',
           width: '100%',
-        }}
-      >
+        }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <>
             <IconButton
@@ -840,10 +650,6 @@ const SearchComponent = () => {
 
         </Box>
       </Box>
-
-      {!showTreeComponent ? (
-
-        <>
 
           <Box
             component="form"
@@ -877,7 +683,6 @@ const SearchComponent = () => {
                   onKeyPress={(event) => {
                     if (event.key === 'Enter' && keyword.trim() !== '') {
                       handlesearch();
-                      // setLoading(false) // Trigger search when Enter is pressed and keyword is not empty
                     }
                   }}
 
@@ -1200,10 +1005,39 @@ const SearchComponent = () => {
           </Typography>
         </>
 
+           ): showSetting ?( 
+            <>
+             <Box
+          sx={{
+            width: '100%',
+            height: '100vh',
+            marginTop: '0px',
+            padding: '0px',
+          }}
+        >
+            <Box sx={{ display: 'flex', alignItems: 'center', }}>
+            <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={backfromsetting}>
+              <ArrowBackIcon />
+            </IconButton>
 
+            <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+            <Typography
+              sx={{
+                marginLeft: '8px',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                whiteSpace: 'nowrap',
+                fontSize: '12px'
+              }}
+              onClick={handleClick}>
+              VisioStencils.com
+            </Typography>
+          </Box>
+                </Box>
+          <Setting />
+                </>
+    
       ) : (
-
-
         <Box
           sx={{
             display: showTreeComponent ? 'block' : 'none',
@@ -1211,15 +1045,11 @@ const SearchComponent = () => {
             height: '100vh',
             marginTop: '0px',
             padding: '0px',
-            // overflowY:'auto'
           }}
         >
           {showTreeComponent && treeData.length > 0 ? (
             <>
               <Box sx={{ display: 'flex', alignItems: 'center', }}>
-
-
-
                 <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={handleBackClick}>
                   <ArrowBackIcon />
                 </IconButton>
@@ -1233,12 +1063,9 @@ const SearchComponent = () => {
                     whiteSpace: 'nowrap',
                     fontSize: '12px'
                   }}
-                  onClick={handleClick}
-
-                >
+                  onClick={handleClick}>
                   VisioStencils.com
                 </Typography>
-
               </Box>
               <Treedata treeData={treeData} searchResult={resultData} />
             </>
