@@ -12,6 +12,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
 import SvgContent from '../Components/SvgContent.jsx';
 import BASE_URL from '../Config/Config.js';
+import { insertSvgContentIntoOffice } from '../Common/CommonFunction.jsx';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handleprop }) => {
 
@@ -780,17 +781,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       });
       const svgonDragstart = response.data.Data.SVGFile
 
-      await Office.context.document.setSelectedDataAsync(
-        svgonDragstart,
-        { coercionType: Office.CoercionType.XmlSvg },
-        (asyncResult) => {
-          if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
-            console.log('SVG image successfully inserted into Word document.');
-          } else {
-            console.error('Failed to insert SVG image:', asyncResult.error.message);
-          }
-        }
-      );
+      await insertSvgContentIntoOffice(svgonDragstart, 'drag')
       return response;
     } catch (error) {
       console.error('API Error:', error);
