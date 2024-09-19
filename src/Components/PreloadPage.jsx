@@ -32,7 +32,9 @@ function PreloadPage() {
   const handleclick = () => {
     window.open(data.logourl, '_blank');
   }
-  useTheme(data.colortheme)
+
+  useTheme(data.colortheme);
+  
   if (!isLoading) {
     return null;
   }
@@ -42,7 +44,7 @@ function PreloadPage() {
       className="relative flex items-center justify-center h-screen w-screen"
       style={{
         backgroundImage: `url(${data.backdrop})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'contain', // Change this to 'contain' for responsiveness
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
@@ -65,7 +67,6 @@ function PreloadPage() {
         <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px', fontWeight:'bold', fontSize:'25px', fontFamily:'Segoe UI, sans-serif' }}>
           Add-In for Stencils
         </h1>
-      
       </div>
     </div>
   );

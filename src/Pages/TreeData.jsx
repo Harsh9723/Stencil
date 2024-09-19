@@ -11,6 +11,7 @@ import PropertyTable from '../Components/PropertyTable';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
 import SvgContent from '../Components/SvgContent.jsx';
+import BASE_URL from '../Config/Config.js';
 
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handleprop }) => {
 
@@ -33,7 +34,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
   const [Eqid, SetEqId] = useState(null);
 
 
-  const API_URL = 'http://localhost:5000/api/library/';
+  const API_URL = `${BASE_URL}`;
 
   /**
   
@@ -282,27 +283,22 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
     return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
   };
-
-
-
   const generateUniqueKey = () => {
     return `visio_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
   };
-
-
   const getDeviceShapes = async (selectedNode, addLeafNode, eqid, setSelectedNode, isRelatedTree = false) => {
-    
+
     try {
       const eqId = selectedNode.key;
-      const response = await axios.post('http://localhost:5000/api/library/GetDeviceShapes', {
+      const response = await axios.post(`${BASE_URL}GetDeviceShapes`, {
         Email: '',
         SubNo: '000000000000000000001234',
         EQID: eqId,
         Get3DShapes: true,
       });
-  
+
       const shapesData = response.data.Data;
-  
+
       // Generate leaf nodes from shape data
       const shapeLeafNodes = shapesData.map((shape) => ({
         key: shape.ShapeID,
@@ -323,7 +319,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
         isLeaf: true,
         children: [],
       }));
-  
+
       if (!isRelatedTree && treeData) {
         addLeafNode(selectedNode.key, ...shapeLeafNodes);
       }
@@ -336,14 +332,14 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       return [];
     }
   };
-  
+
 
   const getStencilNameByEQID = async (selectedNode, addLeafNode, eqid, isRelatedTree = false) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/library/GetStencilNameByEQID', {
+      const response = await axios.post(`${BASE_URL}GetStencilNameByEQID`, {
         EQID: [eqid],
       });
-  
+
       const stencilData = response.data?.Data[0]?.StencilName;
       console.log('stencildata', stencilData);
       const visioDownloadUrl = response.data?.Data[0]?.URL;
@@ -361,7 +357,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
           console.error('Visio download URL is not available');
         }
       };
-  
+
       const stencilLeafNode = {
         key: generateUniqueKey(),
         title: (
@@ -387,16 +383,15 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       return [];
     }
   };
-  
+
   const getStencilName = async (eqid) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/library/GetStencilNameByEQID', {
+      const response = await axios.post(`${BASE_URL}GetStencilNameByEQID`, {
         EQID: [eqid],
       });
 
       const stencilData = response.data?.Data[0]?.StencilName;
       console.log('stencildata', stencilData)
-      // const visioDownloadUrl = response.data?.Data[0]?.URL;
       SetStencilResponse(stencilData)
       return stencilData
     } catch (error) {
@@ -429,12 +424,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     setIsLoading(true);
     try {
       const [relatedDevicesResponse, libraryPropertyResponse] = await Promise.all([
-        axios.post('http://localhost:5000/api/library/HasRelatedDevices', {
+        axios.post(`${BASE_URL}HasRelatedDevices`, {
           Email: '',
           SubNo: '000000000000000000001234',
           EQID: eqId,
         }),
-        axios.post('http://localhost:5000/api/library/GetLibraryPropertyWithSkeleton', {
+        axios.post(`${BASE_URL}GetLibraryPropertyWithSkeleton`, {
           Email: '',
           SubNo: '000000000000000000001234',
           EQID: eqId,
@@ -456,7 +451,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setPropertyValuesFromXML(librarypropertywithskeloton, PropertyXMLString);
 
       if (relatedDevice) {
-        setRelatedDevicesVisible(true); 
+        setRelatedDevicesVisible(true);
       } else {
         setRelatedDevicesVisible(false);
       }
@@ -469,7 +464,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
   const callApiForGetDevicePreview = async (shapeId) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/library/GetDevicePreview', {
+      const response = await axios.post(`${BASE_URL}GetDevicePreview`, {
         Email: '',
         SubNo: '000000000000000000001234',
         ShapeID: shapeId,
@@ -570,9 +565,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       setRelatedDevicesVisible(true)
       SetEqId(selectedNode.EqId)
     }
-
-    console.log('Related Tree Expanded Keys:', newExpandedKeys);
-    console.log('Related Tree Selected Keys:', autoSelectedKeys);
   };
 
 
@@ -608,10 +600,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       SetSelectedNode(selectedNode)
     }
 
-    console.log('Selected Node:', selectedNode);
-    console.log('Auto-selected keys:', autoSelectedKeys);
-
-
     if (selectedNode.Type && selectedNode.EQID && IsSelected === true) {
 
       await RelatedandLibraryProperty(selectedNode.EQID);
@@ -633,9 +621,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       await callApiForGetDevicePreview(selectedNode.ShapeID);
       setRelatedDevicesVisible(true)
     }
-
-    console.log('Expanded Keys:', newExpandedKeys);
-    console.log('Selected Keys:', autoSelectedKeys);
   };
 
 
@@ -652,10 +637,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       selectedNode.onClick();
       return;
     }
-
-    console.log('Selected Node:', selectedNode);
-    console.log('Auto-selected keys:', selectedNode);
-
 
     if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
@@ -787,13 +768,12 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
   };
 
-  // Handle the drag start event
   const handleDragStart = async (info) => {
     const { node } = info;
     console.log('Drag started on node:', node);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/library/GetDevicePreviewToDrawOnSlide', {
+      const response = await axios.post(`${BASE_URL}GetDevicePreviewToDrawOnSlide`, {
         Email: '',
         SubNo: '000000000000000000001234',
         ShapeID: node.ShapeID
@@ -821,10 +801,25 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
   return (
     <div style={{
       height: '100vh',
+      padding: '0 16px'
     }}>
       <div
       >
-        <Tabs value={tabValue} onChange={handleTabChange} TabIndicatorProps={{ style: { display: 'none' } }}>
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          TabIndicatorProps={{
+            style: {
+              display: 'none',
+              color: 'var(--font-color)'
+            }
+          }}
+          sx={{
+            minHeight: 'auto',  // Reduces the height of the Tabs container
+            padding: 0,         // Remove any padding around the Tabs
+            margin: 0,          // Remove any margin around the Tabs
+          }}
+        >
           <Tab
             label="Result"
             disableRipple
@@ -832,8 +827,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
               fontSize: '12px',
               fontFamily: '"Segoe UI", sans-serif',
               textTransform: 'none',
-              color: '#ffffff',
-              padding: '0px'
+              color: 'var(--font-color)',
+              padding: '4px 8px',  // Adjust padding for smaller tabs
+              minWidth: 'auto',    // Prevent default minimum width of Tab
             }}
           />
           {relatedDevicesVisible && (
@@ -844,16 +840,14 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
                 fontSize: '12px',
                 fontFamily: '"Segoe UI", sans-serif',
                 textTransform: 'none',
-                color: 'white',
-                '& .MuiTab-wrapper': {
-                  color: 'white',
-                  display: 'flex',
-
-                },
+                color: 'var(--font-color)',
+                padding: '4px 8px',  // Adjust padding for smaller tabs
+                minWidth: 'auto',    // Prevent default minimum width of Tab
               }}
             />
           )}
         </Tabs>
+
         <Backdrop
           sx={{
             color: '#fff',

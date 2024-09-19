@@ -51,29 +51,23 @@ const SvgContent = ({ svgContent }) => {
 
   const handleDragStart = async (e) => {
     e.dataTransfer.setData('text/plain', '');
+    await insertSvgContentIntoOffice(svgContent, 'drag');
+  };
+ export const insertSvgContentIntoOffice = async (svgContent, insertType) => {
     try {
       await Office.context.document.setSelectedDataAsync(svgContent, {
         coercionType: Office.CoercionType.XmlSvg,
-        asyncContext: { insertType: 'drag' }
+        asyncContext: { insertType }
       });
-      console.log('SVG inserted via drag and drop');
+      console.log(`SVG inserted via ${insertType}`);
     } catch (error) {
-      console.error('Error during drag and drop:', error);
+      console.error(`Error during ${insertType}:`, error);
     }
   };
-
   const svg = useRef(null);
 
   const handleDoubleClick = async () => {
-    try {
-      await Office.context.document.setSelectedDataAsync(svgContent, {
-        coercionType: Office.CoercionType.XmlSvg,
-        asyncContext: { insertType: 'double-click' }
-      });
-      console.log('SVG inserted via double-click');
-    } catch (error) {
-      console.error('Error during double-click:', error);
-    }
+    await insertSvgContentIntoOffice(svgContent, 'double-click');
   };
 
   return (

@@ -1,0 +1,30 @@
+-----------------------------------------------------------------------------
+Date : 14-09-2024 18:55:04
+
+System.ServiceModel.CommunicationException
+Message : The socket connection was aborted. This could be caused by an error processing your message or a receive timeout being exceeded by the remote host, or an underlying network resource issue. Local socket timeout was '00:14:59.9980000'.
+StackTrace : 
+Server stack trace: 
+   at System.ServiceModel.Channels.HttpInput.WebResponseHttpInput.WebResponseInputStream.Read(Byte[] buffer, Int32 offset, Int32 count)
+   at System.ServiceModel.Channels.HttpInput.ReadBufferedMessage(Stream inputStream)
+   at System.ServiceModel.Channels.HttpInput.ParseIncomingMessage(HttpRequestMessage httpRequestMessage, Exception& requestException)
+   at System.ServiceModel.Channels.HttpChannelFactory`1.HttpRequestChannel.HttpChannelRequest.WaitForReply(TimeSpan timeout)
+   at System.ServiceModel.Channels.RequestChannel.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Dispatcher.RequestChannelBinder.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannel.Call(String action, Boolean oneway, ProxyOperationRuntime operation, Object[] ins, Object[] outs, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannelProxy.InvokeService(IMethodCallMessage methodCall, ProxyOperationRuntime operation)
+   at System.ServiceModel.Channels.ServiceChannelProxy.Invoke(IMessage message)
+
+Exception rethrown at [0]: 
+   at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)
+   at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type)
+   at NetZoomAddInWebAPI.BasicLibraryService.ILibraryService.GetLibraryAvaliableManufacturersNew(LibraryUserIdentity user, String models, Nullable`1 FullLib)
+   at NetZoomAddInWebAPI.Controllers.LibraryController.GetLibraryAvailableManufacturersNew(GetManufacturerRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 216
+System.IO.IOException
+Message : Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.
+StackTrace :    at System.Net.ConnectStream.Read(Byte[] buffer, Int32 offset, Int32 size)
+   at System.ServiceModel.Channels.HttpInput.WebResponseHttpInput.WebResponseInputStream.Read(Byte[] buffer, Int32 offset, Int32 count)
+System.Net.Sockets.SocketException
+Message : An existing connection was forcibly closed by the remote host
+StackTrace :    at System.Net.Sockets.Socket.Receive(Byte[] buffer, Int32 offset, Int32 size, SocketFlags socketFlags)
+   at System.Net.Sockets.NetworkStream.Read(Byte[] buffer, Int32 offset, Int32 size)

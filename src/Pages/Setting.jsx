@@ -1,6 +1,6 @@
 import React from 'react';
 import data from '../Links.json';
-import { IconButton,  Typography, Box, Link, TextField, Button } from '@mui/material';
+import { IconButton, Typography, Box, Link, TextField, Button } from '@mui/material';
 import useTheme from '../Components/Theme';
 
 const Setting = () => {
@@ -11,10 +11,8 @@ const Setting = () => {
     window.open(data.logourl, '_blank');
   };
 
-  
-
   const CustomTypography = ({ children, ...props }) => (
-    <Typography variant="body2" sx={{ fontSize: '12px', fontFamily:['Segoe UI', 'sans-serif'] }} {...props}>
+    <Typography variant="body2" sx={{ fontSize: '12px', fontFamily: ['Segoe UI', 'sans-serif'], }} {...props}>
       {children}
     </Typography>
   );
@@ -43,12 +41,12 @@ const Setting = () => {
           marginBottom: '20px',
         }}
       >
-        <Typography sx={{fontSize:'12px'}}>
+        <Typography sx={{ fontSize: '12px' }}>
           The NetZoom device library contains the latest devices from over 5000 manufacturers. 
           To access the full library, you must purchase a subscription at 
-          <Link href="https://www.VisioStencils.com" sx={{fontSize:'12px', color: 'skyblue'}} > www.VisioStencils.com </Link> 
+          <Link href="https://www.VisioStencils.com" sx={{ fontSize: '12px', color: 'skyblue' }}> www.VisioStencils.com </Link> 
           and register it at the Service portal  
-          <Link href="https://Service.NetZoom.com"  sx={{fontSize:'12px', color: 'skyblue'}}> https://Service.NetZoom.com </Link>.
+          <Link href="https://Service.NetZoom.com" sx={{ fontSize: '12px', color: 'skyblue' }}> https://Service.NetZoom.com </Link>.
         </Typography>
         <TextField 
           label={<CustomTypography>Portal Login Email</CustomTypography>} 
@@ -56,7 +54,7 @@ const Setting = () => {
           placeholder='Email address registered at service portal'
           InputLabelProps={{ style: { color: 'var(--font-color)' } }}
           InputProps={{
-            style: { color: 'var(--font-color)', borderColor: 'var(--font-color)', fontSize:'12px' },
+            style: { color: 'var(--font-color)', borderColor: 'var(--font-color)', fontSize: '12px' },
           }}
           sx={{
             '.MuiOutlinedInput-root': {
@@ -68,6 +66,9 @@ const Setting = () => {
               },
               '&.Mui-focused fieldset': {
                 borderColor: 'var(--font-color)',
+              },
+              '& .MuiInputBase-input': {
+                padding: '12px 12px', // Adjust padding here to decrease height
               },
             },
           }}
@@ -92,6 +93,9 @@ const Setting = () => {
               '&.Mui-focused fieldset': {
                 borderColor: 'var(--font-color)',
               },
+              '& .MuiInputBase-input': {
+                padding: '12px 12px', 
+              },
             },
           }}
           fullWidth
@@ -103,7 +107,7 @@ const Setting = () => {
         size='small'
         sx={{ 
           padding: '5px 15px', 
-          alignSelf: 'flex-center',
+          alignSelf: 'center',
           backgroundColor: '#87CEEB',
           color: 'var(--font-color)',
           '&:hover': {

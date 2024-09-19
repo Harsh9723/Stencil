@@ -29,7 +29,7 @@ font-family: 'Segoe UI', sans-serif;
   font-size: 12px;
 }
 .MuiSelect-select .MuiSelect-outlined .MuiInputBase-input .MuiOutlinedInput-input{
-  font-size: 15px;
+  font-size: 12px;
   padding: 0px 5px
 }
 
@@ -121,6 +121,7 @@ font-family: 'Segoe UI', sans-serif;
   background-color: #efefef !important; /* Set background color */
   color: black !important; /* Set text color */
   width: 100%; /* Ensure full width selection */
+  line-height: 0px;
 }
 
 /* Ensure expand/collapse icons also match the selected node styles */
@@ -151,9 +152,12 @@ font-family: 'Segoe UI', sans-serif;
 }
 
 .rc-tree .rc-tree-treenode .rc-tree-node-content-wrapper{
-  vertical-align: middle !important; 
-}
+  vertical-align: middle;
 
+}
+.MuiTabs-scroller{
+  margin-top: 0px;
+}
 span.rc-tree-iconEle{
   margin-top: 4px !important;
 }

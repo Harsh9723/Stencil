@@ -1,0 +1,28 @@
+-----------------------------------------------------------------------------
+Date : 14-09-2024 19:10:06
+
+System.TimeoutException
+Message : The request channel timed out while waiting for a reply after 00:15:00. Increase the timeout value passed to the call to Request or increase the SendTimeout value on the Binding. The time allotted to this operation may have been a portion of a longer timeout.
+StackTrace : 
+Server stack trace: 
+   at System.ServiceModel.Channels.RequestChannel.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Dispatcher.RequestChannelBinder.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannel.Call(String action, Boolean oneway, ProxyOperationRuntime operation, Object[] ins, Object[] outs, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannelProxy.InvokeService(IMethodCallMessage methodCall, ProxyOperationRuntime operation)
+   at System.ServiceModel.Channels.ServiceChannelProxy.Invoke(IMessage message)
+
+Exception rethrown at [0]: 
+   at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)
+   at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type)
+   at NetZoomAddInWebAPI.BasicLibraryService.ILibraryService.SearchLibraryNew(SearchLibraryNewRequest request)
+   at NetZoomAddInWebAPI.BasicLibraryService.LibraryServiceClient.NetZoomAddInWebAPI.BasicLibraryService.ILibraryService.SearchLibraryNew(SearchLibraryNewRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Connected Services\BasicLibraryService\Reference.cs:line 2589
+   at NetZoomAddInWebAPI.Controllers.LibraryController.SearchLibraryNew(LibrarySearchRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 399
+System.TimeoutException
+Message : The HTTP request to 'https://lib3.netzoom.com/LIB3/LIBRARYSERVICE.SVC' has exceeded the allotted timeout of 00:15:00. The time allotted to this operation may have been a portion of a longer timeout.
+StackTrace :    at System.ServiceModel.Channels.HttpChannelUtilities.ProcessGetResponseWebException(WebException webException, HttpWebRequest request, HttpAbortReason abortReason)
+   at System.ServiceModel.Channels.HttpChannelFactory`1.HttpRequestChannel.HttpChannelRequest.WaitForReply(TimeSpan timeout)
+   at System.ServiceModel.Channels.RequestChannel.Request(Message message, TimeSpan timeout)
+System.Net.WebException
+Message : The operation has timed out
+StackTrace :    at System.Net.HttpWebRequest.GetResponse()
+   at System.ServiceModel.Channels.HttpChannelFactory`1.HttpRequestChannel.HttpChannelRequest.WaitForReply(TimeSpan timeout)

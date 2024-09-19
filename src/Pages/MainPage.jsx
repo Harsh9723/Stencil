@@ -20,6 +20,7 @@ import Treedata from './TreeData';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useTreeData } from '../Context/TreedataContext';
 import Setting from './Setting';
+import BASE_URL from '../Config/Config';
 
 
 const SearchComponent = () => {
@@ -44,8 +45,8 @@ const SearchComponent = () => {
   const [showTreeComponent, setShowTreeComponent] = useState(false)
   const [kwdSearchType, setKwdSearchType] = useState('0');
   const [showSetting, setShowSetting] = useState(false)
-  
-  const API_URL = 'http://localhost:5000/api/library/';
+
+  const API_URL = `${BASE_URL}/`;
 
   /** 
    * @param {Object} searchParams -
@@ -100,8 +101,8 @@ const SearchComponent = () => {
       });
 
       const searchData = response.data.Data.SearchData;
-      const resultData = searchData?.dtSearchResults || []; 
-      const dtResultdata = searchData?.dtManufacturers || []; 
+      const resultData = searchData?.dtSearchResults || [];
+      const dtResultdata = searchData?.dtManufacturers || [];
       console.log('Result Data:', resultData);
       console.log('dtResult Data:', dtResultdata);
 
@@ -279,7 +280,7 @@ const SearchComponent = () => {
     const fetchManufacturers = async () => {
       setLoading(true);
       try {
-        const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableManufacturersNew', {
+        const response = await axios.post(`${BASE_URL}GetLibraryAvailableManufacturersNew`, {
           Email: "",
           SubNo: "000000000000000000001234",
           FullLibrary: false,
@@ -305,7 +306,7 @@ const SearchComponent = () => {
       const fetchEqTypes = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableEqTypesNew', {
+          const response = await axios.post(`${BASE_URL}GetLibraryAvailableEqTypesNew`, {
             Email: "",
             Subno: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,
@@ -334,7 +335,7 @@ const SearchComponent = () => {
       const fetchProductLine = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableProdLinesNew', {
+          const response = await axios.post(`${BASE_URL}/GetLibraryAvailableProdLinesNew`, {
             Email: "",
             SubNo: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,
@@ -363,7 +364,7 @@ const SearchComponent = () => {
       const fetchProductNumber = async () => {
         setLoading(true);
         try {
-          const response = await axios.post('http://localhost:5000/api/library/GetLibraryAvailableProdNumbersNew', {
+          const response = await axios.post(`${BASE_URL}/GetLibraryAvailableProdNumbersNew`, {
             Email: "",
             SubNo: "000000000000000000001234",
             ActualMfgAcronym: selectedManufacturer,
@@ -441,9 +442,9 @@ const SearchComponent = () => {
 
   }
   const handleSettingClick = () => {
-  setShowSetting(true)
+    setShowSetting(true)
   };
-  const backfromsetting =() => {
+  const backfromsetting = () => {
     setShowSetting(false)
   }
   const handleClick = () => {
@@ -605,50 +606,50 @@ const SearchComponent = () => {
 
 
 
-     
+
 
       {!showTreeComponent && !showSetting ? (
 
         <>
 
-         <Box
-        sx={{
-          position: 'relative',
-          top: '0px',
-          display: 'flex',
-          alignItems: 'center',
-          overflow: 'hidden',
-          width: '100%',
-        }}>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <>
-            <IconButton
-              title="Setting"
-              sx={{ color: 'var(--font-color)', padding: 0 }}
-              onClick={handleSettingClick}
-            >
-              <SettingsIcon />
-            </IconButton>
+          <Box
+            sx={{
+              position: 'relative',
+              top: '0px',
+              display: 'flex',
+              alignItems: 'center',
+              overflow: 'hidden',
+              width: '100%',
+            }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <>
+                <IconButton
+                  title="Setting"
+                  sx={{ color: 'var(--font-color)', padding: 0 }}
+                  onClick={handleSettingClick}
+                >
+                  <SettingsIcon />
+                </IconButton>
 
-            <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
-            <Typography
-              title="Visit VisioStencil website"
-              sx={{
-                marginLeft: '8px',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                whiteSpace: 'nowrap',
-                fontSize: '12px',
-              }}
-              onClick={handleClick}
-            >
-              VisioStencils.com
-            </Typography>
+                <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+                <Typography
+                  title="Visit VisioStencil website"
+                  sx={{
+                    marginLeft: '8px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    whiteSpace: 'nowrap',
+                    fontSize: '12px',
+                  }}
+                  onClick={handleClick}
+                >
+                  VisioStencils.com
+                </Typography>
 
-          </>
+              </>
 
-        </Box>
-      </Box>
+            </Box>
+          </Box>
 
           <Box
             component="form"
@@ -662,46 +663,56 @@ const SearchComponent = () => {
             noValidate
             autoComplete="off"
           >
-            <Grid container alignItems="center" direction='row'>
-              <Grid item xs={11} sx={{ px: '1px', fontSize: '12px' }} >
-                <TextField
-                  id="outlined-basic"
-                  label={<CustomTypography>Search</CustomTypography>}
-                  variant="outlined"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder="By keyword"
-                  InputLabelProps={{ style: { color: 'var(--font-color)' } }}
-                  InputProps={{
-                    style: {
+            <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', width: '100%' }}>
+              <div style={{ flexGrow: 1, padding: '1px', fontSize: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '10px' }}> {/* Adjust the minHeight value as needed */}
+                  <TextField
+                    id="outlined-basic"
+                    label={<CustomTypography>Search</CustomTypography>}
+                    variant="outlined"
+                    value={keyword}
+                    onChange={(e) => setKeyword(e.target.value)}
+                    placeholder="By keyword"
+                    InputLabelProps={{ style: { color: 'var(--font-color)' } }}
+                    InputProps={{
+                      style: {
+                        color: 'var(--font-color)',
+                        fontSize: '12px',
+                        padding: '10px', // Apply padding here if needed
+                      },
+                    }}
+                    onKeyPress={(event) => {
+                      if (event.key === 'Enter' && keyword.trim() !== '') {
+                        handlesearch();
+                      }
+                    }}
+                    fullWidth
+                    sx={{
+                      '.MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderColor: 'var(--font-color)',
+                          padding: '10px', // Adjust fieldset padding
+                        },
+                        '&:hover fieldset': {
+                          borderColor: 'var(--font-color)',
+                        },
+                        '&.Mui-focused fieldset': {
+                          borderColor: 'var(--font-color)',
+                        },
+                        '& .MuiInputBase-input': {
+                          padding: '10px', // Adjust input padding to match fieldset
+                          boxSizing: 'border-box', // Ensure padding is included in the element's total width and height
+                        },
+                      },
+                      fontSize: '12px',
                       color: 'var(--font-color)',
-                      borderColor: 'var(--font-color)',
-                      fontSize: '12px'
-                    },
-                  }}
-                  onKeyPress={(event) => {
-                    if (event.key === 'Enter' && keyword.trim() !== '') {
-                      handlesearch();
-                    }
-                  }}
+                    }}
+                  />
 
-                  fullWidth
-                  sx={{
-                    '.MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderColor: 'var(--font-color)',
-                      },
-                      '&:hover fieldset': {
-                        borderColor: 'var(--font-color)',
-                      },
-                      '&.Mui-focused fieldset': {
-                        borderColor: 'var(--font-color)',
-                      },
-                    },
-                    fontSize: '12px',
-                    color: 'var(--font-color)'
-                  }}
-                />
+                </div>
+
+
+
 
                 {keyword ? (
                   <Snackbar
@@ -709,285 +720,300 @@ const SearchComponent = () => {
                     onClose={handleSnackbarClose}
                     anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
                   >
-                    <Alert onClose={handleSnackbarClose} severity="info" sx={{ width: '100%' }}
+                    <Alert
+                      onClose={handleSnackbarClose}
+                      severity="info"
+                      sx={{ width: '100%' }}
                       action={
-                        <Button color='inherit' size='small' onClick={handlebuttonclick}>OK</Button>
+                        <Button color="inherit" size="small" onClick={handlebuttonclick}>
+                          OK
+                        </Button>
                       }
                     >
                       {snackbarMessage}
                     </Alert>
                   </Snackbar>
-
                 ) : (
                   <Snackbar
                     open={snackbarOpen}
                     onClose={handleSnackbarClose}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                    <Alert
-                      onClose={handleSnackbarClose} severity='error' sx={{ width: '100%' }}
-                    >
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                  >
+                    <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: '100%' }}>
                       {snackbarMessage}
                     </Alert>
                   </Snackbar>
                 )}
+              </div>
 
-              </Grid>
-
-              <Grid item xs={1} >
-                <IconButton sx={{ color: 'var(--font-color)', }} size='small' onClick={handlesearch}>
+              <div style={{ paddingLeft: '8px' }}>
+                <IconButton
+                  sx={{ color: 'var(--font-color)' }}
+                  size="small"
+                  onClick={handlesearch}
+                >
                   <SearchIcon />
                 </IconButton>
-              </Grid>
-            </Grid>
+              </div>
+            </div>
 
-            <FormControl component="fieldset" sx={{ width: '100%', }}>
-              <RadioGroup
-                row
-                sx={{
-                  justifyContent: 'flex-start',
-                  color: 'var(--font-color)',
-                  fontSize: '12px'
-                }}
-                onChange={handleKwdSearchTypeChange}
-                value={kwdSearchType}
-              >
-                <FormControlLabel
-                  sx={{ fontSize: '12px' }}
-                  control={<Radio sx={{ color: 'var(--font-color)', fontSize: '12px' }} color='default' value="0" />}
-                  label={<CustomTypography>Any Word</CustomTypography>}
-                />
-                <FormControlLabel
-                  control={<Radio sx={{ color: 'var(--font-color)' }} color='default' value="1" />}
-                  label={<CustomTypography>All Words</CustomTypography>}
-                />
-              </RadioGroup>
-            </FormControl>
+            <div style={{ minHeight: '30px' }}> {/* Adjust the minHeight value as needed */}
+              <FormControl component="fieldset" sx={{ width: '100%' }}>
+                <RadioGroup
+                  row
+                  sx={{
+                    justifyContent: 'flex-start',
+                    color: 'var(--font-color)',
+                    fontSize: '12px'
+                  }}
+                  onChange={handleKwdSearchTypeChange}
+                  value={kwdSearchType}
+                >
+                  <FormControlLabel
+                    sx={{ fontSize: '12px' }}
+                    control={<Radio sx={{ color: 'var(--font-color)', fontSize: '12px' }} color='default' value="0" />}
+                    label={<CustomTypography>Any Word</CustomTypography>}
+                  />
+                  <FormControlLabel
+                    control={<Radio sx={{ color: 'var(--font-color)' }} color='default' value="1" />}
+                    label={<CustomTypography>All Words</CustomTypography>}
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
 
-            <FormControl fullWidth variant="outlined" sx={{ mt: 3, }}>
-              <InputLabel sx={{ color: 'var(--font-color)', fontSize: '12px' }} shrink>
-                Manufacturers [{manufacturers.length}]
-              </InputLabel>
-              <Select
-                displayEmpty
-                value={selectedManufacturer}
-                onChange={handleManufacturerChange}
-                className='nz-searchcombo'
-                input={
-                  <OutlinedInput
-                    notched
-                    label={`Manufacturers [${manufacturers.length}]`}
+            <div style={{ minHeight: '10px' }}>
+              <FormControl fullWidth variant="outlined" sx={{ mt: 1, height: 'auto' }}>
+                <InputLabel
+                  sx={{
+                    color: 'var(--font-color)',
+                    fontSize: '12px',
+                    height: 'auto',  // Adjust the height here
+                  }}
+                  shrink
+                >
+                  Manufacturers [{manufacturers.length}]
+                </InputLabel>
+                <Select
+                  displayEmpty
+                  value={selectedManufacturer}
+                  onChange={handleManufacturerChange}
+                  className='nz-searchcombo'
+                  input={
+                    <OutlinedInput
+                      notched
+                      label={`Manufacturers [${manufacturers.length}]`}
+                      sx={{
+                        color: 'var(--font-color)',
+                        fontSize: '12px',
+                        height: 'auto',  // Adjust the height here
+                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                          borderColor: 'var(--font-color)',
+                        },
+                        '& .MuiInputBase-input': {
+                          fontSize: '12px',
+                          padding: '12px',  // Adjust padding to decrease height
+                        },
+                      }}
+                    />
+                  }
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <h1>All</h1>;
+                    }
+                    const selectedManufacturer = manufacturers.find(manufacturer => manufacturer.MfgAcronym === selected);
+                    return selectedManufacturer ? selectedManufacturer.Manufacturer : 'All';
+                  }}
+                >
+                  {manufacturers.length > 0 && (
+                    <MenuItem value="" sx={{ fontSize: '12px' }}>
+                      <h1>All</h1>
+                    </MenuItem>
+                  )}
+                  {manufacturers.length > 0 ? (
+                    manufacturers.map((manufacturer) => (
+                      <MenuItem
+                        key={manufacturer.MfgAcronym}
+                        value={manufacturer.MfgAcronym}
+                        sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}
+                      >
+                        {manufacturer.Manufacturer}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No Manufacturers Available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+
+            </div>
+            <div>
+
+              <FormControl fullWidth variant="outlined" sx={{ mt: 2, height: 'auto' }}>
+                <InputLabel sx={{ color: 'var(--font-color)', fontSize: '12px' }} shrink>
+                  Equipment Types [{eqTypes.length}]
+                </InputLabel>
+                <Select
+                  displayEmpty
+                  value={selectedEqType}
+                  className='nz-searchcombo'
+                  onChange={handleEqTypeChange}
+                  input={<OutlinedInput notched label={`Equipment Types [${eqTypes.length}]`}
                     sx={{
                       color: 'var(--font-color)',
                       fontSize: '12px',
+                      height: 'auto',  // Adjust the height here
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: 'var(--font-color)',
                       },
                       '& .MuiInputBase-input': {
                         fontSize: '12px',
+                        padding: '12px',  // Adjust padding to decrease height
                       },
                     }}
-                  />
-
-                }
-                renderValue={(selected) => {
-                  if (!selected) {
-                    return <h1>All</h1>;
-                  }
-                  const selectedManufacturer = manufacturers.find(manufacturer => manufacturer.MfgAcronym === selected);
-                  return selectedManufacturer ? selectedManufacturer.Manufacturer : 'All';
-                }}
-
-              >
-                {manufacturers.length > 0 && (
-
-                  <MenuItem value="" sx={{ fontSize: '12px' }} >
-                    <h1>All</h1>
-                  </MenuItem>
-                )}
-                {manufacturers.length > 0 ? (
-                  manufacturers.map((manufacturer) => (
-                    <MenuItem
-                      key={manufacturer.MfgAcronym}
-                      value={manufacturer.MfgAcronym}
-                      sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}
-                    >
-                      {manufacturer.Manufacturer}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled>No Manufacturers Available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-              <InputLabel sx={{ color: 'var(--font-color)', fontSize: '12px' }} shrink>
-                Equipment Types [{eqTypes.length}]
-              </InputLabel>
-              <Select
-                displayEmpty
-                value={selectedEqType}
-                className='nz-searchcombo'
-                onChange={handleEqTypeChange}
-                input={<OutlinedInput notched label={`Equipment Types [${eqTypes.length}]`}
-                  sx={{
-                    color: 'var(--font-color)',
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: 'var(--font-color)',
-                      fontSize: '12px'
-                    },
-                  }}
-                />}
+                  />}
 
 
-                renderValue={(selected) => {
-                  if (!selected) {
-                    return <h1>All</h1>;
-                  }
-                  console.log('abc', selected)
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <h1>All</h1>;
+                    }
+                    console.log('abc', selected)
 
-                  return selected;
-                }}
-                sx={{
-                  '.MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'var(--font-color)',
-                    },
-                    '&:hover fieldset': {
-                      borderColor: 'var(--font-color)',
-                    },
-                    '&.Mui-focused fieldset': {
-                      borderColor: 'var(--font-color)',
-                    },
-                  },
-                  '.MuiSelect-select': {
-                    color: 'var(--font-color) !important',
-                  },
-                  '.MuiSvgIcon-root': {
-                    color: 'var(--font-color) !important',
-                  }, fontSize: '12px'
-                }}
-              >
-                {eqTypes.length > 0 && (
-                  <MenuItem value="" sx={{ fontSize: '12px' }}>
-                    <h1>All</h1>
-                  </MenuItem>
-                )}
-                {eqTypes.length > 0 ? (
-                  eqTypes.map((eqtype) => (
-                    <MenuItem key={eqtype} value={eqtype} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                      {eqtype}
-                    </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled sx={{fontSize:'12px', fontFamily:'Segoe UI, sans-serif'}} >No Equipment Types Available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
-
-
-
-            <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-              <InputLabel
-                sx={{ color: 'var(--font-color)', fontSize: '12px' }}
-                shrink
-              >
-                Product Lines [{productLine.length}]
-              </InputLabel>
-              <Select
-                displayEmpty
-                value={selectedProductLine}
-                className='nz-searchcombo'
-                onChange={handleproductlinechange}
-                input={<OutlinedInput notched label=" Product Lines [0]"
-                  sx={{
-                    color: 'var(--font-color)',
-                    '.MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'var(--font-color)' },
-                      '&:hover fieldset': { borderColor: 'var(--font-color)' },
-                      '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
-                    },
-                    '.MuiSelect-select': { color: 'var(--font-color) !important' },
-                    '.MuiSvgIcon-root': { color: 'var(--font-color) !important' }, fontSize: '12px'
+                    return selected;
                   }}
 
-                />}
-
-                renderValue={(selected) => {
-                  if (!selected) {
-                    return <h1>All</h1>
-                  }
-                  console.log('productline', selected)
-                  return selected
-                }}
-              >
-                {productLine.length > 0 && (
-
-                  <MenuItem value="" sx={{ fontSize: '12px' }}>
-                    <h1>All</h1>
-                  </MenuItem>
-                )}
-                {productLine.length > 0 ? (
-                  productLine.map((productLine) => (
-                    <MenuItem key={productLine} value={productLine} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                      {productLine}
+                >
+                  {eqTypes.length > 0 && (
+                    <MenuItem value="" sx={{ fontSize: '12px' }}>
+                      <h1>All</h1>
                     </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled sx={{fontSize:'12px', fontFamily:'Segoe UI, sans-serif'}}>No product line available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
+                  )}
+                  {eqTypes.length > 0 ? (
+                    eqTypes.map((eqtype) => (
+                      <MenuItem key={eqtype} value={eqtype} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                        {eqtype}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif' }} >No Equipment Types Available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </div>
 
-            <FormControl fullWidth variant="outlined" sx={{ mt: 3 }}>
-              <InputLabel
-                sx={{ color: 'var(--font-color)', fontSize: '12px' }}
-                shrink
-              >
-                Product Numbers [{productNumber.length}]
-              </InputLabel>
-              <Select
-                displayEmpty
-                value={selectedProductNumber}
-                onChange={handleproductnumber}
-                className='nz-searchcombo'
-                input={<OutlinedInput notched label="Product Numbers [0]"
-                  sx={{
-                    color: 'var(--font-color)',
-                    '.MuiOutlinedInput-root': {
-                      '& fieldset': { borderColor: 'var(--font-color)' },
-                      '&:hover fieldset': { borderColor: 'var(--font-color)' },
-                      '&.Mui-focused fieldset': { borderColor: 'var(--font-color)' },
-                    },
-                    '.MuiSelect-select': { color: 'var(--font-color) !important' },
-                    '.MuiSvgIcon-root': { color: 'var(--font-color) !important' }, fontSize: '12px'
+
+            <div>
+
+              <FormControl fullWidth variant="outlined" sx={{ mt: 2, height: 'auto' }}>
+                <InputLabel
+                  sx={{ color: 'var(--font-color)', fontSize: '12px' }}
+                  shrink
+                >
+                  Product Lines [{productLine.length}]
+                </InputLabel>
+                <Select
+                  displayEmpty
+                  value={selectedProductLine}
+                  className='nz-searchcombo'
+                  onChange={handleproductlinechange}
+                  input={<OutlinedInput notched label=" Product Lines [0]"
+                    sx={{
+                      color: 'var(--font-color)',
+                      fontSize: '12px',
+                      height: 'auto',  // Adjust the height here
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'var(--font-color)',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '12px',
+                        padding: '12px',  // Adjust padding to decrease height
+                      },
+                    }}
+
+                  />}
+
+                  renderValue={(selected) => {
+                    if (!selected) {
+                      return <h1>All</h1>
+                    }
+                    console.log('productline', selected)
+                    return selected
                   }}
-                />}
-                renderValue={(Pnumberselected) => {
-                  if (!Pnumberselected) {
-                    return <h1>All</h1>
-                  }
-                  console.log('pnumberselected', Pnumberselected)
-                  return Pnumberselected
-                }}
-              >
-                {productNumber.length > 0 && (
+                >
+                  {productLine.length > 0 && (
 
-                  <MenuItem value="" sx={{ fontSize: '12px' }}>
-                    <h1>All</h1>
-                  </MenuItem>
-                )}
-                {productNumber.length > 0 ? (
-                  productNumber.map((pnumber) => (
-                    <MenuItem key={pnumber} value={pnumber} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
-                      {pnumber}
+                    <MenuItem value="" sx={{ fontSize: '12px' }}>
+                      <h1>All</h1>
                     </MenuItem>
-                  ))
-                ) : (
-                  <MenuItem disabled sx={{ fontSize: '12px' }}>No Product number Available</MenuItem>
-                )}
-              </Select>
-            </FormControl>
+                  )}
+                  {productLine.length > 0 ? (
+                    productLine.map((productLine) => (
+                      <MenuItem key={productLine} value={productLine} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                        {productLine}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif' }}>No product line available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </div>
+            <div>
+
+              <FormControl fullWidth variant="outlined" sx={{ mt: 2, height: 'auto' }}>
+                <InputLabel
+                  sx={{ color: 'var(--font-color)', fontSize: '12px' }}
+                  shrink
+                >
+                  Product Numbers [{productNumber.length}]
+                </InputLabel>
+                <Select
+                  displayEmpty
+                  value={selectedProductNumber}
+                  onChange={handleproductnumber}
+                  className='nz-searchcombo'
+                  input={<OutlinedInput notched label="Product Numbers [0]"
+                    sx={{
+                      color: 'var(--font-color)',
+                      fontSize: '12px',
+                      height: 'auto',  // Adjust the height here
+                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: 'var(--font-color)',
+                      },
+                      '& .MuiInputBase-input': {
+                        fontSize: '12px',
+                        padding: '12px',  // Adjust padding to decrease height
+                      },
+                    }}
+                  />}
+                  renderValue={(Pnumberselected) => {
+                    if (!Pnumberselected) {
+                      return <h1>All</h1>
+                    }
+                    console.log('pnumberselected', Pnumberselected)
+                    return Pnumberselected
+                  }}
+                >
+                  {productNumber.length > 0 && (
+
+                    <MenuItem value="" sx={{ fontSize: '12px' }}>
+                      <h1>All</h1>
+                    </MenuItem>
+                  )}
+                  {productNumber.length > 0 ? (
+                    productNumber.map((pnumber) => (
+                      <MenuItem key={pnumber} value={pnumber} sx={{ fontSize: '12px', fontFamily: 'Segoe UI, sans-serif', color: 'var(--black-font)' }}>
+                        {pnumber}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled sx={{ fontSize: '12px' }}>No Product number Available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </div>
+
           </Box>
 
           <Typography
@@ -1004,38 +1030,38 @@ const SearchComponent = () => {
           </Typography>
         </>
 
-           ): showSetting ?( 
-            <>
-             <Box
+      ) : showSetting ? (
+        <>
+          <Box
             sx={{
-            width: '100%',
-            height: '100vh',
-            marginTop: '0px',
-            padding: '0px',
-          }}
-        >
+              width: '100%',
+              height: '100vh',
+              marginTop: '0px',
+              padding: '0px',
+            }}
+          >
             <Box sx={{ display: 'flex', alignItems: 'center', }}>
-            <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={backfromsetting}>
-              <ArrowBackIcon />
-            </IconButton>
+              <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={backfromsetting}>
+                <ArrowBackIcon />
+              </IconButton>
 
-            <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
-            <Typography
-              sx={{
-                marginLeft: '8px',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                whiteSpace: 'nowrap',
-                fontSize: '12px'
-              }}
-              onClick={handleClick}>
-              VisioStencils.com
-            </Typography>
+              <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+              <Typography
+                sx={{
+                  marginLeft: '8px',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  whiteSpace: 'nowrap',
+                  fontSize: '12px'
+                }}
+                onClick={handleClick}>
+                VisioStencils.com
+              </Typography>
+            </Box>
           </Box>
-                </Box>
           <Setting />
-                </>
-    
+        </>
+
       ) : (
         <Box
           sx={{

@@ -1,0 +1,6 @@
+-----------------------------------------------------------------------------
+Date : 22-08-2024 12:01:50
+
+System.NullReferenceException
+Message : Object reference not set to an instance of an object.
+StackTrace :    at NetZoomAddInWebAPI.Controllers.LibraryController.GetLibraryAvailableManufacturersNew(GetManufacturerRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 212

@@ -1,0 +1,9 @@
+-----------------------------------------------------------------------------
+Date : 22-08-2024 17:40:54
+
+System.IndexOutOfRangeException
+Message : Cannot find column ASC.
+StackTrace :    at System.Data.DataTable.ParseSortString(String sortString)
+   at System.Data.DataView.CheckSort(String sort)
+   at System.Data.DataView.set_Sort(String value)
+   at NetZoomAddInWebAPI.Controllers.LibraryController.OrderDataTable(DataTable dtInputData, AppSettings settings) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 1049

@@ -1,0 +1,52 @@
+-----------------------------------------------------------------------------
+Date : 03-09-2024 21:18:24
+
+System.ServiceModel.EndpointNotFoundException
+Message : There was no endpoint listening at https://lib3.netzoom.com/LIB3/LIBRARYSERVICE.SVC that could accept the message. This is often caused by an incorrect address or SOAP action. See InnerException, if present, for more details.
+StackTrace : 
+Server stack trace: 
+   at System.ServiceModel.Channels.HttpOutput.WebRequestHttpOutput.GetOutputStream()
+   at System.ServiceModel.Channels.HttpOutput.Send(TimeSpan timeout)
+   at System.ServiceModel.Channels.HttpChannelFactory`1.HttpRequestChannel.HttpChannelRequest.SendRequest(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.RequestChannel.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Dispatcher.RequestChannelBinder.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannel.Call(String action, Boolean oneway, ProxyOperationRuntime operation, Object[] ins, Object[] outs, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannelProxy.InvokeService(IMethodCallMessage methodCall, ProxyOperationRuntime operation)
+   at System.ServiceModel.Channels.ServiceChannelProxy.Invoke(IMessage message)
+
+Exception rethrown at [0]: 
+   at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)
+   at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type)
+   at NetZoomAddInWebAPI.BasicLibraryService.ILibraryService.GetLibraryAvaliableManufacturersNew(LibraryUserIdentity user, String models, Nullable`1 FullLib)
+   at NetZoomAddInWebAPI.Controllers.LibraryController.GetLibraryAvailableManufacturersNew(GetManufacturerRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 216
+System.Net.WebException
+Message : The remote name could not be resolved: 'lib3.netzoom.com'
+StackTrace :    at System.Net.HttpWebRequest.GetRequestStream(TransportContext& context)
+   at System.Net.HttpWebRequest.GetRequestStream()
+   at System.ServiceModel.Channels.HttpOutput.WebRequestHttpOutput.GetOutputStream()
+-----------------------------------------------------------------------------
+Date : 03-09-2024 21:18:24
+
+System.ServiceModel.EndpointNotFoundException
+Message : There was no endpoint listening at https://lib3.netzoom.com/LIB3/LIBRARYSERVICE.SVC that could accept the message. This is often caused by an incorrect address or SOAP action. See InnerException, if present, for more details.
+StackTrace : 
+Server stack trace: 
+   at System.ServiceModel.Channels.HttpOutput.WebRequestHttpOutput.GetOutputStream()
+   at System.ServiceModel.Channels.HttpOutput.Send(TimeSpan timeout)
+   at System.ServiceModel.Channels.HttpChannelFactory`1.HttpRequestChannel.HttpChannelRequest.SendRequest(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.RequestChannel.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Dispatcher.RequestChannelBinder.Request(Message message, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannel.Call(String action, Boolean oneway, ProxyOperationRuntime operation, Object[] ins, Object[] outs, TimeSpan timeout)
+   at System.ServiceModel.Channels.ServiceChannelProxy.InvokeService(IMethodCallMessage methodCall, ProxyOperationRuntime operation)
+   at System.ServiceModel.Channels.ServiceChannelProxy.Invoke(IMessage message)
+
+Exception rethrown at [0]: 
+   at System.Runtime.Remoting.Proxies.RealProxy.HandleReturnMessage(IMessage reqMsg, IMessage retMsg)
+   at System.Runtime.Remoting.Proxies.RealProxy.PrivateInvoke(MessageData& msgData, Int32 type)
+   at NetZoomAddInWebAPI.BasicLibraryService.ILibraryService.GetLibraryAvaliableManufacturersNew(LibraryUserIdentity user, String models, Nullable`1 FullLib)
+   at NetZoomAddInWebAPI.Controllers.LibraryController.GetLibraryAvailableManufacturersNew(GetManufacturerRequest request) in C:\NZProjects\TabVersion\Phase2-API\NetZoomAddInWebAPI\Controllers\LibraryController.cs:line 216
+System.Net.WebException
+Message : The remote name could not be resolved: 'lib3.netzoom.com'
+StackTrace :    at System.Net.HttpWebRequest.GetRequestStream(TransportContext& context)
+   at System.Net.HttpWebRequest.GetRequestStream()
+   at System.ServiceModel.Channels.HttpOutput.WebRequestHttpOutput.GetOutputStream()
