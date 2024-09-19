@@ -49,16 +49,21 @@ const SvgContent = ({ svgContent }) => {
       }
     });
   }, []);
+  const [shapeCounter, setShapeCounter] = useState(0);
 
   const handleDragStart = async (e) => {
     e.dataTransfer.setData('text/plain', '');
-    await insertSvgContentIntoOffice(svgContent, 'drag');
+    await insertSvgContentIntoOffice(svgContent, 'drag', shapeCounter);
+    console.log(`Shape counter after drag: ${shapeCounter}`);
+    console.log(`Shape counter after double-click: ${shapeCounter}`);
+    setShapeCounter(shapeCounter + 1);
   };
 
   const svg = useRef(null);
 
   const handleDoubleClick = async () => {
-    await insertSvgContentIntoOffice(svgContent, 'double-click');
+    await insertSvgContentIntoOffice(svgContent, 'double-click', shapeCounter);
+    setShapeCounter(shapeCounter + 1);
   };
 
   return (
