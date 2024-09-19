@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { styled } from '@mui/system';
 import { Card, } from '@mui/material';
+import {insertSvgContentIntoOffice} from '../Common/CommonFunction'
 
 // Styled component for the SVG card
 const StyledSvgCard = styled(Card)(({ theme }) => ({
@@ -53,17 +54,7 @@ const SvgContent = ({ svgContent }) => {
     e.dataTransfer.setData('text/plain', '');
     await insertSvgContentIntoOffice(svgContent, 'drag');
   };
- export const insertSvgContentIntoOffice = async (svgContent, insertType) => {
-    try {
-      await Office.context.document.setSelectedDataAsync(svgContent, {
-        coercionType: Office.CoercionType.XmlSvg,
-        asyncContext: { insertType }
-      });
-      console.log(`SVG inserted via ${insertType}`);
-    } catch (error) {
-      console.error(`Error during ${insertType}:`, error);
-    }
-  };
+
   const svg = useRef(null);
 
   const handleDoubleClick = async () => {
