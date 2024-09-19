@@ -485,7 +485,6 @@ const SearchComponent = () => {
     setSnackbarOpen(false);
   }
   const handlesearch = () => {
-  
     handleSearch(searchParams, onSuccess, onError);
   };
 

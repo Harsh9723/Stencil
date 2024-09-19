@@ -62,7 +62,7 @@ function PreloadPage() {
       </div>
 
       <div className="relative text-center text-white">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px' }}>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px', fontWeight:'bold', fontSize:'25px', fontFamily:'Segoe UI, sans-serif' }}>
           Add-In for Stencils
         </h1>
       

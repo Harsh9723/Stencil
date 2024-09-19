@@ -659,7 +659,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
     if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
-      setRelatedDevicesVisible(true); 
 
       SetEqId(selectedNode.EqId)
     }

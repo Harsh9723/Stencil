@@ -7,14 +7,12 @@ export const TreeDataProvider = ({ children }) => {
   const [relatedTree, setRelatedTree] = useState([]);
 
 
-  // Function to add leaf node to treeData
   const addLeafNode = (parentKey, ...newNodes) => {
     setTreeData((prevData) => {
       const addNodes = (nodes) => {
         return nodes.map((node) => {
           if (node.key === parentKey) {
             const existingKeys = new Set((node.children || []).map((child) => child.key));
-            // Filter out the new nodes that are already added (prevent recursion)
             const uniqueNewNodes = newNodes.filter((newNode) => !existingKeys.has(newNode.key));
   
             if (uniqueNewNodes.length > 0) {
@@ -22,16 +20,15 @@ export const TreeDataProvider = ({ children }) => {
                 ...node,
                 children: [
                   ...(node.children || []),
-                  ...uniqueNewNodes,  // Add new unique nodes only once
+                  ...uniqueNewNodes,  
                 ],
               };
             }
-            // If no unique nodes, return the node as-is
             return node;
           } else if (node.children) {
             return {
               ...node,
-              children: addNodes(node.children), // Recursively check children
+              children: addNodes(node.children), 
             };
           }
           return node;
@@ -48,7 +45,6 @@ export const TreeDataProvider = ({ children }) => {
         return nodes.map((node) => {
           if (node.key === parentKey) {
             const existingKeys = new Set((node.children || []).map((child) => child.key));
-            // Filter out the new nodes that are already added (prevent recursion)
             const uniqueNewNodes = newNodes.filter((newNode) => !existingKeys.has(newNode.key));
   
             if (uniqueNewNodes.length > 0) {
@@ -60,12 +56,11 @@ export const TreeDataProvider = ({ children }) => {
                 ],
               };
             }
-            // If no unique nodes, return the node as-is
             return node;
           } else if (node.children) {
             return {
               ...node,
-              children: addNodes(node.children), // Recursively check children
+              children: addNodes(node.children), 
             };
           }
           return node;
@@ -76,12 +71,10 @@ export const TreeDataProvider = ({ children }) => {
     });
   };
 
-  // Function to set initial data for treeData
   const setInitialTreeData = (data) => {
     setTreeData(data);
   };
 
-  // Function to set initial data for relatedTree
   const setInitialRelatedTreeData = (data) => {
     setRelatedTree(data);
   };
