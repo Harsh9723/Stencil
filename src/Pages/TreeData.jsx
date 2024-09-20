@@ -13,8 +13,8 @@ import Backdrop from '@mui/material/Backdrop';
 import SvgContent from '../Components/SvgContent.jsx';
 import BASE_URL from '../Config/Config.js';
 import { insertSvgContentIntoOffice } from '../Common/CommonFunction.jsx';
-
-const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handleprop }) => {
+import { handleSearch, transformToTreeData } from '../Common/CommonFunction.jsx';
+const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => {
 
   const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree,
   } = useTreeData();
@@ -33,182 +33,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
   const [svgContent, setSvgContent] = useState(null);
   const [stencilResponse, SetStencilResponse] = useState([]);
   const [Eqid, SetEqId] = useState(null);
-
-
-  const API_URL = `${BASE_URL}`;
-
-  /**
-  
-   * 
-   * @param {Object} searchParams -  for the search API call.
-   * @param {Function} onSuccess - Callback to handle successful search response.
-   * @param {Function} onError - Callback to handle errors.
-   */
-
-  const handleSearch = async (searchParams, onSuccess, onError) => {
-    const { keyword, related, Eqid, selectedManufacturer, setSnackbarMessage, setSnackbarOpen, selectedEqType, selectedProductLine, selectedProductNumber, selectedDtManufacturers, } = searchParams;
-    let searchType = 'Solution';
-    let paramXml = '';
-
-
-    if (keyword) {
-      searchType = 'Kwd';
-      paramXml = `<Search><NotificationCount>10</NotificationCount><SearchType>${searchType}</SearchType><KwdSearchType>0</KwdSearchType><TextSearched>${keyword}</TextSearched><MfgFilterList>${selectedManufacturer ? selectedManufacturer : selectedDtManufacturers.length > 0 ? selectedDtManufacturers.join(',') : ""}</MfgFilterList><LikeOpeartor /><LikeType /><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-    }
-    else if (selectedManufacturer || selectedEqType || selectedProductLine || selectedProductNumber) {
-      paramXml = `<Search><NotificationCount/><SearchType>Solution</SearchType><SelectedMfg>${selectedManufacturer || ''}</SelectedMfg><SelectedEqType>${selectedEqType || ''}</SelectedEqType><SelectedMfgProdLine>${selectedProductLine || ''}</SelectedMfgProdLine><SelectedMfgProdNo>${selectedProductNumber || ''}</SelectedMfgProdNo><IncludeRelatedMfg>true</IncludeRelatedMfg><CardModuleFlag>false</CardModuleFlag><RackFlag>false</RackFlag><RMFlag>false</RMFlag><ChassisFlag>false</ChassisFlag><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`;
-
-    } else if (related || '') {
-      paramXml = ` <Search><NotificationCount>500</NotificationCount><SearchType>Related</SearchType><EQID>${Eqid}</EQID><MfgFilterList></MfgFilterList><IncludeRelatedMfg>true</IncludeRelatedMfg><ToSearchOnlyWithShape>true</ToSearchOnlyWithShape><OrderByClause /></Search>`
-    }
-    try {
-      const response = await axios.post(`${API_URL}SearchLibraryNew`, {
-        Email: "",
-        SubNo: "000000000000000000001234",
-        FullLib: false,
-        ParamXML: paramXml,
-        Settings: {
-          RememberLastSearchCount: 16,
-          IncludeRelatedManufacturers: true,
-          NotifyResultsExceedCount: 10,
-          NotifyResultsExceedCountCheck: true,
-          RememberLastSearchCountCheck: true,
-          IsGroupOrderAsc1: true,
-          TreeGroupBy1: "Manufacturer",
-          TreeGroupBy2: "Equipment Type",
-          TreeGroupBy3: "Product Line",
-          TreeGroupBy4: "Product/Model Number",
-        },
-      });
-
-      const searchData = response.data.Data.SearchData;
-      const resultData = searchData?.dtSearchResults || []; // Safely handle if data is missing
-      const dtResultdata = searchData?.dtManufacturers || []; // Safely handle if data is missing
-
-      console.log('Result Data:', resultData);
-      console.log('dtResult Data:', dtResultdata);
-
-      if (resultData.length > 0) {
-        // If there are search results, call onSuccess with resultData
-        onSuccess(resultData);
-      } else if (dtResultdata.length > 0) {
-        onSuccess(dtResultdata);
-      } else {
-        console.log('No relevant data found');
-        // Handle cases where no data is available
-        onFailure('No results found');
-      }
-    } catch (error) {
-      console.error('Related not shown:', error.message);
-      onFailure('An error occurred while fetching data');
-    }
-
-  };
-
-  /**
-  
-   * 
-   * @param {Array} result - The search results to transform.
-   * @returns {Array} - The transformed tree data.
-   */
-
-  const transformToTreeData = (result,) => {
-    const tree = [
-      {
-        title: `Search Results [${result.length}]`,
-        key: `search-results-${Date.now()}`,
-        icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
-        children: [],
-      },
-    ];
-
-
-    const searchResultsNode = tree[0];
-
-    result.forEach((item) => {
-      const {
-        MfgAcronym = '',
-        Manufacturer = '',
-        EQTYPE = '',
-        MFGPRODLINE = '',
-        MFGPRODNO = '',
-        EQID = '',
-        MFGDESC = '',
-      } = item;
-
-      let manufacturerNode = searchResultsNode.children.find(
-        (child) => child.key === MfgAcronym
-      );
-
-      if (!manufacturerNode) {
-        manufacturerNode = {
-          title: Manufacturer,
-          key: MfgAcronym,
-          icon: <img src="./assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
-          children: [],
-        };
-        searchResultsNode.children.push(manufacturerNode);
-      }
-
-      const eqTypeKey = `${MfgAcronym}-${EQTYPE}`;
-      let eqTypeNode = manufacturerNode.children.find(
-        (child) => child.key === eqTypeKey
-      );
-
-      if (!eqTypeNode) {
-        eqTypeNode = {
-          title: EQTYPE,
-          key: eqTypeKey,
-          icon: <img src={`./assets/EqType/${EQTYPE}.png`} alt="EQTYPE" style={{ width: 16, height: 16 }} />,
-          children: [],
-        };
-        manufacturerNode.children.push(eqTypeNode);
-      }
-
-      const prodLineKey = `${MfgAcronym}-${EQTYPE}-${MFGPRODLINE}`;
-      let prodLineNode = eqTypeNode.children.find(
-        (child) => child.key === prodLineKey
-      );
-
-      if (!prodLineNode) {
-        prodLineNode = {
-          title: MFGPRODLINE,
-          key: prodLineKey,
-          icon: <img src="./assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
-          children: [],
-
-        };
-        eqTypeNode.children.push(prodLineNode);
-      }
-
-      const productNumberKey = EQID;
-      let productnoNode = prodLineNode.children.find(
-        (child) => child.key === productNumberKey
-      );
-
-
-
-      if (!productnoNode) {
-        productnoNode = {
-          title: (
-            <span title={MFGDESC} placement="bottom-end" >
-              <span>{MFGPRODNO}</span>
-            </span>
-          ),
-          key: productNumberKey,
-          icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
-          children: [],
-          EQID: productNumberKey,
-          Type: 'ProductNumber',
-          isLeaf: false
-        };
-        prodLineNode.children.push(productnoNode);
-      }
-    });
-
-    return tree;
-  };
+  const [shapeCounter, setShapeCounter] = useState(0);
 
 
   useEffect(() => {
@@ -401,7 +226,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     }
   };
 
-  // Main function to handle API calls and add leaf nodes
   const callApiforDeviceShapeStencilEqid = async (selectedNode, isRelatedTree = false) => {
     setIsLoading(true);
 
@@ -409,9 +233,9 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       const eqId = selectedNode.EQID;
       const addLeafNodeFn = isRelatedTree ? addLeafNodeToRelatedTree : addLeafNode;
 
-      // Call the two APIs in parallel and include the logic for adding nodes
+     
       let shapenodes = await getDeviceShapes(selectedNode, addLeafNodeFn, eqId);
-      let stencilNode = await getStencilNameByEQID(selectedNode, addLeafNodeFn, eqId); // Pass only the necessary addLeafNode function
+      let stencilNode = await getStencilNameByEQID(selectedNode, addLeafNodeFn, eqId); 
 
       return { shapenodes, stencilNode }
     } catch (error) {
@@ -529,14 +353,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       return;
     }
 
-    // Auto-expand related nodes if necessary and get the selected node
     const { expandedKeys: autoExpandedKeys, selectedKeys: autoSelectedKeys, selectedNode, IsSelected } = await autoExpandDefaultNodesOfTree([node]);
 
-    // Merge the expanded keys with the new expanded keys
     newExpandedKeys = Array.from(new Set([...newExpandedKeys, ...autoExpandedKeys]));
     setRelatedExpandedKeys(newExpandedKeys);
 
-    // Set the selected key to the first child node's key if children exist
     if (autoSelectedKeys.length > 0) {
       setRelatedSelectedKeys(autoSelectedKeys);
       SetRelatesSelectedNode([selectedNode])
@@ -546,10 +367,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     console.log('Auto-selected related keys:', autoSelectedKeys);
 
     if (selectedNode.Type && selectedNode.EQID && IsSelected === true) {
-      // Call API for related device & shape/stencil
+      setRelatedSelectedKeys(autoSelectedKeys);
+
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
-      setRelatedSelectedKeys(autoSelectedKeys);
       SetRelatesSelectedNode([selectedNode])
     } else if (selectedNode.Type && selectedNode.EQID && IsSelected === false) {
 
@@ -645,16 +466,17 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       SetEqId(selectedNode.EqId)
     }
     else if (selectedNode.Type && selectedNode.EQID) {
+      setSelectedKeys([selectedNode.key]);
+
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
 
 
-      setSelectedKeys([selectedNode.key]);
       SetSelectedNode([selectedNode])
     }
 
     if (!selectedNode.Type && !selectedNode.EQID && !selectedNode.ShapeID) {
-      debugger
+    
       setPropertyData([])
       setSvgContent(null)
       setRelatedDevicesVisible(false)
@@ -685,10 +507,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
     console.log('Auto-selected Related keys:', selectedNodeRelated);
 
     if (selectedNodeRelated.EQID && selectedNodeRelated.Type) {
+      setRelatedSelectedKeys([selectedNodeRelated.key])
+
       await RelatedandLibraryProperty(selectedNodeRelated.EQID)
       await getStencilName(selectedNodeRelated.EQID)
 
-      setRelatedSelectedKeys([selectedNodeRelated.key])
       SetRelatesSelectedNode([selectedNodeRelated])
     } else if (selectedNodeRelated.ShapeID) {
 
@@ -781,7 +604,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       });
       const svgonDragstart = response.data.Data.SVGFile
 
-      await insertSvgContentIntoOffice(svgonDragstart, 'drag')
+      await insertSvgContentIntoOffice(svgonDragstart, 'drag', shapeCounter)
+      setShapeCounter(shapeCounter +1)
       return response;
     } catch (error) {
       console.error('API Error:', error);
@@ -794,23 +618,22 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
       height: '100vh',
       padding: '0 16px'
     }}>
-      <div
-      >
-        <Tabs
+      <div>
+         <Tabs
           value={tabValue}
           onChange={handleTabChange}
           TabIndicatorProps={{
             style: {
               display: 'none',
-              color: 'var(--font-color)'
+              color: 'var(--font-color)',
+              minHeight:'26px'
             }
           }}
           sx={{
-            minHeight: 'auto',  // Reduces the height of the Tabs container
-            padding: 0,         // Remove any padding around the Tabs
-            margin: 0,          // Remove any margin around the Tabs
-          }}
-        >
+            minHeight: '26px',  
+            padding: 0,         
+            margin: 0,          
+          }}>
           <Tab
             label="Result"
             disableRipple
@@ -819,10 +642,10 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
               fontFamily: '"Segoe UI", sans-serif',
               textTransform: 'none',
               color: 'var(--font-color)',
-              padding: '4px 8px',  // Adjust padding for smaller tabs
-              minWidth: 'auto',    // Prevent default minimum width of Tab
-            }}
-          />
+              padding: '4px 8px', 
+              minWidth: '',   
+              height:'10px'
+            }} />
           {relatedDevicesVisible && (
             <Tab
               label="Related"
@@ -832,8 +655,8 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
                 fontFamily: '"Segoe UI", sans-serif',
                 textTransform: 'none',
                 color: 'var(--font-color)',
-                padding: '4px 8px',  // Adjust padding for smaller tabs
-                minWidth: 'auto',    // Prevent default minimum width of Tab
+                padding: '4px 8px',  
+                minWidth: 'auto',    
               }}
             />
           )}
@@ -845,8 +668,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
             zIndex: (theme) => theme.zIndex.drawer + 1,
             backgroundColor: 'rgba(0, 0, 0, 0.5)',
           }}
-          open={isLoading}
-        >
+          open={isLoading}>
           <CircularProgress color="inherit" />
         </Backdrop>
 
@@ -877,7 +699,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata, handlep
 
           {tabValue === 1 && relatedDevicesVisible && (
             <>
-              {/* Related Tree Rendering */}
               <Tree
                 treeData={relatedTree}
                 switcherIcon={switcherIcon}

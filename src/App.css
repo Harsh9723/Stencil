@@ -44,7 +44,9 @@ font-family: 'Segoe UI', sans-serif;
   height:0 ; 
 }
 
-
+.css-c6jp11-MuiButtonBase-root-MuiMenuItem-root {
+  min-height: auto !important;
+}
 
 
 
@@ -122,6 +124,7 @@ font-family: 'Segoe UI', sans-serif;
   color: black !important; /* Set text color */
   width: 100%; /* Ensure full width selection */
   line-height: 0px;
+  min-height: 10px !important;
 }
 
 /* Ensure expand/collapse icons also match the selected node styles */
@@ -183,3 +186,13 @@ span.rc-tree-iconEle{
   font-size: 12px;
   font-family: 'Segoe UI', sans-serif;
 }
+.css-yp69yl-MuiButtonBase-root-MuiTab-root{
+
+  min-height: 26px !important
+}
+
+.css-1wy54b3-MuiButtonBase-root-MuiTab-root{
+  min-height: 26px !important
+
+}
+

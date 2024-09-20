@@ -5,6 +5,8 @@ import data from '../Links.json';
 
 function PreloadPage() {
   const [isLoading, setIsLoading] = useState(true);
+  const [bgSize, setBgSize] = useState('contain');
+  const [fontSize, setFontSize] = useState('25px'); // Default font size
 
   const Color = `${data.colortheme.split(',')[0]}80`;
 
@@ -31,10 +33,35 @@ function PreloadPage() {
 
   const handleclick = () => {
     window.open(data.logourl, '_blank');
-  }
+  };
 
   useTheme(data.colortheme);
-  
+
+  useEffect(() => {
+    const updateStyles = () => {
+      const width = window.innerWidth;
+
+      if (width < 600) {
+        setBgSize('100%');
+        setFontSize('20px'); 
+      } else if (width < 900) {
+        setBgSize('90%');
+        setFontSize('30px'); 
+      } else {
+        setBgSize('100%');
+        setFontSize('35px'); 
+      }
+    };
+
+    updateStyles();
+
+    window.addEventListener('resize', updateStyles);
+
+    return () => {
+      window.removeEventListener('resize', updateStyles);
+    };
+  }, []);
+
   if (!isLoading) {
     return null;
   }
@@ -44,7 +71,8 @@ function PreloadPage() {
       className="relative flex items-center justify-center h-screen w-screen"
       style={{
         backgroundImage: `url(${data.backdrop})`,
-        backgroundSize: 'contain', // Change this to 'contain' for responsiveness
+        backgroundSize: bgSize,
+        backgroundColor:'var(--bg-color)',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
@@ -52,7 +80,7 @@ function PreloadPage() {
       <div
         className="absolute inset-0"
         style={{
-          backgroundColor: Color,
+          backgroundColor: Color
         }}
       ></div>
 
@@ -64,7 +92,13 @@ function PreloadPage() {
       </div>
 
       <div className="relative text-center text-white">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{ color: 'white', marginTop: '10px', fontWeight:'bold', fontSize:'25px', fontFamily:'Segoe UI, sans-serif' }}>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{
+          color: 'white',
+          marginTop: '10px',
+          fontWeight: 'bold',
+          fontSize: fontSize, 
+          fontFamily: 'Segoe UI, sans-serif'
+        }}>
           Add-In for Stencils
         </h1>
       </div>

@@ -50,7 +50,7 @@ const StyledTableCellBody = styled(TableCell)({
   backgroundColor: '#778899',
   padding: '10px 16px',
   border: '1px solid #ffffff',
-  color: 'var(--font-color)',
+  color: 'var(--font-colo)',
   position: 'relative',
   textAlign: 'left',
   fontSize: '12px',
