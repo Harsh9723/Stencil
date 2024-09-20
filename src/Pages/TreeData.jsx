@@ -3,8 +3,6 @@ import Tree from 'rc-tree';
 import '../App.css';
 import 'rc-tree/assets/index.css';
 import { Tabs, Tab, } from '@mui/material';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import axios from 'axios';
 import { useTreeData } from '../Context/TreedataContext';
 import PropertyTable from '../Components/PropertyTable';
@@ -13,7 +11,7 @@ import Backdrop from '@mui/material/Backdrop';
 import SvgContent from '../Components/SvgContent.jsx';
 import BASE_URL from '../Config/Config.js';
 import { insertSvgContentIntoOffice } from '../Common/CommonFunction.jsx';
-import { handleSearch, transformToTreeData } from '../Common/CommonFunction.jsx';
+import { Search, transformToTreeData } from '../Common/CommonFunction.jsx';
 const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => {
 
   const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree,
@@ -24,8 +22,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
   const [selectednode, SetSelectedNode] = useState([])
   const [relatedExpandedKeys, setRelatedExpandedKeys] = useState([]);
   const [relatedSelectedKeys, setRelatedSelectedKeys] = useState([]);
-  const [relatedselectednode, SetRelatesSelectedNode] = useState([])
-  const [searchData, SetSearchData] = useState();
   const [tabValue, setTabValue] = useState(0);
   const [relatedDevicesVisible, setRelatedDevicesVisible] = useState(false);
   const [propertyData, setPropertyData] = useState([]);
@@ -107,7 +103,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
     if (isLeaf) {
       return null;
     }
-    return expanded ? <ExpandMoreIcon /> : <ChevronRightIcon />;
+    return expanded ? <img src="./assets/Icons/Down_128x128.svg" alt="" />: <img src="./assets/Icons/ArrowForwardIos_128x128.svg" alt="" />;
   };
   const generateUniqueKey = () => {
     return `visio_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
@@ -136,11 +132,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
         ShapeID: shape.ShapeID,
         EqId: eqId,
         icon: shape.Description.toLowerCase().includes('front') ? (
-          <img src='./assets/Front.png' alt="Front icon" />
+          <img src='./assets/Icons/Front.png' alt="Front icon" />
         ) : shape.Description.toLowerCase().includes('rear') ? (
-          <img src='./assets/Rear.png' alt="Rear icon" />
+          <img src='./assets/Icons/Rear.png' alt="Rear icon" />
         ) : shape.Description.toLowerCase().includes('top') ? (
-          <img src='./assets/TopView.png' alt="Top Icon" />
+          <img src='./assets/Icons/TopView.png' alt="Top Icon" />
         ) : null,
         isLeaf: true,
         children: [],
@@ -191,7 +187,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
             <span>Visio Stencil</span>
           </span>
         ),
-        icon: <img src='/assets/visio.png' alt="icon" />,
+        icon: <img src='/assets/Icons/visio.png' alt="icon" />,
         isLeaf: true,
         children: [],
         visioDownloadUrl: visioDownloadUrl,
@@ -339,7 +335,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       newExpandedKeys = newExpandedKeys.filter(key => key !== node.key);
       setRelatedExpandedKeys(newExpandedKeys);
       setRelatedSelectedKeys([node.key]);
-      SetRelatesSelectedNode([node])
 
       if (!node.EQID) {
         setPropertyData([]);
@@ -360,7 +355,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
 
     if (autoSelectedKeys.length > 0) {
       setRelatedSelectedKeys(autoSelectedKeys);
-      SetRelatesSelectedNode([selectedNode])
     }
 
     console.log('Selected Related Node:', selectedNode);
@@ -371,13 +365,11 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
 
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
-      SetRelatesSelectedNode([selectedNode])
     } else if (selectedNode.Type && selectedNode.EQID && IsSelected === false) {
 
       let result = await callApiforDeviceShapeStencilEqid(selectedNode, true);
       if (result && result.shapenodes?.length > 0) {
         setRelatedSelectedKeys([result.shapenodes[0].key]);
-        SetRelatesSelectedNode([result.shapenodes[0]])
         if (result.shapenodes[0].ShapeID) {
           callApiForGetDevicePreview(result.shapenodes[0].ShapeID);
         }
@@ -409,6 +401,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       if (node.EQID && node.Type) {
         await RelatedandLibraryProperty(node.EQID);
         await getStencilName(node.EQID);
+        setRelatedDevicesVisible(true)
       }
       return;
     }
@@ -459,19 +452,14 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       selectedNode.onClick();
       return;
     }
-
     if (selectedNode.ShapeID && selectedNode.EqId) {
       await callApiForGetDevicePreview(selectedNode.ShapeID);
-
       SetEqId(selectedNode.EqId)
     }
     else if (selectedNode.Type && selectedNode.EQID) {
       setSelectedKeys([selectedNode.key]);
-
       await RelatedandLibraryProperty(selectedNode.EQID);
       await getStencilName(selectedNode.EQID);
-
-
       SetSelectedNode([selectedNode])
     }
 
@@ -480,7 +468,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       setPropertyData([])
       setSvgContent(null)
       setRelatedDevicesVisible(false)
-
     }
     console.log('Selected Keys:', selectedKeys);
   };
@@ -497,7 +484,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
     console.log('relatedselected node info', selectedNodeRelated)
 
     setRelatedSelectedKeys([selectedNodeRelated.key]);
-    SetRelatesSelectedNode([selectedNodeRelated])
 
     if (selectedNodeRelated.key.includes('visio') && selectedNodeRelated.visioDownloadUrl) {
       selectedNodeRelated.onClick();
@@ -512,7 +498,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       await RelatedandLibraryProperty(selectedNodeRelated.EQID)
       await getStencilName(selectedNodeRelated.EQID)
 
-      SetRelatesSelectedNode([selectedNodeRelated])
     } else if (selectedNodeRelated.ShapeID) {
 
       await callApiForGetDevicePreview(selectedNodeRelated.ShapeID)
@@ -532,14 +517,13 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       setIsLoading(true);
       setPropertyData([]);
       setSvgContent(null);
-      handleSearch({ Eqid, related: true }, onRelatedSuccess);
+      Search({ Eqid, related: true }, onRelatedSuccess);
       setIsLoading(false);
     }
 
     if (newValue === 0) {
       setSvgContent(null);
       setRelatedSelectedKeys([]);
-      SetRelatesSelectedNode([])
       setSelectedKeys(selectedKeys);
       SetSelectedNode(selectednode)
       setExpandedKeys(expandedKeys);
@@ -566,26 +550,20 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       setRelatedTree(RelatedTree)
       const { expandedKeys, selectedKeys, selectedNode, IsSelected } = await autoExpandDefaultNodesOfTree(RelatedTree);
 
-
       setRelatedExpandedKeys(expandedKeys);
       setRelatedSelectedKeys(selectedKeys);
-      SetRelatesSelectedNode(selectedNode)
       if (selectedNode.Type && selectedNode.EQID && IsSelected == false) {
         let resultRelated = await callApiforDeviceShapeStencilEqid(selectedNode, true)
 
         if (resultRelated && resultRelated.shapenodes?.length > 0) {
           setRelatedSelectedKeys([resultRelated.shapenodes[0].key])
-          SetRelatesSelectedNode([resultRelated.shapenodes[0]])
           if (resultRelated && resultRelated.shapenodes[0].ShapeID) {
             callApiForGetDevicePreview(resultRelated.shapenodes[0].ShapeID)
-          }
-        }
+          }}
       } else if (selectedNode.Type && selectedNode.EQID && IsSelected == true) {
         RelatedandLibraryProperty(selectedNode.EQID)
         getStencilName(selectedNode.EQID)
         setRelatedSelectedKeys(selectedKeys);
-        SetRelatesSelectedNode(selectedNode)
-
       }
     } catch (error) {
       console.error('Error handling related tree data:', error);
@@ -661,7 +639,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
             />
           )}
         </Tabs>
-
         <Backdrop
           sx={{
             color: '#fff',
@@ -696,7 +673,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
               )}
             </>
           )}
-
           {tabValue === 1 && relatedDevicesVisible && (
             <>
               <Tree
@@ -713,7 +689,7 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
                 onDragStart={handleDragStart}
               />
 
-              {Array.isArray(propertyData) && propertyData.length > 0 ? (
+              {(propertyData) && propertyData.length > 0 ? (
                 <PropertyTable propertyData={propertyData} stencilResponse={stencilResponse} />
               ) : (
                 svgContent && svgContent.length > 0 && <SvgContent svgContent={svgContent} />

@@ -39,7 +39,7 @@ const API_URL = `${BASE_URL}`;
  * @param {Function} onError 
  */
 
-export const handleSearch = async (searchParams, onSuccess, onError) => {
+export const Search = async (searchParams, onSuccess, onError) => {
   const { keyword,kwdSearchType, related, Eqid, selectedManufacturer, setSnackbarMessage, setSnackbarOpen, selectedEqType, selectedProductLine, selectedProductNumber, selectedDtManufacturers, } = searchParams;
   let searchType = 'Solution';
   let paramXml = '';
@@ -109,7 +109,7 @@ export const transformToTreeData = (result,) => {
     {
       title: `Search Results [${result.length}]`,
       key: `search-results-${Date.now()}`,
-      icon: <img src="./assets/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
+      icon: <img src="./assets/Icons/main_node.png" alt="Search Results Icon" style={{ width: 16, height: 16 }} />,
       children: [],
     },
   ];
@@ -136,7 +136,7 @@ export const transformToTreeData = (result,) => {
       manufacturerNode = {
         title: Manufacturer,
         key: MfgAcronym,
-        icon: <img src="./assets/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
+        icon: <img src="./assets/Icons/manufacturer.png" alt="manufacturer" style={{ width: 16, height: 16 }} />,
         children: [],
       };
       searchResultsNode.children.push(manufacturerNode);
@@ -166,7 +166,7 @@ export const transformToTreeData = (result,) => {
       prodLineNode = {
         title: MFGPRODLINE,
         key: prodLineKey,
-        icon: <img src="./assets/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
+        icon: <img src="./assets/Icons/product_line.png" alt="product line" style={{ width: 16, height: 16 }} />,
         children: [],
 
       };
@@ -188,7 +188,7 @@ export const transformToTreeData = (result,) => {
           </span>
         ),
         key: productNumberKey,
-        icon: <img src="./assets/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
+        icon: <img src="./assets/Icons/product_no.gif" alt="product no" style={{ width: 16, height: 16 }} />,
         children: [],
         EQID: productNumberKey,
         Type: 'ProductNumber',

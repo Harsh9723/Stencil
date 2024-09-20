@@ -3,7 +3,6 @@ import { styled } from '@mui/system';
 import { Card, } from '@mui/material';
 import {insertSvgContentIntoOffice} from '../Common/CommonFunction'
 
-// Styled component for the SVG card
 const StyledSvgCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
   marginTop: '20px',
@@ -42,6 +41,8 @@ const SvgWrapper = styled('div')(({ theme }) => ({
 }));
 
 const SvgContent = ({ svgContent }) => {
+
+
   useEffect(() => {
     Office.onReady((info) => {
       if (info.host === Office.HostType.Word) {

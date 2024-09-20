@@ -12,13 +12,13 @@ const useTheme = (colortheme) => {
     };
 
     const rgb = hex2rgb(hexColor);
-    const fontColor = (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 150 ? "#222" : "#fff"; // Correct calculation
+    const fontColor = (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) > 150 ? "#222" : "#fff"; 
 
     document.documentElement.style.setProperty('--font-color', fontColor);
     document.documentElement.style.setProperty('--bg-color', hexColor);
-    document.documentElement.style.setProperty('--black-font', fontColor === "#222" ? "true" : "false"); // Use a valid string value for boolean-like property
+    document.documentElement.style.setProperty('--black-font', fontColor === "#000000" ? "true" : "false"); 
 
-    console.log(`Font color set to ${fontColor} based on hex: ${hexColor} and RGB: (${rgb.r}, ${rgb.g}, ${rgb.b})`); // Correct variable reference
+    console.log(`Font color set to ${fontColor} based on hex: ${hexColor} and RGB: (${rgb.r}, ${rgb.g}, ${rgb.b})`); 
   }, [colortheme]);
 };
 

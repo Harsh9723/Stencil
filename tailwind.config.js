@@ -5,15 +5,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        sans: ['Segoe UI', 'sans-serif'],
-      },
-      fontSize:{
-        base:['12px', '11.5px']
-      }
-
-    },
+    extend: {},
   },
   plugins: [],
 }

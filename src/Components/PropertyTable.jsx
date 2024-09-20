@@ -7,11 +7,11 @@ import {
   TableContainer,
   TableRow,
   Paper,
-  IconButton,
   Card,
   CardContent,
 } from '@mui/material';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import { useState } from 'react';
+import { Snackbar } from '@mui/material';
 
 const StyledPropertyCard = styled(Card)(({ theme }) => ({
   backgroundColor: '#778899',
@@ -78,63 +78,96 @@ const StyledTableRow = styled(TableRow)({
 });
 
 const PropertyTable = ({ propertyData = [], stencilResponse = '' }) => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     console.log('Copied to clipboard:', text);
+    setSnackbarOpen(true);
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
- 
+
 
   return (
-    <StyledPropertyCard>
-      <CardContent>
-        <StyledTableContainer component={Paper}>
-          <Table>
-            <TableBody>
-              {propertyData
-                .filter((item) => item.GroupName === 'Basic')
-                 .map((item, index) => (
-                  <StyledTableRow key={index}>
-                    <StyledTableCellHeader component="th" scope="row">
-                      {item.pLabel}
-                    </StyledTableCellHeader>
-                    <StyledTableCellBody>
-                      {item.pValue}
-                      <CopyIconWrapper className="copy-icon">
-                        <IconButton
-                          size="small"
-                          onClick={() => copyToClipboard(item.pValue)}
-                          sx={{ color: '#ffffff' }}
-                        >
-                          <ContentCopyIcon fontSize="small" />
-                        </IconButton>
-                      </CopyIconWrapper>
-                    </StyledTableCellBody>
-                  </StyledTableRow>
-                ))}
-              <StyledTableRow>
-                <StyledTableCellHeader component="th" scope="row">
-                  Stencil
-                </StyledTableCellHeader>
-                <StyledTableCellBody>
-                  {stencilResponse}
-                  <CopyIconWrapper className="copy-icon">
-                    <IconButton
-                      size="small"
-                      onClick={() => copyToClipboard(stencilResponse)}
-                      sx={{ color: '#ffffff' }}
-                    >
-                      <ContentCopyIcon fontSize="small" />
-                    </IconButton>
-                  </CopyIconWrapper>
-                </StyledTableCellBody>
-              </StyledTableRow>
-            </TableBody>
-          </Table>
-        </StyledTableContainer>
-      </CardContent>
+    <>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        message={
+          <span style={{ color: 'var(--black-font)' }}>
+            Content copied to clipboard
+          </span>
+        }
+        ContentProps={{
+          style: {
+            backgroundColor: 'var(--font-color)', // Background color
+          },
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }} 
+      />
 
-    </StyledPropertyCard>
+
+
+      <StyledPropertyCard>
+        <CardContent>
+          <StyledTableContainer component={Paper}>
+            <Table>
+              <TableBody>
+                {propertyData
+                  .filter((item) => item.GroupName === 'Basic')
+                  .map((item, index) => (
+                    <StyledTableRow key={index}>
+                      <StyledTableCellHeader component="th" scope="row">
+                        {item.pLabel}
+                      </StyledTableCellHeader>
+                      <StyledTableCellBody>
+                        {item.pValue}
+                        <CopyIconWrapper className="copy-icon" onClick={() => copyToClipboard(item.pValue)}>
+                          <img
+                            src="/assets/Icons/Copy.svg"
+                            alt="Copy Icon"
+                            style={{
+                              width: '16px',
+                              height: '16px',
+                              cursor: 'pointer',
+                            }}
+                          />
+                        </CopyIconWrapper>
+
+                      </StyledTableCellBody>
+                    </StyledTableRow>
+                  ))}
+                <StyledTableRow>
+                  <StyledTableCellHeader component="th" scope="row">
+                    Stencil
+                  </StyledTableCellHeader>
+                  <StyledTableCellBody>
+                    {stencilResponse}
+                    <CopyIconWrapper className="copy-icon" onClick={() => copyToClipboard(stencilResponse)}>
+                      <img
+                        src="/assets/Icons/Copy.svg"
+                        alt="Copy Icon"
+                        style={{
+                          width: '16px',
+                          height: '16px',
+                          cursor: 'pointer',
+                        }}
+                      />
+                    </CopyIconWrapper>
+
+                  </StyledTableCellBody>
+                </StyledTableRow>
+              </TableBody>
+            </Table>
+          </StyledTableContainer>
+        </CardContent>
+
+      </StyledPropertyCard>
+    </>
+
   );
 };
 

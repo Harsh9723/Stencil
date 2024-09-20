@@ -10,27 +10,6 @@ function PreloadPage() {
 
   const Color = `${data.colortheme.split(',')[0]}80`;
 
-  const getThemeClass = (color) => {
-    switch (color) {
-      case '#1F85DE':
-        return 'theme-1';
-      case '#491313':
-        return 'theme-2';
-      case '#222222':
-        return 'theme-3';
-      case '#892C0F':
-        return 'theme-4';
-      case '#10431d':
-        return 'theme-5';
-      case '#102857':
-        return 'theme-6';
-      default:
-        return '';
-    }
-  };
-
-  const themeClass = getThemeClass(Color);
-
   const handleclick = () => {
     window.open(data.logourl, '_blank');
   };
@@ -43,13 +22,13 @@ function PreloadPage() {
 
       if (width < 600) {
         setBgSize('100%');
-        setFontSize('20px'); 
+        setFontSize('20px');
       } else if (width < 900) {
         setBgSize('90%');
-        setFontSize('30px'); 
+        setFontSize('30px');
       } else {
         setBgSize('100%');
-        setFontSize('35px'); 
+        setFontSize('35px');
       }
     };
 
@@ -68,41 +47,58 @@ function PreloadPage() {
 
   return (
     <div
-      className="relative flex items-center justify-center h-screen w-screen"
       style={{
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        width: '100vw',
         backgroundImage: `url(${data.backdrop})`,
         backgroundSize: bgSize,
-        backgroundColor:'var(--bg-color)',
+        backgroundColor: 'var(--bg-color)',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
     >
       <div
-        className="absolute inset-0"
         style={{
-          backgroundColor: Color
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: Color,
         }}
       ></div>
 
-      <div 
-        className="absolute top-4 left-12 cursor-pointer"
+      <div
+        style={{
+          position: 'absolute',
+          top: '1rem',
+          left: '3rem',
+          cursor: 'pointer',
+        }}
         onClick={handleclick}
       >
-        <img src={data.logoicon} alt={data.logoalt} className="h-14"/>
+        <img src={data.logoicon} alt={data.logoalt} style={{ height: '3.5rem' }} />
       </div>
 
-      <div className="relative text-center text-white">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl" style={{
-          color: 'white',
-          marginTop: '10px',
-          fontWeight: 'bold',
-          fontSize: fontSize, 
-          fontFamily: 'Segoe UI, sans-serif'
-        }}>
+      <div style={{ position: 'relative', textAlign: 'center', color: 'white' }}>
+        <h1
+          style={{
+            color: 'white',
+            marginTop: '10px',
+            fontWeight: 'bold',
+            fontSize: fontSize,
+            fontFamily: 'Segoe UI, sans-serif',
+          }}
+        >
           Add-In for Stencils
         </h1>
       </div>
     </div>
+
   );
 }
 

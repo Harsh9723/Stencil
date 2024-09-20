@@ -7,10 +7,6 @@ const Setting = () => {
 
   useTheme(data.colortheme);
 
-  const handleClick = () => {
-    window.open(data.logourl, '_blank');
-  };
-
   const CustomTypography = ({ children, ...props }) => (
     <Typography variant="body2" sx={{ fontSize: '12px', fontFamily: ['Segoe UI', 'sans-serif'], }} {...props}>
       {children}
@@ -68,7 +64,7 @@ const Setting = () => {
                 borderColor: 'var(--font-color)',
               },
               '& .MuiInputBase-input': {
-                padding: '12px 12px', // Adjust padding here to decrease height
+                padding: '12px 12px', 
               },
             },
           }}

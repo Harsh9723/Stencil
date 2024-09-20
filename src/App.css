@@ -196,3 +196,6 @@ span.rc-tree-iconEle{
 
 }
 
+.svg path {
+  fill: var(--font-color); /* This sets the `currentColor` of the SVG */
+}

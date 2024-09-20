@@ -1,9 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Box, TextField, Typography, IconButton, Grid, CircularProgress, Snackbar } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import Backdrop from '@mui/material/Backdrop';
 import data from '../Links.json';
-import SettingsIcon from '@mui/icons-material/Settings';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -15,9 +13,8 @@ import InputLabel from '@mui/material/InputLabel';
 import useTheme from '../Components/Theme';
 import axios from 'axios';
 import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, FormGroup, Checkbox, Button } from '@mui/material';
-import { handleSearch,transformToTreeData } from '../Common/CommonFunction';
+import { Search, transformToTreeData } from '../Common/CommonFunction';
 import Treedata from './TreeData';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Setting from './Setting';
 import BASE_URL from '../Config/Config';
 
@@ -40,7 +37,6 @@ const SearchComponent = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [treeData, setTreeData] = useState([]);
   const [resultData, setResultData] = useState([])
-  const [dtresultdata, SetDtresultData] = useState([])
   const [showTreeComponent, setShowTreeComponent] = useState(false)
   const [kwdSearchType, setKwdSearchType] = useState('0');
   const [showSetting, setShowSetting] = useState(false)
@@ -67,7 +63,6 @@ const SearchComponent = () => {
       console.log('Processing dtResultdata:', dtResultdata);
 
       // Update state with dtResultdata
-      SetDtresultData(dtResultdata);
       setDtManufacturers(dtResultdata);
       setIsDialogOpen(true);
       return;
@@ -97,12 +92,10 @@ const SearchComponent = () => {
     }
   };
 
-
   const onError = (message) => {
     setSnackbarMessage(message);
     setSnackbarOpen(true);
   };
-
 
   useEffect(() => {
     const fetchManufacturers = async () => {
@@ -314,16 +307,13 @@ const SearchComponent = () => {
     setSnackbarOpen(false);
   }
   const handlesearch = () => {
-    handleSearch(searchParams, onSuccess, onError);
+    Search(searchParams, onSuccess, onError);
   };
-
 
   const handleBackClick = () => {
     setShowTreeComponent(false);
   };
   return (
-
-
     <div
       style={{
         backgroundColor: 'var(--bg-color)',
@@ -339,7 +329,6 @@ const SearchComponent = () => {
         boxSizing: 'border-box',
         padding: '9px',
         width: { xs: '100%', sm: '90%', md: '100%', lg: '100%' },
-
       }}
     >
       <Backdrop
@@ -380,8 +369,7 @@ const SearchComponent = () => {
             sx={{
               fontSize: { xs: '10px', sm: '12px' },
               fontFamily: '"Segoe UI", sans-serif'
-            }}
-          >
+            }} >
             <FormGroup
               sx={{
                 fontSize: { xs: '10px', sm: '12px' },
@@ -445,12 +433,12 @@ const SearchComponent = () => {
             }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <>
+                <img src="./assets/Icons/NetZoom_Settings_128x128.svg" alt="" title='Setting' style={{ padding: 0, maxWidth: '20px', cursor: 'pointer', color: 'var(--font-color)' }} onClick={handleSettingClick} />
+
                 <IconButton
                   title="Setting"
                   sx={{ color: 'var(--font-color)', padding: 0 }}
-                  onClick={handleSettingClick}
-                >
-                  <SettingsIcon />
+                  onClick={handleSettingClick}>
                 </IconButton>
 
                 <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
@@ -461,15 +449,11 @@ const SearchComponent = () => {
                     cursor: 'pointer',
                     textDecoration: 'underline',
                     whiteSpace: 'nowrap',
-                    fontSize: '12px',
-                  }}
-                  onClick={handleClick}
-                >
+                    fontSize: '12px',}}
+                  onClick={handleClick} >
                   VisioStencils.com
                 </Typography>
-
               </>
-
             </Box>
           </Box>
           <Box
@@ -499,7 +483,7 @@ const SearchComponent = () => {
                       style: {
                         color: 'var(--font-color)',
                         fontSize: '12px',
-                        padding: '10px', 
+                        padding: '10px',
                       },
                     }}
                     onKeyPress={(event) => {
@@ -512,7 +496,7 @@ const SearchComponent = () => {
                       '.MuiOutlinedInput-root': {
                         '& fieldset': {
                           borderColor: 'var(--font-color)',
-                          padding: '10px', // Adjust fieldset padding
+                          padding: '10px', 
                         },
                         '&:hover fieldset': {
                           borderColor: 'var(--font-color)',
@@ -521,19 +505,15 @@ const SearchComponent = () => {
                           borderColor: 'var(--font-color)',
                         },
                         '& .MuiInputBase-input': {
-                          padding: '10px', 
-                          boxSizing: 'border-box', 
+                          padding: '10px',
+                          boxSizing: 'border-box',
                         },
                       },
                       fontSize: '12px',
                       color: 'var(--font-color)',
                     }}
                   />
-
                 </div>
-
-
-
 
                 {keyword ? (
                   <Snackbar
@@ -549,8 +529,8 @@ const SearchComponent = () => {
                         <Button color="inherit" size="small" onClick={handlebuttonclick}>
                           OK
                         </Button>
-                      }
-                    >
+                      }>
+                      
                       {snackbarMessage}
                     </Alert>
                   </Snackbar>
@@ -567,18 +547,22 @@ const SearchComponent = () => {
                 )}
               </div>
 
-              <div style={{ paddingLeft: '8px' }}>
-                <IconButton
-                  sx={{ color: 'var(--font-color)' }}
-                  size="small"
+              <div style={{ paddingLeft: '0px' }}>
+                <img
+                  src="./assets/Icons/Search_128x128.svg"
+                  alt="Search"
                   onClick={handlesearch}
-                >
-                  <SearchIcon />
-                </IconButton>
+                  style={{
+                    cursor: 'pointer',
+                    width: '40px',
+                    height: '20px',
+                    color: 'var(font-color)',
+                  }}
+                />
               </div>
             </div>
 
-            <div style={{ minHeight: '30px' }}> {/* Adjust the minHeight value as needed */}
+            <div style={{ minHeight: '30px' }}>
               <FormControl component="fieldset" sx={{ width: '100%' }}>
                 <RadioGroup
                   row
@@ -627,13 +611,13 @@ const SearchComponent = () => {
                       sx={{
                         color: 'var(--font-color)',
                         fontSize: '12px',
-                        height: 'auto',  
+                        height: 'auto',
                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                           borderColor: 'var(--font-color)',
                         },
                         '& .MuiInputBase-input': {
                           fontSize: '12px',
-                          padding: '12px', 
+                          padding: '12px',
                         },
                       }}
                     />
@@ -683,13 +667,13 @@ const SearchComponent = () => {
                     sx={{
                       color: 'var(--font-color)',
                       fontSize: '12px',
-                      height: 'auto',  
+                      height: 'auto',
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: 'var(--font-color)',
                       },
                       '& .MuiInputBase-input': {
                         fontSize: '12px',
-                        padding: '12px',  
+                        padding: '12px',
                       },
                     }}
                   />}
@@ -699,12 +683,9 @@ const SearchComponent = () => {
                     if (!selected) {
                       return <h1>All</h1>;
                     }
-                    console.log('abc', selected)
-
                     return selected;
-                  }}
+                  }}>
 
-                >
                   {eqTypes.length > 0 && (
                     <MenuItem value="" sx={{ fontSize: '12px' }}>
                       <h1>All</h1>
@@ -742,7 +723,7 @@ const SearchComponent = () => {
                     sx={{
                       color: 'var(--font-color)',
                       fontSize: '12px',
-                      height: 'auto',  
+                      height: 'auto',
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: 'var(--font-color)',
                       },
@@ -751,14 +732,12 @@ const SearchComponent = () => {
                         padding: '12px',
                       },
                     }}
-
-                  />}
+                    />}
 
                   renderValue={(selected) => {
                     if (!selected) {
                       return <h1>All</h1>
                     }
-                    console.log('productline', selected)
                     return selected
                   }}
                 >
@@ -781,7 +760,6 @@ const SearchComponent = () => {
               </FormControl>
             </div>
             <div>
-
               <FormControl fullWidth variant="outlined" sx={{ mt: 2, height: 'auto' }}>
                 <InputLabel
                   sx={{ color: 'var(--font-color)', fontSize: '12px' }}
@@ -798,13 +776,14 @@ const SearchComponent = () => {
                     sx={{
                       color: 'var(--font-color)',
                       fontSize: '12px',
-                      height: '36px',
-                      padding:'12px',
+                      height: 'auto',
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: 'var(--font-color)',
                       },
                       '& .MuiInputBase-input': {
                         fontSize: '12px',
+                        padding: '12px',
+
                       },
                     }}
                   />}
@@ -812,7 +791,6 @@ const SearchComponent = () => {
                     if (!Pnumberselected) {
                       return <h1>All</h1>
                     }
-                    console.log('pnumberselected', Pnumberselected)
                     return Pnumberselected
                   }}
                 >
@@ -862,11 +840,20 @@ const SearchComponent = () => {
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', }}>
-              <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={backfromsetting}>
-                <ArrowBackIcon />
-              </IconButton>
+              <img
+                src="./assets/Icons/Left_128x128.svg"
+                alt="Back"
+                onClick={backfromsetting}
+                title='Back'
+                style={{
+                  width: '18px',
+                  cursor: 'pointer',
+                  height: '20px',
+                  marginRight: '4px'
+                }}
+              />
 
-              <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
+              <Typography sx={{ marginLeft: '6px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
               <Typography
                 sx={{
                   marginLeft: '8px',
@@ -896,9 +883,18 @@ const SearchComponent = () => {
           {showTreeComponent && treeData.length > 0 ? (
             <>
               <Box sx={{ display: 'flex', alignItems: 'center', }}>
-                <IconButton sx={{ color: 'var(--font-color)', padding: 0 }} title='Back' onClick={handleBackClick}>
-                  <ArrowBackIcon />
-                </IconButton>
+                <img
+                  src="./assets/Icons/Left_128x128.svg"
+                  alt="Back"
+                  onClick={handleBackClick}
+                  title='Back'
+                  style={{
+                    width: '18px',
+                    cursor: 'pointer',
+                    height: '20px',
+                    marginRight: '4px'
+                  }}
+                />
 
                 <Typography sx={{ marginLeft: '8px', whiteSpace: 'nowrap', fontSize: '12px' }}>Visit</Typography>
                 <Typography
