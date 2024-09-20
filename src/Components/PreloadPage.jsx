@@ -6,7 +6,7 @@ import data from '../Links.json';
 function PreloadPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [bgSize, setBgSize] = useState('contain');
-  const [fontSize, setFontSize] = useState('25px'); // Default font size
+  const [fontSize, setFontSize] = useState('25px'); 
 
   const Color = `${data.colortheme.split(',')[0]}80`;
 
