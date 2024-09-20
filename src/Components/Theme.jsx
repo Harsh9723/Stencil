@@ -16,10 +16,10 @@ const useTheme = (colortheme) => {
 
     document.documentElement.style.setProperty('--font-color', fontColor);
     document.documentElement.style.setProperty('--bg-color', hexColor);
-    document.documentElement.style.setProperty('--black-font', fontColor === "#000000" ? "true" : "false"); 
+    document.documentElement.style.setProperty('--black-font', fontColor === "#000000" ? "#ffff" : "#000000"); 
 
     console.log(`Font color set to ${fontColor} based on hex: ${hexColor} and RGB: (${rgb.r}, ${rgb.g}, ${rgb.b})`); 
   }, [colortheme]);
 };
 
-export default useTheme;
+export default useTheme

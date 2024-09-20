@@ -12,7 +12,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import InputLabel from '@mui/material/InputLabel';
 import useTheme from '../Components/Theme';
 import axios from 'axios';
-import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, ListItem, FormGroup, Checkbox, Button } from '@mui/material';
+import { Alert, Dialog, DialogActions, DialogContent, DialogTitle,  FormGroup, Checkbox, Button } from '@mui/material';
 import { Search, transformToTreeData } from '../Common/CommonFunction';
 import Treedata from './TreeData';
 import Setting from './Setting';
@@ -58,7 +58,6 @@ const SearchComponent = () => {
   };
 
   const onSuccess = (resultData, dtResultdata) => {
-    debugger
     if (dtResultdata && dtResultdata.length > 0) {
       console.log('Processing dtResultdata:', dtResultdata);
 
@@ -909,7 +908,7 @@ const SearchComponent = () => {
                   VisioStencils.com
                 </Typography>
               </Box>
-              <Treedata treeData={treeData} searchResult={resultData} />
+              <Treedata treeData={treeData} />
             </>
           ) : (
             <div>No data available for the tree.</div>

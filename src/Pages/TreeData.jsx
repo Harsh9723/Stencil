@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState,} from 'react';
 import Tree from 'rc-tree';
 import '../App.css';
 import 'rc-tree/assets/index.css';
@@ -12,7 +12,7 @@ import SvgContent from '../Components/SvgContent.jsx';
 import BASE_URL from '../Config/Config.js';
 import { insertSvgContentIntoOffice } from '../Common/CommonFunction.jsx';
 import { Search, transformToTreeData } from '../Common/CommonFunction.jsx';
-const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => {
+const Treedata = ({ treeData: initialTreeData,}) => {
 
   const { treeData, relatedTree, setRelatedTree, setTreeData, addLeafNode, addLeafNodeToRelatedTree,
   } = useTreeData();
@@ -401,7 +401,6 @@ const Treedata = ({ treeData: initialTreeData, searchResult: searchdata,  }) => 
       if (node.EQID && node.Type) {
         await RelatedandLibraryProperty(node.EQID);
         await getStencilName(node.EQID);
-        setRelatedDevicesVisible(true)
       }
       return;
     }
